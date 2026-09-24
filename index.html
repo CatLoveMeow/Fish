@@ -868,12 +868,12 @@
         padding: 8px 18px;
       }
 
-      /* Hero */
+      /* Hero - fix the massive gap */
       .hero {
-        padding: 120px 0 60px;
+        padding: 80px 0 40px;
       }
       .hero-content {
-        margin: 60px auto 0;
+        margin: 20px auto 0;
         text-align: center;
         padding: 0 20px;
         max-width: 100%;
@@ -883,9 +883,14 @@
         gap: 16px;
         flex-direction: column;
         align-items: center;
+        margin-top: 28px;
       }
       .hero-title {
         font-size: clamp(2.2rem, 10vw, 3.5rem);
+      }
+      .hero p.lede {
+        font-size: 0.95rem;
+        max-width: 100%;
       }
 
       /* Wrap padding */
@@ -893,8 +898,20 @@
         padding: 0 20px;
       }
 
-      /* Parallax hidden on mobile for performance */
-      .parallax-container {
+      /* Show static image parallax on mobile, hide only video ones */
+      .parallax-layer video {
+        display: none;
+      }
+      /* Keep the decorative images visible but smaller */
+      .parallax-layer {
+        opacity: 0.4;
+      }
+      .parallax-layer img {
+        max-width: 120px;
+      }
+      /* But hide the very large positioned ones that overflow */
+      .p-earth, .p-octo, .p-dogdance, .p-tentacle, .p-drink,
+      .p-car, .p-small, .p-smallR, .p-moving-octo {
         display: none;
       }
     }
