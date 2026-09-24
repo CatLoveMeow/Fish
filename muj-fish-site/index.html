@@ -1,0 +1,1811 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MUJ FISH — ASTRONOMICALLY CREATIVE SLCM</title>
+  <meta name="description"
+    content="MUJ FISH adds attendance math, CGPA forecasting and sorted dashboards to the MUJ SLCM portal. Local, free, open source.">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐠</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Oi&family=Ultra&family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #111111;
+      --bg-card: rgba(255, 255, 255, 0.03);
+      --bg-card-hover: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.1);
+      --border-hover: rgba(255, 255, 255, 0.2);
+      --coral: #ff4747;
+      --coral-hover: #ff2e2e;
+      --yellow: #eada4f;
+      --green: #39FF14;
+      --text: #ffffff;
+      --text-dim: #A0AAB8;
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      margin: 0;
+      background: #050505;
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .spline-container iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* --- Background only: soft moving glows + stars (fixed, no layout impact) --- */
+    .halo {
+      position: fixed;
+      inset: -20%;
+      width: 140%;
+      height: 140%;
+      z-index: -3;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 45% 40% at 18% 55%, rgba(180, 70, 40, 0.45) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 35% at 82% 18%, rgba(60, 140, 180, 0.4) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 30% at 70% 75%, rgba(120, 50, 40, 0.22) 0%, transparent 70%),
+        radial-gradient(ellipse 30% 28% at 40% 20%, rgba(40, 90, 140, 0.18) 0%, transparent 70%);
+      transform: translate3d(0, 0, 0);
+      animation: glowDrift 55s ease-in-out infinite alternate;
+    }
+
+    .halo-2 {
+      position: fixed;
+      inset: -25%;
+      width: 150%;
+      height: 150%;
+      z-index: -3;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 38% 32% at 70% 40%, rgba(50, 120, 160, 0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 42% 38% at 25% 30%, rgba(200, 90, 45, 0.28) 0%, transparent 70%);
+      transform: translate3d(0, 0, 0);
+      animation: glowDrift2 70s ease-in-out infinite alternate;
+      opacity: 0.85;
+    }
+
+    @keyframes glowDrift {
+      0% {
+        transform: translate3d(-3%, 2%, 0) scale(1);
+      }
+
+      50% {
+        transform: translate3d(4%, -3%, 0) scale(1.05);
+      }
+
+      100% {
+        transform: translate3d(2%, 4%, 0) scale(1.02);
+      }
+    }
+
+    @keyframes glowDrift2 {
+      0% {
+        transform: translate3d(3%, -2%, 0) scale(1.03);
+      }
+
+      50% {
+        transform: translate3d(-4%, 3%, 0) scale(1);
+      }
+
+      100% {
+        transform: translate3d(-2%, -4%, 0) scale(1.06);
+      }
+    }
+
+    .bg-stars {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-stars::before,
+    .bg-stars::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow:
+        80px 120px 0 0 rgba(255, 255, 255, 0.55),
+        220px 40px 0 0 rgba(255, 255, 255, 0.35),
+        400px 280px 0 1px rgba(255, 255, 255, 0.7),
+        560px 90px 0 0 rgba(255, 255, 255, 0.4),
+        720px 340px 0 0 rgba(255, 255, 255, 0.5),
+        900px 160px 0 1px rgba(255, 255, 255, 0.75),
+        1100px 420px 0 0 rgba(255, 255, 255, 0.3),
+        1300px 80px 0 0 rgba(255, 255, 255, 0.55),
+        150px 480px 0 0 rgba(255, 255, 255, 0.45),
+        340px 620px 0 1px rgba(255, 255, 255, 0.65),
+        520px 520px 0 0 rgba(255, 255, 255, 0.35),
+        680px 700px 0 0 rgba(255, 255, 255, 0.5),
+        860px 580px 0 0 rgba(255, 255, 255, 0.4),
+        1040px 740px 0 1px rgba(255, 255, 255, 0.7),
+        1220px 600px 0 0 rgba(255, 255, 255, 0.3),
+        1400px 500px 0 0 rgba(255, 255, 255, 0.55),
+        180px 860px 0 0 rgba(255, 255, 255, 0.4),
+        460px 940px 0 1px rgba(255, 255, 255, 0.6),
+        780px 880px 0 0 rgba(255, 255, 255, 0.35),
+        1120px 980px 0 0 rgba(255, 255, 255, 0.5),
+        300px 200px 0 0 rgba(255, 255, 255, 0.25),
+        980px 300px 0 0 rgba(255, 255, 255, 0.45),
+        60px 700px 0 0 rgba(255, 255, 255, 0.3),
+        1350px 250px 0 1px rgba(255, 255, 255, 0.65),
+        600px 150px 0 0 rgba(255, 255, 255, 0.4);
+      animation: starDrift 180s linear infinite;
+      opacity: 0.85;
+    }
+
+    .bg-stars::after {
+      width: 3px;
+      height: 3px;
+      box-shadow:
+        120px 300px 0 1px rgba(255, 255, 255, 0.8),
+        480px 180px 0 0 rgba(255, 255, 255, 0.5),
+        820px 450px 0 1px rgba(255, 255, 255, 0.9),
+        1180px 120px 0 0 rgba(255, 255, 255, 0.45),
+        250px 750px 0 1px rgba(255, 255, 255, 0.75),
+        700px 820px 0 0 rgba(255, 255, 255, 0.4),
+        1000px 650px 0 1px rgba(255, 255, 255, 0.85),
+        40px 450px 0 0 rgba(255, 255, 255, 0.35),
+        1450px 780px 0 0 rgba(255, 255, 255, 0.55),
+        550px 50px 0 1px rgba(255, 255, 255, 0.7),
+        950px 920px 0 0 rgba(255, 255, 255, 0.4),
+        160px 100px 0 0 rgba(255, 255, 255, 0.5);
+      animation: starDrift 260s linear infinite reverse;
+      opacity: 0.7;
+      filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+    }
+
+    @keyframes starDrift {
+      0% {
+        transform: translate3d(0, 0, 0);
+      }
+
+      100% {
+        transform: translate3d(-80px, 120px, 0);
+      }
+    }
+
+    .bg-noise {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .halo,
+      .halo-2,
+      .bg-stars::before,
+      .bg-stars::after {
+        animation: none;
+      }
+    }
+
+    /* Floating Parallax Container & Elements */
+    .parallax-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .parallax-layer {
+      position: absolute;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.8;
+      transform: translate3d(0, calc(var(--sy, 0px) * var(--speed, 0)), 0);
+      contain: layout style;
+    }
+
+    .parallax-layer video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      mix-blend-mode: screen;
+      /* Great for dark background videos */
+      opacity: 0.6;
+    }
+
+    .parallax-layer img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0.8;
+    }
+
+    /* Video placements */
+    .p-earth {
+      top: -100px;
+      right: -150px;
+      width: 600px;
+      height: 600px;
+      filter: drop-shadow(0 0 50px rgba(57, 255, 20, 0.2));
+    }
+
+    .p-octo {
+      top: 600px;
+      left: -200px;
+      width: 700px;
+      height: 700px;
+      filter: drop-shadow(0 0 50px rgba(255, 107, 107, 0.2));
+    }
+
+    .p-brain-fixed {
+      position: absolute;
+      top: 50%;
+      right: -200px;
+      transform: translate(-50%, -50%);
+      width: 450px;
+      height: 450px;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .p-brain-fixed video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 40px rgba(100, 200, 255, 0.3));
+    }
+
+    .p-moving-octo {
+      position: absolute;
+      top: 5300px;
+      left: -30vw;
+      width: 550px;
+      height: 550px;
+      opacity: 0.9;
+    }
+
+    .p-moving-octo video {
+      animation: driftOcto 40s linear infinite;
+    }
+
+    @keyframes driftOcto {
+      0% {
+        transform: translateX(0) rotate(-5deg);
+      }
+
+      100% {
+        transform: translateX(150vw) rotate(15deg);
+      }
+    }
+
+    .meteor-swarm {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .meteor-fly {
+      position: absolute;
+      opacity: 0.8;
+      mix-blend-mode: screen;
+      filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
+      will-change: transform, left, top;
+    }
+
+    .meteor-1 {
+      width: 120px;
+    }
+
+    .meteor-2 {
+      width: 75px;
+    }
+
+    .meteor-3 {
+      width: 45px;
+    }
+
+    .meteor-4 {
+      width: 90px;
+    }
+
+    .meteor-5 {
+      width: 60px;
+    }
+
+    .meteor-6 {
+      width: 110px;
+    }
+
+    .meteor-7 {
+      width: 50px;
+    }
+
+    .p-dogdance {
+      top: 1750px;
+      left: 1vw;
+      width: 600px;
+      height: 600px;
+      opacity: 0.7;
+    }
+
+    .p-small1 {
+      right: -50px;
+      top: 6600px;
+      width: 300px;
+      height: 300px;
+      opacity: 0.5;
+    }
+
+    .p-small1 img {
+      transform: rotate(-30deg);
+    }
+
+    .p-small2 {
+      left: -50px;
+      top: 6600px;
+      width: 300px;
+      height: 300px;
+      opacity: 0.5;
+    }
+
+    .p-small2 img {
+      transform: scaleX(-1) rotate(-30deg);
+    }
+
+    .p-saturn {
+      top: 3500px;
+      right: -250px;
+      width: 1000px;
+      height: 1000px;
+      opacity: 0.6;
+    }
+
+    .p-tentacle {
+      top: -5px;
+      left: 2vw;
+      width: 350px;
+      height: 350px;
+      opacity: 0.85;
+    }
+
+    .p-small3 {
+      top: 500px;
+      right: 30vw;
+      width: 250px;
+      height: 250px;
+      opacity: 0.6;
+    }
+
+    .p-small4 {
+      top: 2200px;
+      right: 1vw;
+      width: 250px;
+      height: 250px;
+      opacity: 0.6;
+    }
+
+    .p-small5 {
+      top: 770px;
+      right: 1vw;
+      width: 200px;
+      height: 200px;
+      opacity: 0.6;
+    }
+
+    .p-drink {
+      top: 2810px;
+      left: 1vw;
+      width: 550px;
+      height: 550px;
+      opacity: 0.6;
+    }
+
+    .p-small {
+      top: 1500px;
+      right: 1vw;
+      width: 550px;
+      height: 500px;
+      opacity: 0.6;
+    }
+
+    .p-smallR {
+      top: 1500px;
+      left: 1vw;
+      width: 550px;
+      height: 500px;
+      opacity: 0.6;
+    }
+
+    .p-smallR video {
+      transform: scaleX(-1);
+    }
+
+    .p-car {
+      top: 2360px;
+      right: -6.5vw;
+      width: 450px;
+      height: 450px;
+      opacity: 0.6;
+    }
+
+    .p-chromeee {
+      top: 4250px;
+      right: 20vw;
+      width: 250px;
+      height: 250px;
+      opacity: 0.7;
+    }
+
+    .p-chromeeeR {
+      top: 4250px;
+      left: 20vw;
+      width: 250px;
+      height: 250px;
+      opacity: 0.7;
+    }
+
+    .p-chromeeeR img {
+      transform: scaleX(-1);
+    }
+
+    .p-stere {
+      top: 2200px;
+      left: 15vw;
+      width: 260px;
+      height: 260px;
+      opacity: 0.7;
+    }
+
+    .p-cd {
+      top: 4150px;
+      right: 5vw;
+      width: 220px;
+      height: 220px;
+      opacity: 0.7;
+    }
+
+    .p-cdL {
+      top: 4150px;
+      left: 5vw;
+      width: 220px;
+      height: 220px;
+      opacity: 0.7;
+    }
+
+    .p-cdL img {
+      transform: scaleX(-1);
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      transition: color 0.2s;
+      text-decoration: none;
+      position: relative;
+    }
+
+    a:not(.btn):hover {
+      color: var(--coral);
+    }
+
+    a:not(.btn)::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -4px;
+      left: 50%;
+      background-color: var(--coral);
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    a:not(.btn):hover::after {
+      width: 100%;
+    }
+
+    .wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+      position: relative;
+      z-index: 10;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Ultra', serif;
+      margin: 0;
+      color: var(--yellow);
+    }
+
+    .hero-title {
+      font-family: 'Oi', cursive;
+      font-size: clamp(2rem, 5vw, 4.2rem);
+      /* Reduced to 60% */
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+      /* Increased to prevent overlap */
+      color: #f1c40f;
+      margin-bottom: 32px;
+      text-shadow: 6px 6px 0px #000;
+      cursor: default;
+    }
+
+    .hero-title .word {
+      display: inline-block;
+      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative;
+    }
+
+    .fly-letters .word {
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    .fly-letters.fly-done .word {
+      opacity: 1;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      color: var(--red-accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .code {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+    }
+
+    /* ---------- Scroll Reveal ---------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---------- Nav ---------- */
+    .header-wrapper {
+      position: sticky;
+      top: 24px;
+      z-index: 100;
+      padding: 0 24px;
+      margin-bottom: -100px;
+    }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .nav-glass {
+      background: rgba(20, 20, 25, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .brand {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem;
+      color: #fff;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 1;
+      cursor: pointer;
+      width: 220px;
+      /* Lock container width */
+    }
+
+    .brand::after {
+      display: none;
+    }
+
+    .brand-text {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: max-width 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+      width: 70px;
+      max-width: 70px;
+      text-align: center;
+    }
+
+    .brand-emoji {
+      font-size: 2.4rem;
+      transition: transform 0.4s ease;
+    }
+
+    .brand:hover .brand-text {
+      max-width: 0;
+      opacity: 0;
+    }
+
+    /* remove link hover */
+    .brand:hover {
+      color: #fff;
+    }
+
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .navlinks a {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .navlinks a:hover {
+      color: #fff;
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    }
+
+    .btn::after {
+      display: none !important;
+    }
+
+    .btn-cta {
+      background: linear-gradient(to bottom, var(--coral), #d43a3a);
+      color: #fff;
+      box-shadow: 0 4px 14px 0 rgba(255, 71, 71, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+      padding: 10px 32px;
+    }
+
+    .btn-cta:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(255, 71, 71, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-ghost:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--border-hover);
+      box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      padding: 180px 0 120px;
+      position: relative;
+    }
+
+    .hero-content {
+      max-width: 600px;
+      margin: 200px auto 0 0;
+      /* Space from top panel, pushed fully left */
+      text-align: left;
+      position: relative;
+    }
+
+    .pill-tag {
+      display: inline-block;
+      color: #ff6b6b;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      /* Reduced to 60% */
+      font-weight: 400;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.6em;
+      /* Wide spacing to match reference */
+      text-shadow: 2px 2px 0px #000;
+    }
+
+    .hero p.lede {
+      margin: 0;
+      max-width: 45ch;
+      font-size: 0.85rem;
+      /* Reduced to ~60-70% so it's still readable */
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    .hero .cta-row {
+      display: flex;
+      justify-content: flex-start;
+      gap: 40px;
+      margin-top: 48px;
+      flex-wrap: wrap;
+    }
+
+    /* ---------- UI Device & Compare (Retro-fit) ---------- */
+    .device {
+      background: rgba(20, 20, 25, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(57, 255, 20, 0.1);
+      transform-style: preserve-3d;
+      margin: 170px auto 0;
+      width: 50%;
+      min-width: 600px;
+      /* prevent it from getting too small on mobile */
+    }
+
+    @media (max-width: 860px) {
+      .device {
+        width: 100%;
+        min-width: unset;
+      }
+    }
+
+    .device-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .device-bar .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border-hover);
+    }
+
+    .device-bar .dot:nth-child(1) {
+      background: #ff4757;
+    }
+
+    .device-bar .dot:nth-child(2) {
+      background: #feca57;
+    }
+
+    .device-bar .dot:nth-child(3) {
+      background: #1dd1a1;
+    }
+
+    .device-bar .url {
+      margin-left: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 6px;
+      padding: 6px 12px;
+      flex: 1;
+      text-align: center;
+    }
+
+    /* Reusable compare */
+    .compare {
+      position: relative;
+      line-height: 0;
+      user-select: none;
+      cursor: ew-resize;
+      touch-action: pan-y;
+      aspect-ratio: 1280 / 800;
+      overflow: hidden;
+    }
+
+    .compare img {
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: left top;
+    }
+
+    .compare .before-img {
+      width: 100%;
+    }
+
+    .compare .before-img.is-stock {
+      filter: grayscale(1) contrast(1.1) brightness(0.8);
+    }
+
+    .compare .after-wrap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      overflow: hidden;
+      width: 55%;
+    }
+
+    .compare .after-wrap img {
+      max-width: none;
+    }
+
+    .compare .handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 55%;
+      width: 0;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .compare .handle::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--green);
+      transform: translateX(-50%);
+      box-shadow: 0 0 15px var(--green);
+    }
+
+    .compare .handle .grip {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 36px;
+      height: 36px;
+      transform: translate(-50%, -50%);
+      background: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--green);
+      font-size: 0.8rem;
+      box-shadow: 0 0 20px rgba(57, 255, 20, 0.4);
+      border: 2px solid var(--green);
+      transition: transform 0.2s ease;
+    }
+
+    .compare input[type=range] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: ew-resize;
+    }
+
+    /* ---------- Strip ---------- */
+    .strip {
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 80px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .strip p {
+      max-width: 40ch;
+      font-size: clamp(1rem, 2vw, 1.5rem);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      color: var(--text);
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    .strip .hl {
+      color: var(--coral);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ---------- Features ---------- */
+    .features {
+      padding: 160px 0;
+    }
+
+    .features-head {
+      text-align: center;
+      margin-bottom: 100px;
+    }
+
+    .features-head p {
+      color: var(--text-dim);
+      max-width: 50ch;
+      margin: 16px auto 0;
+      font-size: 1.15rem;
+    }
+
+    .feature {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 100px;
+      align-items: center;
+      padding: 100px 0;
+    }
+
+    .feature.reverse .figure {
+      order: 1;
+    }
+
+    .feature.reverse .copy {
+      order: 2;
+    }
+
+    .feature .tag {
+      display: inline-flex;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      margin-bottom: 24px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .feature .tag.highlight {
+      color: var(--bg);
+      background: var(--green);
+    }
+
+    .feature h3 {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .feature p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+      max-width: 44ch;
+    }
+
+    .figure {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
+      transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .figure:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(57, 255, 20, 0.4);
+      box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(57, 255, 20, 0.1);
+    }
+
+    .figure .bar {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .figure .bar .path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-left: 8px;
+    }
+
+    /* ---------- Install ---------- */
+    .install {
+      padding: 60px 0 120px 0;
+      text-align: center;
+    }
+
+    .feature:last-child {
+      padding-bottom: 0;
+    }
+
+    .install-head {
+      margin-bottom: 64px;
+    }
+
+    .install-head p {
+      color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    .store-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 32px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .store-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .store-card::after {
+      display: none;
+    }
+
+    .store-card:hover {
+      transform: translateY(-10px);
+      background: var(--bg-card-hover);
+      border-color: var(--coral);
+      box-shadow: 0 20px 40px rgba(255, 107, 107, 0.15);
+    }
+
+    .store-card h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      color: #fff;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .store-card p {
+      color: var(--text-dim);
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .store-card .cta {
+      color: var(--coral);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ---------- FAQ ---------- */
+    .faq {
+      padding: 120px 0;
+    }
+
+    .faq-head {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .faq-list {
+      max-width: 650px;
+      margin: 0 auto;
+      list-style: none;
+      padding: 0;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .faq-item.active {
+      border-color: var(--green);
+      box-shadow: 0 0 30px rgba(57, 255, 20, 0.1);
+    }
+
+    .faq-question {
+      padding: 16px 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .faq-icon {
+      color: var(--text-dim);
+      transition: transform 0.3s ease;
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(180deg);
+      color: var(--green);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      padding: 0 32px;
+      color: var(--text-dim);
+      transition: all 0.4s ease;
+      opacity: 0;
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 200px;
+      padding: 0 32px 32px;
+      opacity: 1;
+    }
+
+    /* ---------- Footer ---------- */
+    footer {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .footer-top h3 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 32px;
+    }
+
+    .bottom {
+      margin-top: 64px;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    @media (max-width: 860px) {
+      .feature {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .feature.reverse .figure {
+        order: 1;
+      }
+
+      .feature.reverse .copy {
+        order: 2;
+      }
+
+      .navlinks a:not(.btn) {
+        display: none;
+      }
+
+      .parallax-layer {
+        display: none;
+      }
+
+      /* Hide videos on small screens for performance */
+    }
+
+    /* ---------- Ooze Animation ---------- */
+    .ooze {
+      opacity: 0;
+      transform: scale(0.9) translateY(40px);
+      transition: all 2.5s cubic-bezier(0.19, 1, 0.22, 1) 0.1s;
+    }
+
+    .ooze.active {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="halo" aria-hidden="true"></div>
+  <div class="halo-2" aria-hidden="true"></div>
+  <div class="bg-stars" aria-hidden="true"></div>
+  <div class="bg-noise" aria-hidden="true"></div>
+
+  <!-- Parallax Background Container (prevents overflow past footer) -->
+  <div class="parallax-container" aria-hidden="true">
+    <div class="parallax-layer p-earth" data-speed="0.2">
+      <video src="assets/media/earth.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-octo" data-speed="0.4">
+      <video src="assets/media/octo.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-dogdance" data-speed="0.3">
+      <video src="assets/media/dogdance.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-small1" data-speed="-0.2">
+      <img src="assets/media/small.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-small2" data-speed="-0.2">
+      <img src="assets/media/small.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-saturn" data-speed="0.1">
+      <img src="assets/media/saturn.webp" alt="Saturn">
+    </div>
+    <div class="parallax-layer p-tentacle" data-speed="0.12">
+      <video src="assets/media/tentacle.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-small3" data-speed="0.2">
+      <img src="assets/img/jup.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-small4" data-speed="0.2">
+      <img src="assets/img/moon.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-small5" data-speed="0.2">
+      <img src="assets/img/mouth.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-drink" data-speed="0.2">
+      <video src="assets/media/drink.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-car" data-speed="0.2">
+      <video src="assets/media/car.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-small" data-speed="0.2">
+      <video src="assets/media/smalll.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-smallR" data-speed="0.2">
+      <video src="assets/media/smalll.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-stere" data-speed="0.2">
+      <img src="assets/img/stere.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-chromeee" data-speed="0.2">
+      <img src="assets/img/chromeee.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-chromeeeR" data-speed="0.2">
+      <img src="assets/img/chromeee.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-cd" data-speed="0.2">
+      <img src="assets/img/cd.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-cdL" data-speed="0.2">
+      <img src="assets/img/cd.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-moving-octo" data-speed="-0.15">
+      <video src="assets/img/moving octo.webm" autoplay loop muted playsinline></video>
+    </div>
+  </div>
+
+  <!-- Flying Meteors -->
+  <div class="meteor-swarm">
+    <video src="assets/media/meteor.webm" class="meteor-fly meteor-1" autoplay loop muted playsinline></video>
+    <video src="assets/media/meteor.webm" class="meteor-fly meteor-2" autoplay loop muted playsinline></video>
+    <video src="assets/media/meteor.webm" class="meteor-fly meteor-3" autoplay loop muted playsinline></video>
+  </div>
+
+  <div class="header-wrapper">
+    <header class="top-nav">
+      <a href="#top" class="brand">
+        <span class="brand-text">MUJ</span>
+        <span class="brand-emoji">🐠</span>
+        <span class="brand-text">FISH</span>
+      </a>
+
+      <nav class="nav-glass navlinks">
+        <a href="#features">Features</a>
+        <a href="#install">Install</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <a class="btn btn-cta" style="font-size: 1rem; padding: 10px 24px;"
+        href="https://github.com/CatLoveMeow/Fish" target="_blank" rel="noopener">🧿 GITHUB</a>
+    </header>
+  </div>
+
+  <section class="hero" id="top">
+    <div class="wrap reveal">
+      <div class="hero-content">
+        <div class="pill-tag">ASTRONOMICALLY CREATIVE</div>
+        <h1 class="hero-title split-word fly-letters">SLCM, BUT BETTER.</h1>
+        <p class="lede">MUJ FISH adds attendance math, CGPA forecasting, and dashboard sorting the SLCM portal forgot.
+          Local. Free. Open source.</p>
+
+      </div>
+
+      <div class="device ooze">
+        <div class="device-bar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="url">slcm.jaipur.manipal.edu/</span>
+        </div>
+        <div class="compare-block">
+          <div class="compare">
+            <img class="before-img" src="assets/img/.png" alt="Before">
+            <div class="after-wrap">
+              <img src="assets/img/ds.png" alt="After">
+            </div>
+            <div class="handle">
+              <div class="grip">⇔</div>
+            </div>
+            <input type="range" min="0" max="100" value="50">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="strip reveal">
+    <div class="p-brain-fixed">
+      <video src="assets/img/brain.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="wrap">
+      <p>SLCM gives you raw data. FISH gives you <span class="hl">SUPERPOWERS</span>. We've completely overhauled the
+        portal experience to be faster, smarter, and infinitely more useful—all without leaving the page.</p>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="features-head reveal">
+        <span class="section-subtitle">Core Upgrades</span>
+        <h2 class="section-title">FIVE THINGS SLCM FORGOT</h2>
+        <p>Each one seamlessly reads the page you're already on and injects the missing features right where you need
+          them.</p>
+      </div>
+
+      <div class="feature reveal">
+        <div class="copy">
+          <span class="tag">FISH.ATTENDANCE</span>
+          <h3 class="split-word fly-letters">KNOW HOW MANY TO SKIP</h3>
+          <p>Set a target percentage and FISH works out how many classes you can miss in a row, or how many you need to
+            attend back-to-back to climb back over 75%.</p>
+        </div>
+        <div class="figure ooze">
+          <div class="bar"><span class="path">Reports → Attendance Summary</span></div>
+          <img src="assets/img/after_attendance.webp" alt="Attendance Feature" style="width: 100%; display: block;">
+        </div>
+      </div>
+
+      <div class="feature reverse reveal">
+        <div class="copy">
+          <span class="tag highlight">NEW IN V1.6.0</span> <span class="tag">FISH.CGPA</span>
+          <h3 class="split-word fly-letters">PREDICT YOUR CGPA</h3>
+          <p>The CGPA predictor plots past semesters on a curve. Add hypothetical future semesters with expected
+            credits, and watch the projected CGPA recalculate live.</p>
+        </div>
+        <div class="figure ooze">
+          <div class="bar"><span class="path">Examination → CGPA & GPA</span></div>
+          <img src="assets/img/pre.png" alt="CGPA Predictor Feature" style="width: 100%; display: block;">
+        </div>
+      </div>
+
+
+
+      <div class="feature reveal">
+        <div class="copy">
+          <span class="tag">FISH.MARKS</span>
+          <h3 class="split-word fly-letters">MARKS ADDED UP</h3>
+          <p>FISH totals every assignment, quiz and midterm on the Internal Marks page and drops a bold total at the
+            bottom. No calculator app required.</p>
+        </div>
+        <div class="figure ooze">
+          <div class="bar"><span class="path">Examination → Marks Sheet</span></div>
+          <img src="assets/img/mr.png" alt="Marks Feature" style="width: 100%; display: block;">
+        </div>
+      </div>
+
+      <div class="feature reverse reveal">
+        <div class="copy">
+          <span class="tag">FISH.TIMETABLE</span>
+          <h3 class="split-word fly-letters">COLOR CODED TIMETABLE</h3>
+          <p>Classes marked absent turn red, ones not considered turn blue. Hooked directly into the portal's calendar
+            requests.</p>
+        </div>
+        <div class="figure ooze">
+          <div class="bar"><span class="path">Home → Timetable</span></div>
+          <img src="assets/img/cr.png" alt="Timetable Feature" style="width: 100%; display: block;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="install" id="install">
+    <div class="wrap">
+      <div class="install-head reveal">
+        <span class="section-subtitle">Launch Sequence</span>
+        <h2 class="section-title">INSTALL FROM STORE</h2>
+        <p>One click, auto-updating, no developer mode required.</p>
+      </div>
+
+      <div class="store-grid reveal">
+        <a class="store-card" href="https://chromewebstore.google.com/detail/muj-fish/knijkmiieojnmmchmmjblnkjbbicicgh"
+          target="_blank" rel="noopener">
+          <h4>Chrome Web Store</h4>
+          <p>Works in Chrome, Brave, Edge and Arc.</p>
+          <span class="cta">ADD TO CHROME →</span>
+        </a>
+        <a class="store-card" href="https://addons.mozilla.org/en-US/firefox/addon/muj-fih/" target="_blank"
+          rel="noopener">
+          <h4>Firefox Add-ons</h4>
+          <p>Works in Firefox and Firefox Developer Edition.</p>
+          <span class="cta">ADD TO FIREFOX →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <div class="wrap">
+      <div class="faq-head reveal">
+        <span class="section-subtitle">Intel</span>
+        <h2 class="section-title">FAQ</h2>
+      </div>
+      <ul class="faq-list reveal">
+        <li class="faq-item">
+          <div class="faq-question">HOW DOES IT GET MY GRADES? <span class="faq-icon">▼</span></div>
+          <div class="faq-answer">
+            <p>FISH works by parsing the SLCM page you're already looking at. Your login credentials are never read or
+              touched.</p>
+          </div>
+        </li>
+        <li class="faq-item">
+          <div class="faq-question">DOES IT SEND MY DATA ANYWHERE? <span class="faq-icon">▼</span></div>
+          <div class="faq-answer">
+            <p>Every calculation happens on your machine. Nothing is sent anywhere.</p>
+          </div>
+        </li>
+        <li class="faq-item">
+          <div class="faq-question">DO YOU TRACK MY USAGE? <span class="faq-icon">▼</span></div>
+          <div class="faq-answer">
+            <p>There's no telemetry in the code to remove. Read it yourself on GitHub.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <h3>STOP DOING SLCM'S ARITHMETIC BY HAND.</h3>
+      <a class="btn btn-cta" href="#install">LAUNCH EXTENSION</a>
+      <div class="bottom">
+        <span>Built by a student, for MUJ students. Not affiliated with MUJ.</span>
+        <a href="https://github.com/CatLoveMeow/Fish" target="_blank"
+          rel="noopener">CatLoveMeow/Fish</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      // Compare Slider Setup
+      function initCompare(el) {
+        var beforeImg = el.querySelector('.before-img');
+        var afterWrap = el.querySelector('.after-wrap');
+        var afterImg = afterWrap.querySelector('img');
+        var handle = el.querySelector('.handle');
+        var slider = el.querySelector('input[type=range]');
+
+        beforeImg.addEventListener('error', function () {
+          this.onerror = null;
+          this.src = afterImg.getAttribute('src');
+          this.classList.add('is-stock');
+        }, { once: true });
+
+        function apply(val) {
+          afterWrap.style.width = val + '%';
+          handle.style.left = val + '%';
+          afterImg.style.width = (10000 / val) + '%';
+        }
+
+        slider.addEventListener('input', function () { apply(slider.value); });
+        apply(slider.value);
+      }
+      document.querySelectorAll('.compare').forEach(initCompare);
+
+      // Scroll Reveal
+      const reveals = document.querySelectorAll('.reveal');
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      reveals.forEach(r => revealObserver.observe(r));
+
+      // Ooze Reveal
+      const oozes = document.querySelectorAll('.ooze');
+      const oozeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            oozeObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      oozes.forEach(o => oozeObserver.observe(o));
+
+      // FAQ Accordion
+      const faqItems = document.querySelectorAll('.faq-item');
+      faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        question.addEventListener('click', () => {
+          const isActive = item.classList.contains('active');
+          faqItems.forEach(i => i.classList.remove('active'));
+          if (!isActive) item.classList.add('active');
+        });
+      });
+
+      // Parallax Scroll Effect (single CSS var update — no per-layer style thrash)
+      const parallaxLayers = document.querySelectorAll('.parallax-layer');
+      parallaxLayers.forEach(layer => {
+        layer.style.setProperty('--speed', layer.getAttribute('data-speed') || '0');
+      });
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          ticking = true;
+          window.requestAnimationFrame(() => {
+            document.documentElement.style.setProperty('--sy', window.pageYOffset + 'px');
+            ticking = false;
+          });
+        }
+      }, { passive: true });
+
+      // Split text into letters for playfully interactive hover, keeping words together
+      document.querySelectorAll('.split-word').forEach(el => {
+        const words = el.innerText.trim().split(/\s+/);
+        el.innerHTML = words.map(word => {
+          const letters = word.split('').map(char => `<span class="word" style="display:inline-block; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">${char === ' ' ? '&nbsp;' : char}</span>`).join('');
+          return `<span style="display:inline-block; white-space:nowrap; margin-right: 0.3em;">${letters}</span>`;
+        }).join(' ');
+      });
+
+      // One-shot letter fly-in from all directions (first view only — never replays)
+      document.querySelectorAll('.fly-letters').forEach(el => {
+        const letters = el.querySelectorAll('.word');
+        letters.forEach(letter => {
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 180 + Math.random() * 520;
+          const x = Math.cos(angle) * dist;
+          const y = Math.sin(angle) * dist;
+          const rot = (Math.random() - 0.5) * 160;
+          letter.style.opacity = '0';
+          letter.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg) scale(0.4)`;
+          letter.style.transition = 'none';
+        });
+
+        const playFlyIn = () => {
+          if (el.dataset.flown === '1') return;
+          el.dataset.flown = '1';
+
+          letters.forEach((letter, i) => {
+            const delay = 80 + i * 45 + Math.random() * 60;
+            letter.style.transition =
+              `transform 1.35s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, opacity 0.7s ease ${delay}ms`;
+            requestAnimationFrame(() => {
+              letter.style.opacity = '1';
+              letter.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
+            });
+          });
+
+          const settleMs = 80 + letters.length * 45 + 1400;
+          setTimeout(() => {
+            letters.forEach(letter => {
+              letter.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
+            el.classList.add('fly-done');
+          }, settleMs);
+        };
+
+        // Fire once when first shown (with reveal), never again
+        const revealParent = el.closest('.reveal');
+        if (revealParent) {
+          if (revealParent.classList.contains('active')) {
+            requestAnimationFrame(() => requestAnimationFrame(playFlyIn));
+          } else {
+            const mo = new MutationObserver(() => {
+              if (revealParent.classList.contains('active')) {
+                playFlyIn();
+                mo.disconnect();
+              }
+            });
+            mo.observe(revealParent, { attributes: true, attributeFilter: ['class'] });
+          }
+        } else {
+          requestAnimationFrame(() => requestAnimationFrame(playFlyIn));
+        }
+      });
+
+      // Playful hover repulsion for all .word elements
+      const words = document.querySelectorAll('.word');
+      document.addEventListener('mousemove', (e) => {
+        words.forEach(word => {
+          // Skip repulsion while letters are still flying in
+          const parent = word.closest('.fly-letters');
+          if (parent && parent.dataset.flown === '1' && !parent.classList.contains('fly-done')) return;
+          if (parent && parent.dataset.flown !== '1') return;
+
+          const rect = word.getBoundingClientRect();
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + rect.height / 2;
+          const dx = x - e.clientX;
+          const dy = y - e.clientY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 180) {
+            const push = (180 - dist) / 2.5;
+            const moveX = (dx / dist) * push;
+            const moveY = (dy / dist) * push;
+            const rotate = (dx / 180) * 15;
+            word.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${rotate}deg) scale(1.1)`;
+          } else {
+            word.style.transform = `translate(0px, 0px) rotate(0deg) scale(1)`;
+          }
+        });
+      });
+
+      // Meteors roaming
+      const meteors = document.querySelectorAll('.meteor-fly');
+
+      meteors.forEach((meteor, index) => {
+        const totalSections = meteors.length;
+        let sectionHeight = document.documentElement.scrollHeight / totalSections;
+        let minY = index * sectionHeight;
+        let maxY = (index + 1) * sectionHeight;
+
+        let x = Math.random() * document.documentElement.scrollWidth;
+        let y = minY + Math.random() * sectionHeight;
+        let angle = Math.random() * 360;
+        let targetX = Math.random() * document.documentElement.scrollWidth;
+        let targetY = minY + Math.random() * sectionHeight;
+        let speed = 1.5 + (Math.random() * 1);
+
+        // If meteor tail is at the back, but the graphic's head is pointing left, 
+        // we offset by 180 degrees so it moves head-first.
+        const graphicOffset = 180;
+
+        function update() {
+          const dx = targetX - x;
+          const dy = targetY - y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 100) {
+            // Refresh section bounds in case page resizes
+            sectionHeight = document.documentElement.scrollHeight / totalSections;
+            minY = index * sectionHeight;
+            maxY = (index + 1) * sectionHeight;
+
+            targetX = Math.random() * document.documentElement.scrollWidth;
+            targetY = minY + Math.random() * sectionHeight;
+          }
+
+          const desiredAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+          let angleDiff = desiredAngle - angle;
+          while (angleDiff > 180) angleDiff -= 360;
+          while (angleDiff < -180) angleDiff += 360;
+
+          angle += angleDiff * 0.03;
+
+          const rad = angle * Math.PI / 180;
+          x += Math.cos(rad) * speed;
+          y += Math.sin(rad) * speed;
+
+          // Wrap horizontally across the screen
+          const m = 300; // margin
+          if (x < -m) x = document.documentElement.scrollWidth + m;
+          else if (x > document.documentElement.scrollWidth + m) x = -m;
+
+          // Wrap vertically within its designated 1/3 section
+          if (y < minY - m) y = maxY + m;
+          else if (y > maxY + m) y = minY - m;
+
+          meteor.style.transform = `translate3d(calc(${x}px - 50%), calc(${y}px - 50%), 0) rotate(${angle + graphicOffset}deg)`;
+
+          requestAnimationFrame(update);
+        }
+        update();
+      });
+
+    })();
+  </script>
+</body>
+
+</html>

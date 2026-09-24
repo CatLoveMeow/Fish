@@ -1,0 +1,75 @@
+{
+    "name": "MUJ FISH",
+    "description": "Automate attendance math, track safe skips, total internal marks, predict your CGPA, and organize your dashboard in MUJ SLCM.",
+    "version": "1.6.0",
+    "manifest_version": 3,
+    "icons": {
+        "128": "icon128.png"
+    },
+    "permissions": [
+        "storage"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://mujslcm.jaipur.manipal.edu/Student/Academic/AttendanceSummaryForStudent*"
+            ],
+            "js": [
+                "attendance.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://mujslcm.jaipur.manipal.edu/Student/Academic/InternalMarkForStudent*"
+            ],
+            "js": [
+                "marks_sum.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://mujslcm.jaipur.manipal.edu/Student/Academic/GradesForStudent*"
+            ],
+            "js": [
+                "grades_parser.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://mujslcm.jaipur.manipal.edu/Student/Academic/ViewTimeTableForStudent*"
+            ],
+            "js": [
+                "timetable.js"
+            ],
+            "run_at": "document_idle",
+            "world": "MAIN"
+        },
+        {
+            "matches": [
+                "https://mujslcm.jaipur.manipal.edu/Student/Academic/CGPAGPAForStudent*"
+            ],
+            "js": [
+                "cgpa_predictor.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://mujslcm.jaipur.manipal.edu/Home/Dashboard*"
+            ],
+            "js": [
+                "dashboard.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "studenttool@muj",
+            "strict_min_version": "109.0"
+        }
+    }
+}

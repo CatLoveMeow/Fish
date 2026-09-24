@@ -1,0 +1,15 @@
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Build artifacts and packages
+*.zip
+*.xpi
+student-tool-chrome/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Local Notes
+future_updates.txt
