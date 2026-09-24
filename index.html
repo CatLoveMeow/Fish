@@ -838,6 +838,64 @@
       .device {
         width: 100%;
         min-width: unset;
+        margin: 60px auto 0;
+      }
+
+      /* Nav */
+      .header-wrapper {
+        top: 12px;
+        padding: 0 12px;
+      }
+      .nav-glass {
+        padding: 10px 20px;
+      }
+      .brand {
+        font-size: 1.8rem;
+        width: auto;
+      }
+      .brand-text {
+        max-width: 0;
+        opacity: 0;
+      }
+      .navlinks {
+        gap: 16px;
+      }
+      .navlinks a:not(.btn) {
+        display: none;
+      }
+      .btn-cta {
+        font-size: 1rem;
+        padding: 8px 18px;
+      }
+
+      /* Hero */
+      .hero {
+        padding: 120px 0 60px;
+      }
+      .hero-content {
+        margin: 60px auto 0;
+        text-align: center;
+        padding: 0 20px;
+        max-width: 100%;
+      }
+      .hero .cta-row {
+        justify-content: center;
+        gap: 16px;
+        flex-direction: column;
+        align-items: center;
+      }
+      .hero-title {
+        font-size: clamp(2.2rem, 10vw, 3.5rem);
+      }
+
+      /* Wrap padding */
+      .wrap {
+        padding: 0 20px;
+      }
+
+      /* Parallax hidden on mobile for performance */
+      .parallax-container {
+        display: none;
       }
     }
 
@@ -1276,15 +1334,50 @@
         order: 2;
       }
 
-      .navlinks a:not(.btn) {
-        display: none;
+      /* Features section text */
+      .copy h3 {
+        font-size: clamp(1.6rem, 6vw, 2.2rem);
       }
 
-      .parallax-layer {
+      /* Strip / brain section */
+      .p-brain-fixed {
         display: none;
       }
+      .strip {
+        padding: 60px 0 !important;
+      }
+      .strip .wrap p {
+        font-size: 1rem;
+      }
 
-      /* Hide videos on small screens for performance */
+      /* Install cards stack */
+      .store-cards {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .store-card {
+        width: 100%;
+      }
+
+      /* FAQ */
+      .faq-list {
+        padding: 0;
+      }
+      .faq-question {
+        font-size: 0.9rem;
+      }
+
+      /* Footer */
+      .bottom {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+      }
+
+      /* Section spacing */
+      section {
+        padding: 60px 0;
+      }
     }
 
     /* ---------- Ooze Animation ---------- */
@@ -1417,7 +1510,7 @@
           <div class="compare">
             <img class="before-img" src="assets/img/.png" alt="Before">
             <div class="after-wrap">
-              <img src="assets/img/ds.png" alt="After">
+              <img src="assets/img/ds.webp" alt="After">
             </div>
             <div class="handle">
               <div class="grip">⇔</div>
@@ -1470,7 +1563,7 @@
         </div>
         <div class="figure ooze">
           <div class="bar"><span class="path">Examination → CGPA & GPA</span></div>
-          <img src="assets/img/pre.png" alt="CGPA Predictor Feature" style="width: 100%; display: block;">
+          <img src="assets/img/pre.webp" alt="CGPA Predictor Feature" style="width: 100%; display: block;">
         </div>
       </div>
 
@@ -1485,7 +1578,7 @@
         </div>
         <div class="figure ooze">
           <div class="bar"><span class="path">Examination → Marks Sheet</span></div>
-          <img src="assets/img/mr.png" alt="Marks Feature" style="width: 100%; display: block;">
+          <img src="assets/img/mr.webp" alt="Marks Feature" style="width: 100%; display: block;">
         </div>
       </div>
 
@@ -1498,7 +1591,7 @@
         </div>
         <div class="figure ooze">
           <div class="bar"><span class="path">Home → Timetable</span></div>
-          <img src="assets/img/cr.png" alt="Timetable Feature" style="width: 100%; display: block;">
+          <img src="assets/img/cr.webp" alt="Timetable Feature" style="width: 100%; display: block;">
         </div>
       </div>
     </div>
