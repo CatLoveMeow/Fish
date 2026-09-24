@@ -898,21 +898,25 @@
         padding: 0 20px;
       }
 
-      /* Show static image parallax on mobile, hide only video ones */
-      .parallax-layer video {
+      /* Hide ALL parallax decorative elements on mobile — screenshots only */
+      .parallax-container {
         display: none;
       }
-      /* Keep the decorative images visible but smaller */
-      .parallax-layer {
-        opacity: 0.4;
+      /* Hide meteors completely */
+      .meteor-fly {
+        display: none !important;
       }
-      .parallax-layer img {
-        max-width: 120px;
+
+      /* Subtle gradient background for mobile (not pure black) */
+      body {
+        background: linear-gradient(160deg, #0d0810 0%, #0a0d14 40%, #0d0a0a 100%);
       }
-      /* But hide the very large positioned ones that overflow */
-      .p-earth, .p-octo, .p-dogdance, .p-tentacle, .p-drink,
-      .p-car, .p-small, .p-smallR, .p-moving-octo {
-        display: none;
+      /* Add a soft ambient glow at the top */
+      .halo {
+        opacity: 0.6;
+      }
+      .halo-2 {
+        opacity: 0.5;
       }
     }
 
@@ -1338,15 +1342,23 @@
     }
 
     @media (max-width: 860px) {
+      /* Tighter section spacing */
+      .features {
+        padding: 60px 0 !important;
+      }
       .feature {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 24px;
+        padding: 40px 0 !important;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+      }
+      .feature:last-child {
+        border-bottom: none;
       }
 
       .feature.reverse .figure {
         order: 1;
       }
-
       .feature.reverse .copy {
         order: 2;
       }
@@ -1355,16 +1367,31 @@
       .copy h3 {
         font-size: clamp(1.6rem, 6vw, 2.2rem);
       }
+      .features-head {
+        margin-bottom: 20px;
+      }
 
       /* Strip / brain section */
       .p-brain-fixed {
         display: none;
       }
       .strip {
-        padding: 60px 0 !important;
+        padding: 50px 0 !important;
+        border-top: 1px solid rgba(255,255,255,0.07);
+        border-bottom: 1px solid rgba(255,255,255,0.07);
       }
       .strip .wrap p {
         font-size: 1rem;
+      }
+
+      /* Section dividers */
+      .install {
+        border-top: 1px solid rgba(255,255,255,0.07);
+        padding: 50px 0 80px !important;
+      }
+      .faq {
+        border-top: 1px solid rgba(255,255,255,0.07);
+        padding: 50px 0 60px !important;
       }
 
       /* Install cards stack */
@@ -1390,10 +1417,9 @@
         text-align: center;
         align-items: center;
       }
-
-      /* Section spacing */
-      section {
-        padding: 60px 0;
+      footer {
+        padding: 40px 0 !important;
+        border-top: 1px solid rgba(255,255,255,0.07);
       }
     }
 
