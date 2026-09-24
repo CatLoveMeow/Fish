@@ -1181,11 +1181,10 @@
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
-      transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
     }
 
     .figure:hover {
-      transform: translateY(-8px) scale(1.02);
       border-color: rgba(57, 255, 20, 0.4);
       box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(57, 255, 20, 0.1);
     }
@@ -1627,13 +1626,13 @@
   <!-- Parallax Background Container (prevents overflow past footer) -->
   <div class="parallax-container" aria-hidden="true">
     <div class="parallax-layer p-earth" data-speed="0.2">
-      <video data-src="assets/media/earth.webm" autoplay loop muted playsinline></video>
+      <video src="assets/media/earth.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-octo" data-speed="0.4">
-      <video data-src="assets/media/octo.webm" autoplay loop muted playsinline></video>
+      <video src="assets/media/octo.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-dogdance" data-speed="0.3">
-      <video data-src="assets/media/dogdance.webm" autoplay loop muted playsinline></video>
+      <video src="assets/media/dogdance.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-small1" data-speed="-0.2">
       <img src="assets/media/small.webp" alt="Decor">
@@ -1645,7 +1644,7 @@
       <img src="assets/media/saturn.webp" alt="Saturn">
     </div>
     <div class="parallax-layer p-tentacle" data-speed="0.12">
-      <video data-src="assets/media/tentacle.webm" autoplay loop muted playsinline></video>
+      <video src="assets/media/tentacle.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-small3" data-speed="0.2">
       <img src="assets/img/jup.webp" alt="Decor">
@@ -1657,16 +1656,16 @@
       <img src="assets/img/mouth.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-drink" data-speed="0.2">
-      <video data-src="assets/media/drink.webm" autoplay loop muted playsinline></video>
+      <video src="assets/media/drink.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-car" data-speed="0.2">
-      <video data-src="assets/media/car.webm" autoplay loop muted playsinline></video>
+      <video src="assets/media/car.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-small" data-speed="0.2">
-      <video data-src="assets/media/smalll.webm" autoplay loop muted playsinline></video>
+      <video src="assets/media/smalll.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-smallR" data-speed="0.2">
-      <video data-src="assets/media/smalll.webm" autoplay loop muted playsinline></video>
+      <video src="assets/media/smalll.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-stere" data-speed="0.2">
       <img src="assets/img/stere.webp" alt="Decor">
@@ -1684,7 +1683,7 @@
       <img src="assets/img/cd.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-moving-octo" data-speed="-0.15">
-      <video data-src="assets/img/moving octo.webm" autoplay loop muted playsinline></video>
+      <video src="assets/img/moving octo.webm" autoplay loop muted playsinline></video>
     </div>
   </div>
 
@@ -1726,7 +1725,7 @@
 
       </div>
 
-      <div class="device ooze">
+      <div class="device">
         <div class="device-bar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="url">slcm.jaipur.manipal.edu/ ✨ but better</span>
@@ -1749,7 +1748,7 @@
 
   <section class="strip reveal">
     <div class="p-brain-fixed">
-      <video data-src="assets/img/brain.webm" autoplay loop muted playsinline></video>
+      <video src="assets/img/brain.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="wrap">
       <p>SLCM gives you raw data. FISH gives you <span class="hl">SUPERPOWERS</span>. We've completely overhauled the
@@ -1773,7 +1772,7 @@
           <p>Set a target percentage and FISH works out how many classes you can miss in a row, or how many you need to
             attend back-to-back to climb back over 75%.</p>
         </div>
-        <div class="figure ooze">
+        <div class="figure">
           <div class="bar"><span class="path">Reports → Attendance Summary</span></div>
           <img src="assets/img/after_attendance.webp" alt="Attendance Feature" style="width: 100%; display: block;">
         </div>
@@ -1786,7 +1785,7 @@
           <p>The CGPA predictor plots past semesters on a curve. Add hypothetical future semesters with expected
             credits, and watch the projected CGPA recalculate live.</p>
         </div>
-        <div class="figure ooze">
+        <div class="figure">
           <div class="bar"><span class="path">Examination → CGPA & GPA</span></div>
           <img src="assets/img/pre.webp" alt="CGPA Predictor Feature" style="width: 100%; display: block;">
         </div>
@@ -1801,7 +1800,7 @@
           <p>FISH totals every assignment, quiz and midterm on the Internal Marks page and drops a bold total at the
             bottom. No calculator app required.</p>
         </div>
-        <div class="figure ooze">
+        <div class="figure">
           <div class="bar"><span class="path">Examination → Marks Sheet</span></div>
           <img src="assets/img/mr.webp" alt="Marks Feature" style="width: 100%; display: block;">
         </div>
@@ -1814,7 +1813,7 @@
           <p>Classes marked absent turn red, ones not considered turn blue. Hooked directly into the portal's calendar
             requests.</p>
         </div>
-        <div class="figure ooze">
+        <div class="figure">
           <div class="bar"><span class="path">Home → Timetable</span></div>
           <img src="assets/img/cr.webp" alt="Timetable Feature" style="width: 100%; display: block;">
         </div>
@@ -1925,18 +1924,6 @@
         });
       }, { threshold: 0.15 });
       reveals.forEach(r => revealObserver.observe(r));
-
-      // Ooze Reveal
-      const oozes = document.querySelectorAll('.ooze');
-      const oozeObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-            oozeObserver.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.15 });
-      oozes.forEach(o => oozeObserver.observe(o));
 
       // FAQ Accordion
       const faqItems = document.querySelectorAll('.faq-item');
@@ -2122,34 +2109,6 @@
 
     })();
 
-      // Lazy-load videos: only fetch when near viewport
-      const isMobile = window.innerWidth <= 860;
-      const lazyVideos = document.querySelectorAll('video[data-src]');
-      const videoObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const video = entry.target;
-            video.src = video.dataset.src;
-            video.load();
-            if (isMobile) {
-              video.removeAttribute('autoplay');
-              video.pause();
-            } else {
-              video.play().catch(() => {});
-            }
-            videoObserver.unobserve(video);
-          }
-        });
-      }, { rootMargin: '300px' });
-      lazyVideos.forEach(v => videoObserver.observe(v));
-
-      // Loader
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          document.getElementById('loader').classList.add('hidden');
-        }, 1000);
-      });
-
       // Sidebar
       const hamburgerBtn = document.getElementById('hamburgerBtn');
       const mobileSidebar = document.getElementById('mobileSidebar');
@@ -2165,14 +2124,6 @@
         hamburgerBtn.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', toggleSidebar);
         sidebarLinks.forEach(link => link.addEventListener('click', toggleSidebar));
-      }
-
-      // Pause inline videos instantly on mobile (like meteors)
-      if (isMobile) {
-        document.querySelectorAll('video:not([data-src])').forEach(vid => {
-          vid.removeAttribute('autoplay');
-          vid.pause();
-        });
       }
 
   </script>
