@@ -898,13 +898,13 @@
         padding: 0 20px;
       }
 
-      /* Hide ALL parallax decorative elements on mobile — screenshots only */
+      /* Show ALL parallax decorative elements on mobile but they will be static via JS */
       .parallax-container {
-        display: none;
+        display: block;
       }
-      /* Hide meteors completely */
+      /* Show meteors */
       .meteor-fly {
-        display: none !important;
+        display: block !important;
       }
 
       /* Subtle gradient background for mobile (not pure black) */
@@ -1434,10 +1434,93 @@
       opacity: 1;
       transform: scale(1) translateY(0);
     }
+    /* ---------- Loader & Sidebar ---------- */
+    .loader {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #0d0810;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease;
+    }
+    .loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loader-text {
+      font-size: clamp(2rem, 8vw, 4rem);
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 9998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .mobile-sidebar {
+      position: fixed;
+      top: 0; right: -300px;
+      width: 260px;
+      height: 100%;
+      background: #1a1a1a;
+      z-index: 9999;
+      padding: 80px 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      transition: right 0.3s ease;
+      box-shadow: -5px 0 30px rgba(0,0,0,0.5);
+    }
+    .mobile-sidebar.open {
+      right: 0;
+    }
+    .mobile-sidebar a {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 2rem;
+      cursor: pointer;
+    }
+    @media (max-width: 860px) {
+      .hamburger {
+        display: block;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <!-- Loading Screen -->
+  <div id="loader" class="loader">
+    <h1 class="loader-text">MUJ <span class="brand-emoji">🐠</span> FISH</h1>
+  </div>
+  
+  <!-- Sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="mobile-sidebar" id="mobileSidebar">
+    <a href="#features" class="sidebar-link">Features</a>
+    <a href="#install" class="sidebar-link">Install</a>
+    <a href="#faq" class="sidebar-link">FAQ</a>
+  </div>
 
   <div class="halo" aria-hidden="true"></div>
   <div class="halo-2" aria-hidden="true"></div>
@@ -1528,6 +1611,8 @@
         <a href="#install">Install</a>
         <a href="#faq">FAQ</a>
       </nav>
+
+      <button class="hamburger" id="hamburgerBtn">☰</button>
 
       <a class="btn btn-cta" style="font-size: 1rem; padding: 10px 24px;" href="https://github.com/CatLoveMeow/Fish"
         target="_blank" rel="noopener">🧿 GITHUB</a>
@@ -1941,6 +2026,7 @@
     })();
 
       // Lazy-load videos: only fetch when near viewport
+      const isMobile = window.innerWidth <= 860;
       const lazyVideos = document.querySelectorAll('video[data-src]');
       const videoObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -1948,12 +2034,49 @@
             const video = entry.target;
             video.src = video.dataset.src;
             video.load();
-            video.play().catch(() => {});
+            if (isMobile) {
+              video.removeAttribute('autoplay');
+              video.pause();
+            } else {
+              video.play().catch(() => {});
+            }
             videoObserver.unobserve(video);
           }
         });
       }, { rootMargin: '300px' });
       lazyVideos.forEach(v => videoObserver.observe(v));
+
+      // Loader
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          document.getElementById('loader').classList.add('hidden');
+        }, 1500);
+      });
+
+      // Sidebar
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const mobileSidebar = document.getElementById('mobileSidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+      function toggleSidebar() {
+        mobileSidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('active');
+      }
+
+      if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+        sidebarLinks.forEach(link => link.addEventListener('click', toggleSidebar));
+      }
+
+      // Pause inline videos instantly on mobile (like meteors)
+      if (isMobile) {
+        document.querySelectorAll('video:not([data-src])').forEach(vid => {
+          vid.removeAttribute('autoplay');
+          vid.pause();
+        });
+      }
 
   </script>
 </body>
