@@ -6,15 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MUJ FISH — ASTRONOMICALLY CREATIVE SLCM</title>
   <meta name="description"
-    content="Upgrade your MUJ SLCM portal with MUJ FISH. A free, open-source browser extension adding attendance math, CGPA forecasting, and sorted dashboards safely and locally.">
-  <link rel="canonical" href="https://fish.mujfish.workers.dev/" />
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    content="MUJ FISH adds attendance math, CGPA forecasting and sorted dashboards to the MUJ SLCM portal. Local, free, open source.">
   <link rel="icon" type="image/webp" href="assets/img/image-removebg-preview.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Oi&family=Ultra&family=Bebas+Neue&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Oi&family=Ultra&family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
   <style>
     :root {
@@ -27,7 +24,6 @@
       --coral-hover: #ff2e2e;
       --yellow: #eada4f;
       --green: #39FF14;
-      --red-accent: #ff6b6b;
       --text: #ffffff;
       --text-dim: #A0AAB8;
       --radius: 24px;
@@ -52,6 +48,12 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       position: relative;
+    }
+
+    .spline-container iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
     }
 
     /* --- Background only: soft moving glows + stars (fixed, no layout impact) --- */
@@ -232,7 +234,6 @@
       opacity: 0.8;
       transform: translate3d(0, calc(var(--sy, 0px) * var(--speed, 0)), 0);
       contain: layout style;
-      will-change: transform;
     }
 
     .parallax-layer video {
@@ -240,6 +241,7 @@
       height: 100%;
       object-fit: contain;
       mix-blend-mode: screen;
+      /* Great for dark background videos */
       opacity: 0.6;
     }
 
@@ -251,6 +253,21 @@
     }
 
     /* Video placements */
+    .p-earth {
+      top: -100px;
+      right: -150px;
+      width: 600px;
+      height: 600px;
+      filter: drop-shadow(0 0 50px rgba(57, 255, 20, 0.2));
+    }
+
+    .p-octo {
+      top: 600px;
+      left: -200px;
+      width: 700px;
+      height: 700px;
+      filter: drop-shadow(0 0 50px rgba(255, 107, 107, 0.2));
+    }
 
     .p-brain-fixed {
       position: absolute;
@@ -294,6 +311,61 @@
       }
     }
 
+    .meteor-swarm {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .meteor-fly {
+      position: absolute;
+      opacity: 0.8;
+      mix-blend-mode: screen;
+      filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.6));
+      will-change: transform, left, top;
+    }
+
+    .meteor-1 {
+      width: 120px;
+    }
+
+    .meteor-2 {
+      width: 75px;
+    }
+
+    .meteor-3 {
+      width: 45px;
+    }
+
+    .meteor-4 {
+      width: 90px;
+    }
+
+    .meteor-5 {
+      width: 60px;
+    }
+
+    .meteor-6 {
+      width: 110px;
+    }
+
+    .meteor-7 {
+      width: 50px;
+    }
+
+    .p-dogdance {
+      top: 4150px;
+      left: 43vw;
+      width: 200px;
+      height: 200px;
+      opacity: 0.7;
+    }
+
     .p-small1 {
       right: -50px;
       top: 6600px;
@@ -326,6 +398,13 @@
       opacity: 0.6;
     }
 
+    .p-tentacle {
+      top: -5px;
+      left: 2vw;
+      width: 350px;
+      height: 350px;
+      opacity: 0.85;
+    }
 
     .p-small3 {
       top: 500px;
@@ -348,6 +427,14 @@
       right: 1vw;
       width: 200px;
       height: 200px;
+      opacity: 0.6;
+    }
+
+    .p-drink {
+      top: 2810px;
+      left: 1vw;
+      width: 550px;
+      height: 550px;
       opacity: 0.6;
     }
 
@@ -478,10 +565,12 @@
     .hero-title {
       font-family: 'Oi', cursive;
       font-size: clamp(2rem, 5vw, 4.2rem);
+      /* Reduced to 60% */
       font-weight: 400;
       text-transform: uppercase;
       letter-spacing: 0.02em;
       line-height: 1.5;
+      /* Increased to prevent overlap */
       color: #f1c40f;
       margin-bottom: 32px;
       text-shadow: 6px 6px 0px #000;
@@ -633,6 +722,7 @@
       opacity: 0;
     }
 
+    /* remove link hover */
     .brand:hover {
       color: #fff;
     }
@@ -715,6 +805,7 @@
     .hero-content {
       max-width: 600px;
       margin: 200px auto 0 0;
+      /* Space from top panel, pushed fully left */
       text-align: left;
       position: relative;
     }
@@ -724,10 +815,12 @@
       color: #ff6b6b;
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1rem;
+      /* Reduced to 60% */
       font-weight: 400;
       margin-bottom: 16px;
       text-transform: uppercase;
       letter-spacing: 0.6em;
+      /* Wide spacing to match reference */
       text-shadow: 2px 2px 0px #000;
     }
 
@@ -735,6 +828,7 @@
       margin: 0;
       max-width: 45ch;
       font-size: 0.85rem;
+      /* Reduced to ~60-70% so it's still readable */
       color: var(--text-dim);
       line-height: 1.6;
     }
@@ -759,6 +853,7 @@
       margin: 170px auto 0;
       width: 50%;
       min-width: 600px;
+      /* prevent it from getting too small on mobile */
     }
 
     @media (max-width: 860px) {
@@ -768,6 +863,7 @@
         margin: 60px auto 0;
       }
 
+      /* Nav */
       .header-wrapper {
         top: 12px;
         padding: 0 12px;
@@ -813,6 +909,7 @@
         padding: 8px 18px;
       }
 
+      /* Hero - fix the massive gap */
       .hero {
         padding: 80px 0 40px;
       }
@@ -841,18 +938,27 @@
         max-width: 100%;
       }
 
+      /* Wrap padding */
       .wrap {
         padding: 0 20px;
       }
 
+      /* Show ALL parallax decorative elements on mobile but they will be static via JS */
       .parallax-container {
         display: block;
       }
 
+      /* Show meteors */
+      .meteor-fly {
+        display: block !important;
+      }
+
+      /* Subtle gradient background for mobile (not pure black) */
       body {
         background: linear-gradient(160deg, #0d0810 0%, #0a0d14 40%, #0d0a0a 100%);
       }
 
+      /* Add a soft ambient glow at the top */
       .halo {
         opacity: 0.6;
       }
@@ -1114,11 +1220,6 @@
       margin-left: 8px;
     }
 
-    .figure img {
-      width: 100%;
-      display: block;
-    }
-
     /* ---------- Install ---------- */
     .install {
       padding: 60px 0 120px 0;
@@ -1288,6 +1389,8 @@
     }
 
     @media (max-width: 860px) {
+
+      /* Tighter section spacing */
       .features {
         padding: 60px 0 !important;
       }
@@ -1311,6 +1414,7 @@
         order: 2;
       }
 
+      /* Features section text */
       .copy h3 {
         font-size: clamp(1.6rem, 6vw, 2.2rem);
       }
@@ -1319,6 +1423,7 @@
         margin-bottom: 20px;
       }
 
+      /* Strip / brain section */
       .p-brain-fixed {
         display: none;
       }
@@ -1333,6 +1438,7 @@
         font-size: 1rem;
       }
 
+      /* Section dividers */
       .install {
         border-top: 1px solid rgba(255, 255, 255, 0.07);
         padding: 50px 0 80px !important;
@@ -1343,7 +1449,8 @@
         padding: 50px 0 60px !important;
       }
 
-      .store-grid {
+      /* Install cards stack */
+      .store-cards {
         flex-direction: column;
         align-items: stretch;
       }
@@ -1352,6 +1459,7 @@
         width: 100%;
       }
 
+      /* FAQ */
       .faq-list {
         padding: 0;
       }
@@ -1360,6 +1468,7 @@
         font-size: 0.9rem;
       }
 
+      /* Footer */
       .bottom {
         flex-direction: column;
         text-align: center;
@@ -1370,6 +1479,18 @@
         padding: 40px 0 !important;
         border-top: 1px solid rgba(255, 255, 255, 0.07);
       }
+    }
+
+    /* ---------- Ooze Animation ---------- */
+    .ooze {
+      opacity: 0;
+      transform: scale(0.9) translateY(40px);
+      transition: all 2.5s cubic-bezier(0.19, 1, 0.22, 1) 0.1s;
+    }
+
+    .ooze.active {
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
 
     /* ---------- Loader & Sidebar ---------- */
@@ -1406,6 +1527,7 @@
       text-align: center;
     }
 
+    /* Animation for Loader Fish */
     .loader-fish-img {
       display: inline-block;
       height: 1.4em;
@@ -1549,11 +1671,11 @@
 <body>
   <!-- Loading Screen -->
   <div id="loader" class="loader">
-    <div class="loader-text" style="margin: 0;">
+    <h1 class="loader-text">
       <span class="loader-muj">MUJ</span>
       <img src="assets/img/image-removebg-preview.webp" class="loader-fish-img" alt="FISH">
       <span class="loader-fish-text">FISH</span>
-    </div>
+    </h1>
   </div>
 
   <!-- Sidebar -->
@@ -1564,54 +1686,77 @@
     <a href="#faq" class="sidebar-link">FAQ</a>
   </div>
 
-  <!-- Parallax Background Container -->
-  <div class="parallax-container" aria-hidden="true">
+  <div class="bg-stars" aria-hidden="true"></div>
 
+  <!-- Parallax Background Container (prevents overflow past footer) -->
+  <div class="parallax-container" aria-hidden="true">
+    <div class="parallax-layer p-earth" data-speed="0.2">
+      <video src="assets/media/earth.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-octo" data-speed="0.4">
+      <video src="assets/media/octo.webm" autoplay loop muted playsinline></video>
+    </div>
+    <div class="parallax-layer p-dogdance" data-speed="0.3">
+      <video src="assets/media/dogdance.webm" autoplay loop muted playsinline></video>
+    </div>
     <div class="parallax-layer p-small1" data-speed="-0.2">
-      <img src="assets/media/small.webp" alt="Decor" loading="lazy">
+      <img src="assets/media/small.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-small2" data-speed="-0.2">
-      <img src="assets/media/small.webp" alt="Decor" loading="lazy">
+      <img src="assets/media/small.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-saturn" data-speed="0.1">
-      <img src="assets/media/saturn.webp" alt="Saturn" loading="lazy">
+      <img src="assets/media/saturn.webp" alt="Saturn">
+    </div>
+    <div class="parallax-layer p-tentacle" data-speed="0.12">
+      <video src="assets/media/tentacle.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-small3" data-speed="0.2">
-      <img src="assets/img/jup.webp" alt="Decor" loading="lazy">
+      <img src="assets/img/jup.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-small4" data-speed="0.2">
-      <img src="assets/img/moon.webp" alt="Decor" loading="lazy">
+      <img src="assets/img/moon.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-small5" data-speed="0.2">
-      <img src="assets/img/mouth.webp" alt="Decor" loading="lazy">
+      <img src="assets/img/mouth.webp" alt="Decor">
+    </div>
+    <div class="parallax-layer p-drink" data-speed="0.2">
+      <video src="assets/media/drink.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-car" data-speed="0.2">
-      <video src="assets/media/car.webm" loop muted playsinline preload="metadata"></video>
+      <video src="assets/media/car.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-small" data-speed="0.2">
-      <video src="assets/media/smalll.webm" loop muted playsinline preload="metadata"></video>
+      <video src="assets/media/smalll.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-smallR" data-speed="0.2">
-      <video src="assets/media/smalll.webm" loop muted playsinline preload="metadata"></video>
+      <video src="assets/media/smalll.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="parallax-layer p-stere" data-speed="0.2">
-      <img src="assets/img/stere.webp" alt="Decor" loading="lazy">
+      <img src="assets/img/stere.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-chromeee" data-speed="0.2">
-      <img src="assets/img/chromeee.webp" alt="Decor" loading="lazy">
+      <img src="assets/img/chromeee.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-chromeeeR" data-speed="0.2">
-      <img src="assets/img/chromeee.webp" alt="Decor" loading="lazy">
+      <img src="assets/img/chromeee.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-cd" data-speed="0.2">
-      <img src="assets/img/cd.webp" alt="Decor" loading="lazy">
+      <img src="assets/img/cd.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-cdL" data-speed="0.2">
-      <img src="assets/img/cd.webp" alt="Decor" loading="lazy">
+      <img src="assets/img/cd.webp" alt="Decor">
     </div>
     <div class="parallax-layer p-moving-octo" data-speed="-0.15">
-      <video src="assets/img/moving octo.webm" loop muted playsinline preload="metadata"></video>
+      <video src="assets/img/moving octo.webm" autoplay loop muted playsinline></video>
     </div>
+  </div>
+
+  <!-- Flying Meteors -->
+  <div class="meteor-swarm">
+    <video src="assets/media/meteor.webm" class="meteor-fly meteor-1" autoplay loop muted playsinline></video>
+    <video src="assets/media/meteor.webm" class="meteor-fly meteor-2" autoplay loop muted playsinline></video>
+    <video src="assets/media/meteor.webm" class="meteor-fly meteor-3" autoplay loop muted playsinline></video>
   </div>
 
   <div class="header-wrapper">
@@ -1642,6 +1787,7 @@
         <h1 class="hero-title split-word fly-letters">SLCM, BUT BETTER.</h1>
         <p class="lede">MUJ FISH adds attendance math, CGPA forecasting, and dashboard sorting the SLCM portal forgot.
           Local. Free. Open source.</p>
+
       </div>
 
       <div class="device">
@@ -1667,7 +1813,7 @@
 
   <section class="strip reveal">
     <div class="p-brain-fixed">
-      <video src="assets/img/brain.webm" loop muted playsinline preload="metadata"></video>
+      <video src="assets/img/brain.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="wrap">
       <p>SLCM gives you raw data. FISH gives you <span class="hl">SUPERPOWERS</span>. We've completely overhauled the
@@ -1709,6 +1855,8 @@
           <img src="assets/img/pre.webp" alt="CGPA Predictor Feature" style="width: 100%; display: block;">
         </div>
       </div>
+
+
 
       <div class="feature reveal">
         <div class="copy">
@@ -1807,6 +1955,7 @@
 
   <script>
     (function () {
+      // Compare Slider Setup
       function initCompare(el) {
         var beforeImg = el.querySelector('.before-img');
         var afterWrap = el.querySelector('.after-wrap');
@@ -1831,6 +1980,7 @@
       }
       document.querySelectorAll('.compare').forEach(initCompare);
 
+      // Scroll Reveal
       const reveals = document.querySelectorAll('.reveal');
       const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -1842,6 +1992,7 @@
       }, { threshold: 0.15 });
       reveals.forEach(r => revealObserver.observe(r));
 
+      // FAQ Accordion
       const faqItems = document.querySelectorAll('.faq-item');
       faqItems.forEach(item => {
         const question = item.querySelector('.faq-question');
@@ -1852,6 +2003,7 @@
         });
       });
 
+      // Parallax Scroll Effect (single CSS var update — no per-layer style thrash)
       const parallaxLayers = document.querySelectorAll('.parallax-layer');
       parallaxLayers.forEach(layer => {
         layer.style.setProperty('--speed', layer.getAttribute('data-speed') || '0');
@@ -1867,26 +2019,7 @@
         }
       }, { passive: true });
 
-      const lazyVideos = document.querySelectorAll(
-        '.parallax-layer video, .p-brain-fixed video'
-      );
-
-      if ('IntersectionObserver' in window) {
-        const videoObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            const vid = entry.target;
-            if (entry.isIntersecting) {
-              vid.play().catch(() => { });
-            } else {
-              vid.pause();
-            }
-          });
-        }, { rootMargin: '200px 0px', threshold: 0 });
-        lazyVideos.forEach(v => videoObserver.observe(v));
-      } else {
-        lazyVideos.forEach(v => v.play().catch(() => { }));
-      }
-
+      // Split text into letters for playfully interactive hover, keeping words together
       document.querySelectorAll('.split-word').forEach(el => {
         const words = el.innerText.trim().split(/\s+/);
         el.innerHTML = words.map(word => {
@@ -1895,6 +2028,7 @@
         }).join(' ');
       });
 
+      // One-shot letter fly-in from all directions (first view only — never replays)
       document.querySelectorAll('.fly-letters').forEach(el => {
         const letters = el.querySelectorAll('.word');
         letters.forEach(letter => {
@@ -1931,6 +2065,7 @@
           }, settleMs);
         };
 
+        // Fire once when first shown (with reveal), never again
         const revealParent = el.closest('.reveal');
         if (revealParent) {
           if (revealParent.classList.contains('active')) {
@@ -1949,55 +2084,20 @@
         }
       });
 
+      // Playful hover repulsion for all .word elements
       const words = document.querySelectorAll('.word');
-      const wordCenters = new WeakMap();
-
-      function cacheWordPositions() {
+      document.addEventListener('mousemove', (e) => {
         words.forEach(word => {
-          const rect = word.getBoundingClientRect();
-          wordCenters.set(word, {
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2
-          });
-        });
-      }
-      requestAnimationFrame(() => requestAnimationFrame(cacheWordPositions));
-
-      let resizeTimer;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(cacheWordPositions, 150);
-      });
-      let scrollEndTimer;
-      window.addEventListener('scroll', () => {
-        clearTimeout(scrollEndTimer);
-        scrollEndTimer = setTimeout(cacheWordPositions, 150);
-      }, { passive: true });
-
-      document.querySelectorAll('.fly-letters').forEach(el => {
-        const mo = new MutationObserver(() => {
-          if (el.classList.contains('fly-done')) {
-            cacheWordPositions();
-            mo.disconnect();
-          }
-        });
-        mo.observe(el, { attributes: true, attributeFilter: ['class'] });
-      });
-
-      let mouseX = 0, mouseY = 0, mouseRafPending = false;
-
-      function applyRepulsion() {
-        mouseRafPending = false;
-        words.forEach(word => {
+          // Skip repulsion while letters are still flying in
           const parent = word.closest('.fly-letters');
           if (parent && parent.dataset.flown === '1' && !parent.classList.contains('fly-done')) return;
           if (parent && parent.dataset.flown !== '1') return;
 
-          const center = wordCenters.get(word);
-          if (!center) return;
-
-          const dx = center.x - mouseX;
-          const dy = center.y - mouseY;
+          const rect = word.getBoundingClientRect();
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + rect.height / 2;
+          const dx = x - e.clientX;
+          const dy = y - e.clientY;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < 180) {
@@ -2010,25 +2110,80 @@
             word.style.transform = `translate(0px, 0px) rotate(0deg) scale(1)`;
           }
         });
-      }
+      });
 
-      document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        if (!mouseRafPending) {
-          mouseRafPending = true;
-          requestAnimationFrame(applyRepulsion);
+      // Meteors roaming
+      const meteors = document.querySelectorAll('.meteor-fly');
+
+      meteors.forEach((meteor, index) => {
+        const totalSections = meteors.length;
+        let sectionHeight = document.documentElement.scrollHeight / totalSections;
+        let minY = index * sectionHeight;
+        let maxY = (index + 1) * sectionHeight;
+
+        let x = Math.random() * document.documentElement.scrollWidth;
+        let y = minY + Math.random() * sectionHeight;
+        let angle = Math.random() * 360;
+        let targetX = Math.random() * document.documentElement.scrollWidth;
+        let targetY = minY + Math.random() * sectionHeight;
+        let speed = 1.5 + (Math.random() * 1);
+
+        // If meteor tail is at the back, but the graphic's head is pointing left, 
+        // we offset by 180 degrees so it moves head-first.
+        const graphicOffset = 180;
+
+        function update() {
+          const dx = targetX - x;
+          const dy = targetY - y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 100) {
+            // Refresh section bounds in case page resizes
+            sectionHeight = document.documentElement.scrollHeight / totalSections;
+            minY = index * sectionHeight;
+            maxY = (index + 1) * sectionHeight;
+
+            targetX = Math.random() * document.documentElement.scrollWidth;
+            targetY = minY + Math.random() * sectionHeight;
+          }
+
+          const desiredAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+          let angleDiff = desiredAngle - angle;
+          while (angleDiff > 180) angleDiff -= 360;
+          while (angleDiff < -180) angleDiff += 360;
+
+          angle += angleDiff * 0.03;
+
+          const rad = angle * Math.PI / 180;
+          x += Math.cos(rad) * speed;
+          y += Math.sin(rad) * speed;
+
+          // Wrap horizontally across the screen
+          const m = 300; // margin
+          if (x < -m) x = document.documentElement.scrollWidth + m;
+          else if (x > document.documentElement.scrollWidth + m) x = -m;
+
+          // Wrap vertically within its designated 1/3 section
+          if (y < minY - m) y = maxY + m;
+          else if (y > maxY + m) y = minY - m;
+
+          meteor.style.transform = `translate3d(calc(${x}px - 50%), calc(${y}px - 50%), 0) rotate(${angle + graphicOffset}deg)`;
+
+          requestAnimationFrame(update);
         }
-      }, { passive: true });
+        update();
+      });
 
     })();
 
+    // Loader
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.getElementById('loader').classList.add('hidden');
       }, 1000);
     });
 
+    // Sidebar
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const mobileSidebar = document.getElementById('mobileSidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -2044,6 +2199,7 @@
       sidebarOverlay.addEventListener('click', toggleSidebar);
       sidebarLinks.forEach(link => link.addEventListener('click', toggleSidebar));
     }
+
   </script>
 </body>
 
