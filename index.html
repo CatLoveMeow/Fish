@@ -2387,15 +2387,15 @@
     if (window.innerWidth <= 860) {
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-          setTimeout(dismissLoader, 2000);
+          setTimeout(dismissLoader, 1500);
         });
       } else {
-        setTimeout(dismissLoader, 2000);
+        setTimeout(dismissLoader, 1500);
       }
     } else {
       // Desktop waits for full asset load normally, then stays visible for 5 seconds
       window.addEventListener('load', () => {
-        setTimeout(dismissLoader, 6000);
+        setTimeout(dismissLoader, 3400);
       }, { once: true });
     }
 
