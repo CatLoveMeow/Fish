@@ -670,6 +670,55 @@
         overflow: hidden;
       }
 
+      /* --- CUSTOM MOBILE POSITIONS FOR BACKGROUND ASSETS --- */
+
+      /* Saturn position on mobile */
+      .parallax-container .p-saturn {
+        top: 168px !important;
+        right: -80px !important;
+        width: 320px !important;
+        height: 320px !important;
+      }
+
+      /* Jupiter (.p-small3) position on mobile */
+      .parallax-container .p-small3 {
+        top: 500px !important;
+        left: -40px !important;
+        width: 300px !important;
+        height: 280px !important;
+      }
+
+      /* Moon (.p-small4) position on mobile */
+      .parallax-container .p-small4 {
+        top: 1600px !important;
+        right: -30px !important;
+        width: 200px !important;
+        height: 200px !important;
+      }
+
+      /* Stereo (.p-stere) position on mobile */
+      .parallax-container .p-stere {
+        top: 1800px !important;
+        left: 20px !important;
+        width: 150px !important;
+        height: 150px !important;
+      }
+
+      /* CDs (.p-cd & .p-cdL) position on mobile */
+      .parallax-container .p-cd {
+        top: 3800px !important;
+        right: 20px !important;
+        width: 130px !important;
+        height: 130px !important;
+      }
+
+      .parallax-container .p-cdL {
+        top: 3800px !important;
+        left: 20px !important;
+        width: 130px !important;
+        height: 130px !important;
+      }
+
       .device,
       .nav-glass {
         backdrop-filter: none !important;
@@ -739,10 +788,12 @@
       }
 
       .parallax-container .p-earth,
-      .parallax-container .mouth,
+      .parallax-container .p-mouth,
       .parallax-container .p-saturn,
+      .parallax-container .p-jup,
       .parallax-container .p-small3,
       .parallax-container .p-small4,
+      .parallax-container .p-stere,
       .parallax-container .p-cd,
       .parallax-container .p-cdL {
         display: block !important;
@@ -987,6 +1038,14 @@
       .header-wrapper {
         top: 12px;
         padding: 0 12px;
+      }
+
+      /* Disable scroll reveal animations on mobile so everything appears instantly */
+      .reveal,
+      .ooze {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
       }
 
       .nav-glass {
