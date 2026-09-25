@@ -1943,6 +1943,10 @@
       // regardless of scroll position, which is the main CPU/battery/jank cost
       // (this hits Chrome's software/hardware decoder limits harder than Firefox).
 
+      const lazyVideos = document.querySelectorAll(
+        '.parallax-layer video, .p-brain-fixed video'
+      );
+
       if ('IntersectionObserver' in window) {
         const videoObserver = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
