@@ -753,13 +753,26 @@
         display: none !important;
       }
 
+      /* Give the mobile fish hieroglyphs the same pop-out entrance animation */
       .loader-text::after {
         content: "𓆝 𓆟 𓆞 𓆝 𓆟";
-        font-size: 1.6rem;
-        letter-spacing: 0.1em;
-        display: block;
-        text-align: center;
-        width: 100%;
+        font-size: 1.8rem;
+        letter-spacing: 0.15em;
+        display: inline-block;
+        animation: popMobileFish 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+    }
+
+    /* Keyframes for the mobile fish pop entrance */
+    @keyframes popMobileFish {
+      0% {
+        opacity: 0;
+        transform: scale(0) translateY(10px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
       }
 
       html,
@@ -1671,6 +1684,7 @@
     }
 
     /* ---------- Loader & Sidebar ---------- */
+
     .loader {
       position: fixed;
       inset: 0;
@@ -1681,11 +1695,13 @@
       justify-content: center;
       padding: 0 20px;
       box-sizing: border-box;
-      transition: opacity 0.5s ease;
+      /* Smooth slide-up transition */
+      transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
     }
 
     .loader.hidden {
-      opacity: 0;
+      transform: translateY(-100%);
+      /* Slides straight up and out of view */
       pointer-events: none;
     }
 
@@ -2369,25 +2385,38 @@
 
 
     // Loader & Synchronized Hero Fly-In
-    // Loader & Synchronized Hero Fly-In
-    window.addEventListener('load', () => {
+    // Snappy Loader with Mobile Targeting
+    function dismissLoader() {
+      const loader = document.getElementById('loader');
+      if (!loader || loader.classList.contains('hidden')) return;
+      loader.classList.add('hidden');
+
+      // Unlock scrolling instantly
+      document.body.classList.remove('is-loading');
+
+      // Trigger hero text animation
       setTimeout(() => {
-        const loader = document.getElementById('loader');
-        loader.classList.add('hidden');
+        document.querySelectorAll('.hero .fly-letters').forEach(el => {
+          if (typeof el.playFlyIn === 'function') {
+            el.playFlyIn();
+          }
+        });
+      }, 100);
+    }
 
-        // Unlock scrolling once loader disappears
-        document.body.classList.remove('is-loading');
-
-        // Trigger the hero fly-in animation right AFTER the loader clears
-        setTimeout(() => {
-          document.querySelectorAll('.hero .fly-letters').forEach(el => {
-            if (typeof el.playFlyIn === 'function') {
-              el.playFlyIn();
-            }
-          });
-        }, 100); // 100ms after loader disappears
-      }, 1000);
-    });
+    // Fast 1-sec loader strictly for mobile phones; desktop can use standard load
+    if (window.innerWidth <= 860) {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          setTimeout(dismissLoader, 2000);
+        });
+      } else {
+        setTimeout(dismissLoader, 2000);
+      }
+    } else {
+      // Desktop waits for full asset load normally
+      window.addEventListener('load', dismissLoader, { once: true });
+    }
 
     // Sidebar
     const hamburgerBtn = document.getElementById('hamburgerBtn');
