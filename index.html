@@ -665,6 +665,9 @@
       #loader {
         display: flex !important;
         background: #050505;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
       }
 
       .device,
@@ -679,6 +682,15 @@
         filter: none !important;
       }
 
+      .loader-text {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        width: 100% !important;
+        margin: 0 !important;
+      }
+
       .loader-text .loader-muj,
       .loader-text .loader-fish-img,
       .loader-text .loader-fish-text {
@@ -687,8 +699,38 @@
 
       .loader-text::after {
         content: "𓆝 𓆟 𓆞 𓆝 𓆟";
-        font-size: 2rem;
-        letter-spacing: 0.15em;
+        font-size: 1.6rem;
+        letter-spacing: 0.1em;
+        display: block;
+        text-align: center;
+        width: 100%;
+      }
+
+      html,
+      body {
+        max-width: 100vw;
+        overflow-x: hidden !important;
+      }
+
+      .parallax-container {
+        width: 100vw;
+        max-width: 100vw;
+        overflow: hidden !important;
+        left: 0;
+        right: 0;
+      }
+
+      /* Scale down Earth so it doesn't push past the screen edge */
+      .parallax-container .p-earth {
+        right: -30px !important;
+        width: 240px !important;
+        height: 240px !important;
+      }
+
+      .feature h3.fly-letters .word {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
       }
 
       /* Parallax: Hide everything except Earth, Saturn, Jupiter, Moon, Stereo, and CDs */
