@@ -689,10 +689,10 @@
 
       /* Jupiter (.p-small3) position on mobile */
       .parallax-container .p-small3 {
-        top: 500px !important;
-        left: -15px !important;
-        width: 200px !important;
-        height: 180px !important;
+        top: 300px !important;
+        right: -15px !important;
+        width: 300px !important;
+        height: 280px !important;
       }
 
       /* Moon (.p-small4) position on mobile */
@@ -739,12 +739,18 @@
       }
 
       .loader-text {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        text-align: center !important;
-        width: 100% !important;
-        margin: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        /* Reduced from 6px to bring them closer to the fish */
+        font-size: clamp(1.8rem, 8vw, 3.2rem);
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.02em;
+        text-align: center;
+        margin: 0;
+        width: 100%;
       }
 
       .loader-text .loader-muj,
@@ -2348,6 +2354,14 @@
 
     })();
 
+    // Ensure loader and pop-out animations replay fresh on every reload or navigation
+    window.addEventListener('pageshow', (event) => {
+      const loader = document.getElementById('loader');
+      if (loader) {
+        loader.classList.remove('hidden');
+        document.body.classList.add('is-loading');
+      }
+    });
 
     // Loader & Synchronized Hero Fly-In
     // Snappy Loader with Mobile Targeting
@@ -2379,8 +2393,10 @@
         setTimeout(dismissLoader, 2000);
       }
     } else {
-      // Desktop waits for full asset load normally
-      window.addEventListener('load', dismissLoader, { once: true });
+      // Desktop waits for full asset load normally, then stays visible for 5 seconds
+      window.addEventListener('load', () => {
+        setTimeout(dismissLoader, 6000);
+      }, { once: true });
     }
 
     // Sidebar
