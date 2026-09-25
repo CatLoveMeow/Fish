@@ -667,6 +667,18 @@
         background: #050505;
       }
 
+      .device,
+      .nav-glass {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(20, 20, 25, 0.95) !important;
+        /* Solid dark tint instead of blur */
+      }
+
+      .p-earth {
+        filter: none !important;
+      }
+
       .loader-text .loader-muj,
       .loader-text .loader-fish-img,
       .loader-text .loader-fish-text {
@@ -679,20 +691,13 @@
         letter-spacing: 0.15em;
       }
 
-      .device,
-      .figure {
-        transform: none !important;
-        transform-style: flat !important;
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6) !important;
-        transition: none !important;
-      }
-
       /* Parallax: Hide everything except Earth, Saturn, Jupiter, Moon, Stereo, and CDs */
       .parallax-container .parallax-layer {
         display: none !important;
       }
 
       .parallax-container .p-earth,
+      .parallax-container .mouth,
       .parallax-container .p-saturn,
       .parallax-container .p-small3,
       .parallax-container .p-small4,
@@ -2088,6 +2093,7 @@
       });
       let ticking = false;
       window.addEventListener('scroll', () => {
+        if (window.innerWidth <= 860) return; // Skip parallax calculations entirely on phones!
         if (!ticking) {
           ticking = true;
           window.requestAnimationFrame(() => {
