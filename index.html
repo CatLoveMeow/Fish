@@ -663,7 +663,34 @@
     @media (max-width: 860px) {
 
       #loader {
+        display: flex !important;
+        background: #050505;
+      }
+
+      .loader-text .loader-muj,
+      .loader-text .loader-fish-img,
+      .loader-text .loader-fish-text {
         display: none !important;
+      }
+
+      .loader-text::after {
+        content: "𓆝 𓆟 𓆞 𓆝 𓆟";
+        font-size: 2rem;
+        letter-spacing: 0.15em;
+      }
+
+      .fly-letters .word {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+
+      .device,
+      .figure {
+        transform: none !important;
+        transform-style: flat !important;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6) !important;
+        transition: none !important;
       }
 
       /* Parallax: Hide everything except Earth, Saturn, Jupiter, Moon, Stereo, and CDs */
@@ -675,7 +702,6 @@
       .parallax-container .p-saturn,
       .parallax-container .p-small3,
       .parallax-container .p-small4,
-      .parallax-container .p-stere,
       .parallax-container .p-cd,
       .parallax-container .p-cdL {
         display: block !important;
