@@ -806,13 +806,17 @@
         display: block !important;
       }
 
-      .parallax-container .p-earth {
+      /* Ensure the mobile Earth image fits and positions correctly */
+      .parallax-layer.p-earth img.mobile-only {
+        display: block !important;
         position: absolute;
         top: -60px;
         right: -100px;
         width: 300px;
         height: 300px;
         opacity: 0.35;
+        pointer-events: none;
+        object-fit: contain;
       }
 
       /* Hide desktop nav links and the main desktop CTA button on phones */
@@ -1881,9 +1885,9 @@
 
   <!-- Parallax Background Container (prevents overflow past footer) -->
   <div class="parallax-container" aria-hidden="true">
-    <div class="parallax-layer p-earth" data-speed="0.2">
-      <video src="assets/media/earth.webm" autoplay loop muted playsinline></video>
-    </div>
+    <video class="desktop-only" src="assets/media/earth.webm" autoplay loop muted playsinline></video>
+    <!-- Mobile: shows your lightweight WebP image -->
+    <img class="mobile-only" src="assets/img/earth-.webp" alt="Earth">
     <div class="parallax-layer p-octo" data-speed="0.4">
       <video src="assets/media/octo.webm" autoplay loop muted playsinline></video>
     </div>
