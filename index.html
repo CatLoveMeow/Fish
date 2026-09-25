@@ -662,6 +662,34 @@
     /* --- Mobile Nav Adjustments --- */
     @media (max-width: 860px) {
 
+      #loader {
+        display: none !important;
+      }
+
+      /* Parallax: Hide everything except Earth, Saturn, Jupiter, Moon, Stereo, and CDs */
+      .parallax-container .parallax-layer {
+        display: none !important;
+      }
+
+      .parallax-container .p-earth,
+      .parallax-container .p-saturn,
+      .parallax-container .p-small3,
+      .parallax-container .p-small4,
+      .parallax-container .p-stere,
+      .parallax-container .p-cd,
+      .parallax-container .p-cdL {
+        display: block !important;
+      }
+
+      .parallax-container .p-earth {
+        position: absolute;
+        top: -60px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        opacity: 0.35;
+      }
+
       /* Hide desktop nav links and the main desktop CTA button on phones */
       .top-nav .navlinks,
       .top-nav>.btn-cta {
@@ -1655,6 +1683,17 @@
       box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
     }
 
+    .sidebar-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
     .mobile-sidebar.open {
       right: 0;
     }
@@ -1701,6 +1740,7 @@
   <!-- Sidebar -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="mobile-sidebar" id="mobileSidebar">
+    <button class="sidebar-close" id="sidebarCloseBtn" aria-label="Close Menu">✕</button>
     <a href="#features" class="sidebar-link">Features</a>
     <a href="#install" class="sidebar-link">Install</a>
     <a href="#faq" class="sidebar-link">FAQ</a>
@@ -2216,6 +2256,7 @@
 
     // Sidebar
     const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
     const mobileSidebar = document.getElementById('mobileSidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
@@ -2228,6 +2269,7 @@
     if (hamburgerBtn) {
       hamburgerBtn.addEventListener('click', toggleSidebar);
       sidebarOverlay.addEventListener('click', toggleSidebar);
+      if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', toggleSidebar);
       sidebarLinks.forEach(link => link.addEventListener('click', toggleSidebar));
     }
 
