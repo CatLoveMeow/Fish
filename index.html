@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MUJ FISH — ASTRONOMICALLY CREATIVE SLCM</title>
+  <title>MUJ FISH</title>
   <meta name="description"
     content="MUJ FISH adds attendance math, CGPA forecasting and sorted dashboards to the MUJ SLCM portal. Local, free, open source.">
   <link rel="icon" type="image/webp" href="assets/img/image-removebg-preview.webp">
@@ -56,143 +56,24 @@
       height: 100%;
     }
 
-    /* --- Background only: soft moving glows + stars (fixed, no layout impact) --- */
-    .halo {
-      position: fixed;
-      inset: -20%;
-      width: 140%;
-      height: 140%;
-      z-index: -3;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse 45% 40% at 18% 55%, rgba(180, 70, 40, 0.45) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 35% at 82% 18%, rgba(60, 140, 180, 0.4) 0%, transparent 70%),
-        radial-gradient(ellipse 35% 30% at 70% 75%, rgba(120, 50, 40, 0.22) 0%, transparent 70%),
-        radial-gradient(ellipse 30% 28% at 40% 20%, rgba(40, 90, 140, 0.18) 0%, transparent 70%);
-      transform: translate3d(0, 0, 0);
-      animation: glowDrift 55s ease-in-out infinite alternate;
-    }
-
-    .halo-2 {
-      position: fixed;
-      inset: -25%;
-      width: 150%;
-      height: 150%;
-      z-index: -3;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse 38% 32% at 70% 40%, rgba(50, 120, 160, 0.3) 0%, transparent 70%),
-        radial-gradient(ellipse 42% 38% at 25% 30%, rgba(200, 90, 45, 0.28) 0%, transparent 70%);
-      transform: translate3d(0, 0, 0);
-      animation: glowDrift2 70s ease-in-out infinite alternate;
-      opacity: 0.85;
-    }
-
-    @keyframes glowDrift {
-      0% {
-        transform: translate3d(-3%, 2%, 0) scale(1);
-      }
-
-      50% {
-        transform: translate3d(4%, -3%, 0) scale(1.05);
-      }
-
-      100% {
-        transform: translate3d(2%, 4%, 0) scale(1.02);
-      }
-    }
-
-    @keyframes glowDrift2 {
-      0% {
-        transform: translate3d(3%, -2%, 0) scale(1.03);
-      }
-
-      50% {
-        transform: translate3d(-4%, 3%, 0) scale(1);
-      }
-
-      100% {
-        transform: translate3d(-2%, -4%, 0) scale(1.06);
-      }
-    }
-
     .bg-stars {
       position: fixed;
       inset: 0;
       z-index: -2;
       pointer-events: none;
-      overflow: hidden;
-    }
+      background-image:
+        /* Star layer 1: Small & dense */
+        radial-gradient(rgba(255, 255, 255, 0.75) 1px, transparent 0),
+        /* Star layer 2: Medium & scattered */
+        radial-gradient(rgba(255, 255, 255, 0.6) 1.2px, transparent 0),
+        /* Star layer 3: Bright foreground stars */
+        radial-gradient(rgba(220, 235, 255, 0.9) 1.6px, transparent 0);
 
-    .bg-stars::before,
-    .bg-stars::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 2px;
-      height: 2px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow:
-        80px 120px 0 0 rgba(255, 255, 255, 0.55),
-        220px 40px 0 0 rgba(255, 255, 255, 0.35),
-        400px 280px 0 1px rgba(255, 255, 255, 0.7),
-        560px 90px 0 0 rgba(255, 255, 255, 0.4),
-        720px 340px 0 0 rgba(255, 255, 255, 0.5),
-        900px 160px 0 1px rgba(255, 255, 255, 0.75),
-        1100px 420px 0 0 rgba(255, 255, 255, 0.3),
-        1300px 80px 0 0 rgba(255, 255, 255, 0.55),
-        150px 480px 0 0 rgba(255, 255, 255, 0.45),
-        340px 620px 0 1px rgba(255, 255, 255, 0.65),
-        520px 520px 0 0 rgba(255, 255, 255, 0.35),
-        680px 700px 0 0 rgba(255, 255, 255, 0.5),
-        860px 580px 0 0 rgba(255, 255, 255, 0.4),
-        1040px 740px 0 1px rgba(255, 255, 255, 0.7),
-        1220px 600px 0 0 rgba(255, 255, 255, 0.3),
-        1400px 500px 0 0 rgba(255, 255, 255, 0.55),
-        180px 860px 0 0 rgba(255, 255, 255, 0.4),
-        460px 940px 0 1px rgba(255, 255, 255, 0.6),
-        780px 880px 0 0 rgba(255, 255, 255, 0.35),
-        1120px 980px 0 0 rgba(255, 255, 255, 0.5),
-        300px 200px 0 0 rgba(255, 255, 255, 0.25),
-        980px 300px 0 0 rgba(255, 255, 255, 0.45),
-        60px 700px 0 0 rgba(255, 255, 255, 0.3),
-        1350px 250px 0 1px rgba(255, 255, 255, 0.65),
-        600px 150px 0 0 rgba(255, 255, 255, 0.4);
-      animation: starDrift 180s linear infinite;
-      opacity: 0.85;
-    }
+      /* Using mismatched/prime widths and heights breaks the grid lines */
+      background-size: 230px 310px, 410px 170px, 350px 470px;
 
-    .bg-stars::after {
-      width: 3px;
-      height: 3px;
-      box-shadow:
-        120px 300px 0 1px rgba(255, 255, 255, 0.8),
-        480px 180px 0 0 rgba(255, 255, 255, 0.5),
-        820px 450px 0 1px rgba(255, 255, 255, 0.9),
-        1180px 120px 0 0 rgba(255, 255, 255, 0.45),
-        250px 750px 0 1px rgba(255, 255, 255, 0.75),
-        700px 820px 0 0 rgba(255, 255, 255, 0.4),
-        1000px 650px 0 1px rgba(255, 255, 255, 0.85),
-        40px 450px 0 0 rgba(255, 255, 255, 0.35),
-        1450px 780px 0 0 rgba(255, 255, 255, 0.55),
-        550px 50px 0 1px rgba(255, 255, 255, 0.7),
-        950px 920px 0 0 rgba(255, 255, 255, 0.4),
-        160px 100px 0 0 rgba(255, 255, 255, 0.5);
-      animation: starDrift 260s linear infinite reverse;
-      opacity: 0.7;
-      filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
-    }
-
-    @keyframes starDrift {
-      0% {
-        transform: translate3d(0, 0, 0);
-      }
-
-      100% {
-        transform: translate3d(-80px, 120px, 0);
-      }
+      /* Random offset positions for each layer */
+      background-position: 15px 30px, 120px 85px, 210px 160px;
     }
 
     .bg-noise {
@@ -1535,7 +1416,7 @@
       object-fit: contain;
       vertical-align: middle;
       transform: scale(0) rotate(90deg);
-      animation: popFish 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, floatFish 2s ease-in-out infinite 0.75s;
+      animation: popFish 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, floatFish 2s ease-in-out infinite 0.8s;
       margin: 0;
     }
 
@@ -1553,15 +1434,6 @@
       0% {
         opacity: 0;
         transform: scale(0) rotate(45deg);
-      }
-
-      60% {
-        opacity: 1;
-        transform: scale(1.75) rotate(105deg);
-      }
-
-      80% {
-        transform: scale(1.3) rotate(85deg);
       }
 
       100% {
@@ -1669,6 +1541,11 @@
 </head>
 
 <body>
+
+
+  <div class="bg-stars" aria-hidden="true"></div>
+
+
   <!-- Loading Screen -->
   <div id="loader" class="loader">
     <h1 class="loader-text">
@@ -1791,7 +1668,7 @@
       <div class="device">
         <div class="device-bar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          <span class="url">slcm.jaipur.manipal.edu/ ✨ but better</span>
+          <span class="url">slcm.jaipur.manipal.edu/ ✨ DASHBOARD ✨</span>
         </div>
         <div class="compare-block">
           <div class="compare">
@@ -1814,8 +1691,8 @@
       <video src="assets/img/brain.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="wrap">
-      <p>SLCM gives you raw data. FISH gives you <span class="hl">SUPERPOWERS</span>. We've completely overhauled the
-        portal experience to be faster, smarter, and infinitely more useful—all without leaving the page.</p>
+      <p>Stop opening calculator apps for SLCM. <span class="hl">Fish</span> handles the math—tracking your attendance
+        limits, predicting your CGPA, totaling your internal marks, and color-coding your timetable."</p>
     </div>
   </section>
 
@@ -1823,7 +1700,7 @@
     <div class="wrap">
       <div class="features-head reveal">
         <span class="section-subtitle">Core Upgrades</span>
-        <h2 class="section-title">FIVE THINGS SLCM FORGOT</h2>
+        <h2 class="section-title">FOUR THINGS SLCM FORGOT</h2>
         <p>Each one seamlessly reads the page you're already on and injects the missing features right where you need
           them.</p>
       </div>
@@ -1832,8 +1709,8 @@
         <div class="copy">
           <span class="tag">FISH.ATTENDANCE</span>
           <h3 class="split-word fly-letters">KNOW HOW MANY TO SKIP</h3>
-          <p>Set a target percentage and FISH works out how many classes you can miss in a row, or how many you need to
-            attend back-to-back to climb back over 75%.</p>
+          <p>Give it a target percentage. FISH tells you exactly how many classes you can bunk before you're in trouble
+            — or how many you need to grind through to climb back to 75%..</p>
         </div>
         <div class="figure">
           <div class="bar"><span class="path">Reports → Attendance Summary</span></div>
@@ -2027,6 +1904,7 @@
       });
 
       // One-shot letter fly-in from all directions (first view only — never replays)
+      // One-shot letter fly-in (Hero waits for loader, others reveal on scroll)
       document.querySelectorAll('.fly-letters').forEach(el => {
         const letters = el.querySelectorAll('.word');
         letters.forEach(letter => {
@@ -2063,12 +1941,13 @@
           }, settleMs);
         };
 
-        // Fire once when first shown (with reveal), never again
+        // Attach function to element so loader can trigger it directly for the hero
+        el.playFlyIn = playFlyIn;
+
+        // For non-hero elements further down the page, trigger normally on scroll reveal
         const revealParent = el.closest('.reveal');
-        if (revealParent) {
-          if (revealParent.classList.contains('active')) {
-            requestAnimationFrame(() => requestAnimationFrame(playFlyIn));
-          } else {
+        if (!el.closest('.hero')) {
+          if (revealParent) {
             const mo = new MutationObserver(() => {
               if (revealParent.classList.contains('active')) {
                 playFlyIn();
@@ -2076,9 +1955,9 @@
               }
             });
             mo.observe(revealParent, { attributes: true, attributeFilter: ['class'] });
+          } else {
+            requestAnimationFrame(() => requestAnimationFrame(playFlyIn));
           }
-        } else {
-          requestAnimationFrame(() => requestAnimationFrame(playFlyIn));
         }
       });
 
@@ -2174,10 +2053,21 @@
 
     })();
 
-    // Loader
+
+    // Loader & Synchronized Hero Fly-In
     window.addEventListener('load', () => {
       setTimeout(() => {
-        document.getElementById('loader').classList.add('hidden');
+        const loader = document.getElementById('loader');
+        loader.classList.add('hidden');
+
+        // Trigger the hero fly-in animation right AFTER the loader clears
+        setTimeout(() => {
+          document.querySelectorAll('.hero .fly-letters').forEach(el => {
+            if (typeof el.playFlyIn === 'function') {
+              el.playFlyIn();
+            }
+          });
+        }, 100); // 100ms after loader disappears
       }, 1000);
     });
 
