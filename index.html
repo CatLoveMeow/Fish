@@ -774,6 +774,9 @@
         opacity: 1;
         transform: scale(1) translateY(0);
       }
+    }
+
+    @media (max-width: 860px) {
 
       html,
       body {
@@ -789,20 +792,7 @@
         right: 0;
       }
 
-      /* Scale down Earth so it doesn't push past the screen edge */
-      .parallax-container .p-earth {
-        right: -30px !important;
-        width: 240px !important;
-        height: 240px !important;
-      }
-
-      .feature h3.fly-letters .word {
-        opacity: 1 !important;
-        transform: none !important;
-        transition: none !important;
-      }
-
-      /* Parallax: Hide everything except Earth, Saturn, Jupiter, Moon, Stereo, and CDs */
+      /* Parallax: Hide everything except whitelisted mobile assets (Earth is completely excluded here) */
       .parallax-container .parallax-layer {
         display: none !important;
       }
@@ -816,27 +806,6 @@
       .parallax-container .p-cd,
       .parallax-container .p-cdL {
         display: block !important;
-      }
-
-
-      /* Hide desktop nav links and the main desktop CTA button on phones */
-      .top-nav .navlinks,
-      .top-nav>.btn-cta {
-        display: none !important;
-      }
-
-      /* Streamline the header wrapper and make the nav glass span nicely */
-      .header-wrapper {
-        top: 12px;
-        padding: 0 16px;
-        margin-bottom: -80px;
-      }
-
-      .nav-glass {
-        width: 100%;
-        justify-content: space-between;
-        padding: 10px 20px;
-        border-radius: 30px;
       }
     }
 
@@ -1888,13 +1857,8 @@
 
   <!-- Parallax Background Container (prevents overflow past footer) -->
   <div class="parallax-container" aria-hidden="true">
-
     <div class="parallax-layer p-earth" data-speed="0.2">
-      <!-- Desktop: plays the heavy WebM video -->
       <video class="desktop-only" src="assets/media/earth.webm" autoplay loop muted playsinline></video>
-
-      <!-- Mobile: shows your lightweight WebP image -->
-      <img class="mobile-only" src="assets/img/earth-.webp" alt="Earth">
     </div>
 
     <div class="parallax-layer p-octo" data-speed="0.4">
@@ -2321,6 +2285,7 @@
 
       // Meteors roaming
       const meteors = document.querySelectorAll('.meteor-fly');
+      if (window.innerWidth <= 860) return;
 
       meteors.forEach((meteor, index) => {
         const totalSections = meteors.length;
@@ -2404,7 +2369,7 @@
       }, 100);
     }
 
-    // Fast 1-sec loader strictly for mobile phones; desktop can use standard load
+    // Fast 2-sec loader strictly for mobile phones; desktop can use standard load
     if (window.innerWidth <= 860) {
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
