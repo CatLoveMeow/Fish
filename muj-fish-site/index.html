@@ -7,11 +7,12 @@
   <title>MUJ FISH — ASTRONOMICALLY CREATIVE SLCM</title>
   <meta name="description"
     content="MUJ FISH adds attendance math, CGPA forecasting and sorted dashboards to the MUJ SLCM portal. Local, free, open source.">
-  <link rel="icon" type="image/webp" href="assets/img/image-removebg-preview.webp">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐠</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Oi&family=Ultra&family=Bebas+Neue&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Oi&family=Ultra&family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap"
     rel="stylesheet">
   <style>
     :root {
@@ -24,7 +25,6 @@
       --coral-hover: #ff2e2e;
       --yellow: #eada4f;
       --green: #39FF14;
-      --red-accent: #ff6b6b;
       --text: #ffffff;
       --text-dim: #A0AAB8;
       --radius: 24px;
@@ -48,7 +48,6 @@
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-      position: relative;
     }
 
     .spline-container iframe {
@@ -70,8 +69,9 @@
         radial-gradient(ellipse 40% 35% at 82% 18%, rgba(60, 140, 180, 0.4) 0%, transparent 70%),
         radial-gradient(ellipse 35% 30% at 70% 75%, rgba(120, 50, 40, 0.22) 0%, transparent 70%),
         radial-gradient(ellipse 30% 28% at 40% 20%, rgba(40, 90, 140, 0.18) 0%, transparent 70%);
+      filter: blur(60px);
       transform: translate3d(0, 0, 0);
-      animation: glowDrift 55s ease-in-out infinite alternate;
+      animation: glowDrift 28s ease-in-out infinite alternate;
     }
 
     .halo-2 {
@@ -84,8 +84,9 @@
       background:
         radial-gradient(ellipse 38% 32% at 70% 40%, rgba(50, 120, 160, 0.3) 0%, transparent 70%),
         radial-gradient(ellipse 42% 38% at 25% 30%, rgba(200, 90, 45, 0.28) 0%, transparent 70%);
+      filter: blur(70px);
       transform: translate3d(0, 0, 0);
-      animation: glowDrift2 70s ease-in-out infinite alternate;
+      animation: glowDrift2 36s ease-in-out infinite alternate;
       opacity: 0.85;
     }
 
@@ -161,7 +162,7 @@
         60px 700px 0 0 rgba(255, 255, 255, 0.3),
         1350px 250px 0 1px rgba(255, 255, 255, 0.65),
         600px 150px 0 0 rgba(255, 255, 255, 0.4);
-      animation: starDrift 180s linear infinite;
+      animation: starDrift 90s linear infinite;
       opacity: 0.85;
     }
 
@@ -181,7 +182,7 @@
         550px 50px 0 1px rgba(255, 255, 255, 0.7),
         950px 920px 0 0 rgba(255, 255, 255, 0.4),
         160px 100px 0 0 rgba(255, 255, 255, 0.5);
-      animation: starDrift 260s linear infinite reverse;
+      animation: starDrift 140s linear infinite reverse;
       opacity: 0.7;
       filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
     }
@@ -216,18 +217,7 @@
       }
     }
 
-    /* Floating Parallax Container & Elements */
-    .parallax-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: -1;
-    }
-
+    /* Floating Parallax Elements */
     .parallax-layer {
       position: absolute;
       pointer-events: none;
@@ -235,7 +225,6 @@
       opacity: 0.8;
       transform: translate3d(0, calc(var(--sy, 0px) * var(--speed, 0)), 0);
       contain: layout style;
-      will-change: transform;
     }
 
     .parallax-layer video {
@@ -292,7 +281,7 @@
 
     .p-moving-octo {
       position: absolute;
-      top: 5300px;
+      top: 5400px;
       left: -30vw;
       width: 550px;
       height: 550px;
@@ -318,8 +307,6 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      overflow: hidden;
       z-index: 9999;
       pointer-events: none;
     }
@@ -361,16 +348,16 @@
     }
 
     .p-dogdance {
-      top: 4150px;
-      left: 43vw;
-      width: 200px;
-      height: 200px;
+      top: 3600px;
+      right: -150px;
+      width: 600px;
+      height: 600px;
       opacity: 0.7;
     }
 
     .p-small1 {
       right: -50px;
-      top: 6600px;
+      top: 6900px;
       width: 300px;
       height: 300px;
       opacity: 0.5;
@@ -382,7 +369,7 @@
 
     .p-small2 {
       left: -50px;
-      top: 6600px;
+      top: 6900px;
       width: 300px;
       height: 300px;
       opacity: 0.5;
@@ -409,8 +396,8 @@
     }
 
     .p-small3 {
-      top: 500px;
-      right: 30vw;
+      top: 2800px;
+      left: 10vw;
       width: 250px;
       height: 250px;
       opacity: 0.6;
@@ -433,87 +420,27 @@
     }
 
     .p-drink {
-      top: 2810px;
-      left: 1vw;
-      width: 550px;
-      height: 550px;
+      top: 770px;
+      right: 1vw;
+      width: 200px;
+      height: 200px;
       opacity: 0.6;
     }
 
     .p-small {
-      top: 1500px;
+      top: 770px;
       right: 1vw;
-      width: 550px;
-      height: 500px;
+      width: 200px;
+      height: 200px;
       opacity: 0.6;
-    }
-
-    .p-smallR {
-      top: 1500px;
-      left: 1vw;
-      width: 550px;
-      height: 500px;
-      opacity: 0.6;
-    }
-
-    .p-smallR video {
-      transform: scaleX(-1);
     }
 
     .p-car {
-      top: 2360px;
-      right: -6.5vw;
-      width: 450px;
-      height: 450px;
+      top: 2400px;
+      right: 1vw;
+      width: 250px;
+      height: 250px;
       opacity: 0.6;
-    }
-
-    .p-chromeee {
-      top: 4250px;
-      right: 20vw;
-      width: 250px;
-      height: 250px;
-      opacity: 0.7;
-    }
-
-    .p-chromeeeR {
-      top: 4250px;
-      left: 20vw;
-      width: 250px;
-      height: 250px;
-      opacity: 0.7;
-    }
-
-    .p-chromeeeR img {
-      transform: scaleX(-1);
-    }
-
-    .p-stere {
-      top: 2200px;
-      left: 15vw;
-      width: 260px;
-      height: 260px;
-      opacity: 0.7;
-    }
-
-    .p-cd {
-      top: 4150px;
-      right: 5vw;
-      width: 220px;
-      height: 220px;
-      opacity: 0.7;
-    }
-
-    .p-cdL {
-      top: 4150px;
-      left: 5vw;
-      width: 220px;
-      height: 220px;
-      opacity: 0.7;
-    }
-
-    .p-cdL img {
-      transform: scaleX(-1);
     }
 
     img {
@@ -662,65 +589,42 @@
 
     .brand {
       position: relative;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
-      height: 3.5rem;
-      width: 150px;
+      gap: 12px;
       font-family: 'Bebas Neue', sans-serif;
       font-size: 2.4rem;
       color: #fff;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       line-height: 1;
       cursor: pointer;
-      text-decoration: none;
+      width: 220px;
+      /* Lock container width */
     }
 
-    .brand::after,
-    .brand:hover::after {
-      display: none !important;
-      content: none !important;
-    }
-
-    .brand-fish-img {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%) rotate(90deg);
-      height: 3.5rem;
-      width: auto;
-      object-fit: contain;
-      z-index: 2;
-      pointer-events: none;
+    .brand::after {
+      display: none;
     }
 
     .brand-text {
-      position: absolute;
-      top: 50%;
+      display: inline-block;
+      overflow: hidden;
       white-space: nowrap;
-      opacity: 1;
-      z-index: 1;
-      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease;
+      transition: max-width 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+      width: 70px;
+      max-width: 70px;
+      text-align: center;
     }
 
-    .brand-text-left {
-      right: calc(50% + 14px);
-      transform: translateY(-50%) translateX(0);
+    .brand-emoji {
+      font-size: 2.4rem;
+      transition: transform 0.4s ease;
     }
 
-    .brand-text-right {
-      left: calc(50% + 14px);
-      transform: translateY(-50%) translateX(0);
-    }
-
-    .brand:hover .brand-text-left {
-      transform: translateY(-50%) translateX(20px);
-      opacity: 0;
-    }
-
-    .brand:hover .brand-text-right {
-      transform: translateY(-50%) translateX(-20px);
+    .brand:hover .brand-text {
+      max-width: 0;
       opacity: 0;
     }
 
@@ -862,95 +766,6 @@
       .device {
         width: 100%;
         min-width: unset;
-        margin: 60px auto 0;
-      }
-
-      /* Nav */
-      .header-wrapper {
-        top: 12px;
-        padding: 0 12px;
-      }
-      .nav-glass {
-        padding: 10px 16px;
-      }
-      .brand {
-        height: 2.6rem;
-        width: 110px;
-        font-size: 1.7rem;
-      }
-      .brand-fish-img {
-        height: 2.5rem;
-      }
-      .brand-text {
-        font-size: 1.7rem;
-        opacity: 1;
-      }
-      .brand-text-left {
-        right: calc(50% + 10px);
-      }
-      .brand-text-right {
-        left: calc(50% + 10px);
-      }
-      .navlinks {
-        gap: 16px;
-      }
-      .navlinks a:not(.btn) {
-        display: none;
-      }
-      .btn-cta {
-        font-size: 1rem;
-        padding: 8px 18px;
-      }
-
-      /* Hero - fix the massive gap */
-      .hero {
-        padding: 80px 0 40px;
-      }
-      .hero-content {
-        margin: 20px auto 0;
-        text-align: center;
-        padding: 0 20px;
-        max-width: 100%;
-      }
-      .hero .cta-row {
-        justify-content: center;
-        gap: 16px;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 28px;
-      }
-      .hero-title {
-        font-size: clamp(2.2rem, 10vw, 3.5rem);
-      }
-      .hero p.lede {
-        font-size: 0.95rem;
-        max-width: 100%;
-      }
-
-      /* Wrap padding */
-      .wrap {
-        padding: 0 20px;
-      }
-
-      /* Show ALL parallax decorative elements on mobile but they will be static via JS */
-      .parallax-container {
-        display: block;
-      }
-      /* Show meteors */
-      .meteor-fly {
-        display: block !important;
-      }
-
-      /* Subtle gradient background for mobile (not pure black) */
-      body {
-        background: linear-gradient(160deg, #0d0810 0%, #0a0d14 40%, #0d0a0a 100%);
-      }
-      /* Add a soft ambient glow at the top */
-      .halo {
-        opacity: 0.6;
-      }
-      .halo-2 {
-        opacity: 0.5;
       }
     }
 
@@ -1183,10 +998,11 @@
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.8);
-      transition: border-color 0.4s ease, box-shadow 0.4s ease;
+      transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
     }
 
     .figure:hover {
+      transform: translateY(-8px) scale(1.02);
       border-color: rgba(57, 255, 20, 0.4);
       box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(57, 255, 20, 0.1);
     }
@@ -1204,11 +1020,6 @@
       font-size: 0.75rem;
       color: var(--text-dim);
       margin-left: 8px;
-    }
-
-    .figure img {
-      width: 100%;
-      display: block;
     }
 
     /* ---------- Install ---------- */
@@ -1380,85 +1191,28 @@
     }
 
     @media (max-width: 860px) {
-      /* Tighter section spacing */
-      .features {
-        padding: 60px 0 !important;
-      }
       .feature {
         grid-template-columns: 1fr;
-        gap: 24px;
-        padding: 40px 0 !important;
-        border-bottom: 1px solid rgba(255,255,255,0.07);
-      }
-      .feature:last-child {
-        border-bottom: none;
+        gap: 40px;
       }
 
       .feature.reverse .figure {
         order: 1;
       }
+
       .feature.reverse .copy {
         order: 2;
       }
 
-      /* Features section text */
-      .copy h3 {
-        font-size: clamp(1.6rem, 6vw, 2.2rem);
-      }
-      .features-head {
-        margin-bottom: 20px;
-      }
-
-      /* Strip / brain section */
-      .p-brain-fixed {
+      .navlinks a:not(.btn) {
         display: none;
       }
-      .strip {
-        padding: 50px 0 !important;
-        border-top: 1px solid rgba(255,255,255,0.07);
-        border-bottom: 1px solid rgba(255,255,255,0.07);
-      }
-      .strip .wrap p {
-        font-size: 1rem;
+
+      .parallax-layer {
+        display: none;
       }
 
-      /* Section dividers */
-      .install {
-        border-top: 1px solid rgba(255,255,255,0.07);
-        padding: 50px 0 80px !important;
-      }
-      .faq {
-        border-top: 1px solid rgba(255,255,255,0.07);
-        padding: 50px 0 60px !important;
-      }
-
-      /* Install cards stack */
-      .store-grid {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .store-card {
-        width: 100%;
-      }
-
-      /* FAQ */
-      .faq-list {
-        padding: 0;
-      }
-      .faq-question {
-        font-size: 0.9rem;
-      }
-
-      /* Footer */
-      .bottom {
-        flex-direction: column;
-        text-align: center;
-        align-items: center;
-      }
-      footer {
-        padding: 40px 0 !important;
-        border-top: 1px solid rgba(255,255,255,0.07);
-      }
+      /* Hide videos on small screens for performance */
     }
 
     /* ---------- Ooze Animation ---------- */
@@ -1472,241 +1226,76 @@
       opacity: 1;
       transform: scale(1) translateY(0);
     }
-    /* ---------- Loader & Sidebar ---------- */
-    .loader {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: #0d0810;
-      z-index: 99999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 16px;
-      box-sizing: border-box;
-      transition: opacity 0.5s ease;
-    }
-    .loader.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .loader-text {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      font-size: clamp(1.8rem, 7vw, 4rem);
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.02em;
-      text-align: center;
-    }
-
-    /* Animation for Loader Fish */
-    .loader-fish-img {
-      display: inline-block;
-      height: 1.4em;
-      width: auto;
-      object-fit: contain;
-      vertical-align: middle;
-      transform: scale(0) rotate(90deg);
-      animation: popFish 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, floatFish 2s ease-in-out infinite 0.75s;
-      margin: 0;
-    }
-    .loader-muj {
-      opacity: 0;
-      animation: slideLeft 0.55s cubic-bezier(0.25, 1, 0.5, 1) forwards 0.4s;
-    }
-    .loader-fish-text {
-      opacity: 0;
-      animation: slideRight 0.55s cubic-bezier(0.25, 1, 0.5, 1) forwards 0.4s;
-    }
-
-    @keyframes popFish {
-      0% {
-        opacity: 0;
-        transform: scale(0) rotate(45deg);
-      }
-      60% {
-        opacity: 1;
-        transform: scale(1.75) rotate(105deg);
-      }
-      80% {
-        transform: scale(1.3) rotate(85deg);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1.45) rotate(90deg);
-      }
-    }
-    @keyframes floatFish {
-      0%, 100% {
-        transform: scale(1.45) rotate(90deg) translateY(0px);
-      }
-      50% {
-        transform: scale(1.52) rotate(90deg) translateY(-8px);
-      }
-    }
-    @keyframes slideLeft {
-      0% { opacity: 0; transform: translateX(45px); }
-      100% { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes slideRight {
-      0% { opacity: 0; transform: translateX(-45px); }
-      100% { opacity: 1; transform: translateX(0); }
-    }
-
-    .sidebar-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 9998;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .sidebar-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .mobile-sidebar {
-      position: fixed;
-      top: 0; right: -300px;
-      width: 260px;
-      height: 100%;
-      background: #1a1a1a;
-      z-index: 9999;
-      padding: 80px 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      transition: right 0.3s ease;
-      box-shadow: -5px 0 30px rgba(0,0,0,0.5);
-    }
-    .mobile-sidebar.open {
-      right: 0;
-    }
-    .mobile-sidebar a {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text);
-      text-decoration: none;
-    }
-    .hamburger {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 2rem;
-      cursor: pointer;
-    }
-    @media (max-width: 860px) {
-      .hamburger {
-        display: block;
-      }
-    }
   </style>
 </head>
 
 <body>
-  <!-- Loading Screen -->
-  <div id="loader" class="loader">
-    <h1 class="loader-text">
-      <span class="loader-muj">MUJ</span>
-      <img src="assets/img/image-removebg-preview.webp" class="loader-fish-img" alt="FISH">
-      <span class="loader-fish-text">FISH</span>
-    </h1>
-  </div>
-  
-  <!-- Sidebar -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
-  <div class="mobile-sidebar" id="mobileSidebar">
-    <a href="#features" class="sidebar-link">Features</a>
-    <a href="#install" class="sidebar-link">Install</a>
-    <a href="#faq" class="sidebar-link">FAQ</a>
-  </div>
 
   <div class="halo" aria-hidden="true"></div>
   <div class="halo-2" aria-hidden="true"></div>
   <div class="bg-stars" aria-hidden="true"></div>
   <div class="bg-noise" aria-hidden="true"></div>
 
-  <!-- Parallax Background Container (prevents overflow past footer) -->
-  <div class="parallax-container" aria-hidden="true">
-    <div class="parallax-layer p-earth" data-speed="0.2">
-      <video src="assets/media/earth.webm" loop muted playsinline preload="metadata"></video>
-    </div>
-    <div class="parallax-layer p-octo" data-speed="0.4">
-      <video src="assets/media/octo.webm" loop muted playsinline preload="metadata"></video>
-    </div>
-    <div class="parallax-layer p-dogdance" data-speed="0.3">
-      <video src="assets/media/dogdance.webm" loop muted playsinline preload="metadata"></video>
-    </div>
-    <div class="parallax-layer p-small1" data-speed="-0.2">
-      <img src="assets/media/small.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-small2" data-speed="-0.2">
-      <img src="assets/media/small.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-saturn" data-speed="0.1">
-      <img src="assets/media/saturn.webp" alt="Saturn">
-    </div>
-    <div class="parallax-layer p-tentacle" data-speed="0.12">
-      <video src="assets/media/tentacle.webm" loop muted playsinline preload="metadata"></video>
-    </div>
-    <div class="parallax-layer p-small3" data-speed="0.2">
-      <img src="assets/img/jup.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-small4" data-speed="0.2">
-      <img src="assets/img/moon.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-small5" data-speed="0.2">
-      <img src="assets/img/mouth.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-drink" data-speed="0.2">
-      <video src="assets/media/drink.webm" loop muted playsinline preload="metadata"></video>
-    </div>
-    <div class="parallax-layer p-car" data-speed="0.2">
-      <video src="assets/media/car.webm" loop muted playsinline preload="metadata"></video>
-    </div>
-    <div class="parallax-layer p-small" data-speed="0.2">
-      <video src="assets/media/smalll.webm" loop muted playsinline preload="metadata"></video>
-    </div>
-    <div class="parallax-layer p-smallR" data-speed="0.2">
-      <video src="assets/media/smalll.webm" loop muted playsinline preload="metadata"></video>
-    </div>
-    <div class="parallax-layer p-stere" data-speed="0.2">
-      <img src="assets/img/stere.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-chromeee" data-speed="0.2">
-      <img src="assets/img/chromeee.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-chromeeeR" data-speed="0.2">
-      <img src="assets/img/chromeee.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-cd" data-speed="0.2">
-      <img src="assets/img/cd.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-cdL" data-speed="0.2">
-      <img src="assets/img/cd.webp" alt="Decor">
-    </div>
-    <div class="parallax-layer p-moving-octo" data-speed="-0.15">
-      <video src="assets/img/moving octo.webm" loop muted playsinline preload="metadata"></video>
-    </div>
+  <!-- Parallax Videos/Images -->
+  <div class="parallax-layer p-earth" data-speed="0.2">
+    <video src="assets/media/earth.webm" autoplay loop muted playsinline></video>
   </div>
-
+  <div class="parallax-layer p-octo" data-speed="0.4">
+    <video src="assets/media/octo.webm" autoplay loop muted playsinline></video>
+  </div>
   <!-- Flying Meteors -->
   <div class="meteor-swarm">
-    <video src="assets/media/meteor.webm" class="meteor-fly meteor-1" loop muted playsinline preload="metadata"></video>
-    <video src="assets/media/meteor.webm" class="meteor-fly meteor-2" loop muted playsinline preload="metadata"></video>
-    <video src="assets/media/meteor.webm" class="meteor-fly meteor-3" loop muted playsinline preload="metadata"></video>
+    <video src="assets/media/meteor.webm" class="meteor-fly meteor-1" autoplay loop muted playsinline></video>
+    <video src="assets/media/meteor.webm" class="meteor-fly meteor-2" autoplay loop muted playsinline></video>
+    <video src="assets/media/meteor.webm" class="meteor-fly meteor-3" autoplay loop muted playsinline></video>
+  </div>
+  <div class="parallax-layer p-dogdance" data-speed="0.3">
+    <video src="assets/media/dogdance.webm" autoplay loop muted playsinline></video>
+  </div>
+  <div class="parallax-layer p-small1" data-speed="-0.2">
+    <image src="assets/media/small.webp" autoplay loop muted playsinline></image>
+  </div>
+  <div class="parallax-layer p-small2" data-speed="-0.2">
+    <img src="assets/media/small.webp" autoplay loop muted playsinline></img>
+  </div>
+  <div class="parallax-layer p-saturn" data-speed="0.1">
+    <img src="assets/media/saturn.webp" alt="Saturn">
+  </div>
+  <div class="parallax-layer p-tentacle" data-speed="0.12">
+    <video src="assets/media/tentacle.webm" autoplay loop muted playsinline></video>
+  </div>
+  <div class="parallax-layer p-small3" data-speed="0.2">
+    <img src="assets/img/jup.webp" alt="Decor">
+  </div>
+  <div class="parallax-layer p-small4" data-speed="0.2">
+    <img src="assets/img/moon.webp" alt="Decor">
+  </div>
+  <div class="parallax-layer p-small5" data-speed="0.2">
+    <img src="assets/img/mouth.webp" alt="Decor">
+  </div>
+
+  <div class="parallax-layer p-drink" data-speed="0.2">
+    <video src="assets/media/drink.webm" autoplay loop muted playsinline></video>
+  </div>
+
+  <div class="parallax-layer p-car" data-speed="0.2">
+    <video src="assets/media/car.webm" autoplay loop muted playsinline></video>
+  </div>
+
+  <div class="parallax-layer p-small" data-speed="0.2">
+    <video src="assets/media/small.webm" autoplay loop muted playsinline></video>
+  </div>
+
+  <div class="parallax-layer p-moving-octo" data-speed="-0.15">
+    <video src="assets/img/moving octo.webm" autoplay loop muted playsinline></video>
   </div>
 
   <div class="header-wrapper">
     <header class="top-nav">
       <a href="#top" class="brand">
-        <span class="brand-text brand-text-left">MUJ</span>
-        <img src="assets/img/image-removebg-preview.webp" class="brand-fish-img" alt="FISH">
-        <span class="brand-text brand-text-right">FISH</span>
+        <span class="brand-text">MUJ</span>
+        <span class="brand-emoji">🐠</span>
+        <span class="brand-text">FISH</span>
       </a>
 
       <nav class="nav-glass navlinks">
@@ -1715,10 +1304,8 @@
         <a href="#faq">FAQ</a>
       </nav>
 
-      <button class="hamburger" id="hamburgerBtn">☰</button>
-
-      <a class="btn btn-cta" style="font-size: 1rem; padding: 10px 24px;" href="https://github.com/CatLoveMeow/Fish"
-        target="_blank" rel="noopener">🧿 GITHUB</a>
+      <a class="btn btn-cta" style="font-size: 1rem; padding: 10px 24px;"
+        href="https://github.com/Drifting-Moon/Student-tool-MUJ" target="_blank" rel="noopener">🧿 GITHUB</a>
     </header>
   </div>
 
@@ -1732,16 +1319,16 @@
 
       </div>
 
-      <div class="device">
+      <div class="device ooze">
         <div class="device-bar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          <span class="url">slcm.jaipur.manipal.edu/ ✨ but better</span>
+          <span class="url">slcm.jaipur.manipal.edu/</span>
         </div>
         <div class="compare-block">
           <div class="compare">
             <img class="before-img" src="assets/img/.png" alt="Before">
             <div class="after-wrap">
-              <img src="assets/img/ds.webp" alt="After">
+              <img src="assets/img/ds.png" alt="After">
             </div>
             <div class="handle">
               <div class="grip">⇔</div>
@@ -1755,7 +1342,7 @@
 
   <section class="strip reveal">
     <div class="p-brain-fixed">
-      <video src="assets/img/brain.webm" loop muted playsinline preload="metadata"></video>
+      <video src="assets/img/brain.webm" autoplay loop muted playsinline></video>
     </div>
     <div class="wrap">
       <p>SLCM gives you raw data. FISH gives you <span class="hl">SUPERPOWERS</span>. We've completely overhauled the
@@ -1779,10 +1366,15 @@
           <p>Set a target percentage and FISH works out how many classes you can miss in a row, or how many you need to
             attend back-to-back to climb back over 75%.</p>
         </div>
-        <div class="figure">
+        <div class="figure ooze">
           <div class="bar"><span class="path">Reports → Attendance Summary</span></div>
-          <img src="assets/img/after_attendance.webp" alt="Attendance Feature">
+          <img src="assets/img/after_attendance.webp" alt="Attendance Feature" style="width: 100%; display: block;">
         </div>
+      </div>
+
+      <div class="feature-divider" style="text-align: center; margin: 0;">
+        <video src="assets/media/small.webm" autoplay loop muted playsinline
+          style="width: 200px; opacity: 0.7; mix-blend-mode: screen;"></video>
       </div>
 
       <div class="feature reverse reveal">
@@ -1792,13 +1384,16 @@
           <p>The CGPA predictor plots past semesters on a curve. Add hypothetical future semesters with expected
             credits, and watch the projected CGPA recalculate live.</p>
         </div>
-        <div class="figure">
+        <div class="figure ooze">
           <div class="bar"><span class="path">Examination → CGPA & GPA</span></div>
-          <img src="assets/img/pre.webp" alt="CGPA Predictor Feature">
+          <img src="assets/img/pre.png" alt="CGPA Predictor Feature" style="width: 100%; display: block;">
         </div>
       </div>
 
-
+      <div class="feature-divider" style="text-align: center; margin: 0;">
+        <video src="assets/media/small.webm" autoplay loop muted playsinline
+          style="width: 200px; opacity: 0.7; mix-blend-mode: screen;"></video>
+      </div>
 
       <div class="feature reveal">
         <div class="copy">
@@ -1807,10 +1402,15 @@
           <p>FISH totals every assignment, quiz and midterm on the Internal Marks page and drops a bold total at the
             bottom. No calculator app required.</p>
         </div>
-        <div class="figure">
+        <div class="figure ooze">
           <div class="bar"><span class="path">Examination → Marks Sheet</span></div>
-          <img src="assets/img/mr.webp" alt="Marks Feature">
+          <img src="assets/img/mr.png" alt="Marks Feature" style="width: 100%; display: block;">
         </div>
+      </div>
+
+      <div class="feature-divider" style="text-align: center; margin: 0;">
+        <video src="assets/media/small.webm" autoplay loop muted playsinline
+          style="width: 200px; opacity: 0.7; mix-blend-mode: screen;"></video>
       </div>
 
       <div class="feature reverse reveal">
@@ -1820,9 +1420,9 @@
           <p>Classes marked absent turn red, ones not considered turn blue. Hooked directly into the portal's calendar
             requests.</p>
         </div>
-        <div class="figure">
+        <div class="figure ooze">
           <div class="bar"><span class="path">Home → Timetable</span></div>
-          <img src="assets/img/cr.webp" alt="Timetable Feature">
+          <img src="assets/img/cr.png" alt="Timetable Feature" style="width: 100%; display: block;">
         </div>
       </div>
     </div>
@@ -1861,15 +1461,16 @@
       </div>
       <ul class="faq-list reveal">
         <li class="faq-item">
-          <div class="faq-question">WAIT, DOES IT NEED MY PASSWORD? <span class="faq-icon">▼</span></div>
+          <div class="faq-question">HOW DOES IT GET MY GRADES? <span class="faq-icon">▼</span></div>
           <div class="faq-answer">
-            <p>Nope. FISH only reads the grades that are already visible on your screen. Your login credentials are strictly between you and SLCM.</p>
+            <p>FISH works by parsing the SLCM page you're already looking at. Your login credentials are never read or
+              touched.</p>
           </div>
         </li>
         <li class="faq-item">
-          <div class="faq-question">WHERE DOES ALL MY DATA GO? <span class="faq-icon">▼</span></div>
+          <div class="faq-question">DOES IT SEND MY DATA ANYWHERE? <span class="faq-icon">▼</span></div>
           <div class="faq-answer">
-            <p>Nowhere. Every calculation happens locally on your own machine. We have no servers, and your data never leaves your browser.</p>
+            <p>Every calculation happens on your machine. Nothing is sent anywhere.</p>
           </div>
         </li>
         <li class="faq-item">
@@ -1888,7 +1489,8 @@
       <a class="btn btn-cta" href="#install">LAUNCH EXTENSION</a>
       <div class="bottom">
         <span>Built by a student, for MUJ students. Not affiliated with MUJ.</span>
-        <a href="https://github.com/CatLoveMeow/Fish" target="_blank" rel="noopener">CatLoveMeow/Fish</a>
+        <a href="https://github.com/Drifting-Moon/Student-tool-MUJ" target="_blank"
+          rel="noopener">Drifting-Moon/Student-tool-MUJ</a>
       </div>
     </div>
   </footer>
@@ -1932,6 +1534,18 @@
       }, { threshold: 0.15 });
       reveals.forEach(r => revealObserver.observe(r));
 
+      // Ooze Reveal
+      const oozes = document.querySelectorAll('.ooze');
+      const oozeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            oozeObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      oozes.forEach(o => oozeObserver.observe(o));
+
       // FAQ Accordion
       const faqItems = document.querySelectorAll('.faq-item');
       faqItems.forEach(item => {
@@ -1958,31 +1572,6 @@
           });
         }
       }, { passive: true });
-
-      // ---- Lazy video play/pause: only decode video that's actually visible ----
-      // Fixes: a dozen simultaneous autoplaying webm videos were decoding at once
-      // regardless of scroll position, which is the main CPU/battery/jank cost
-      // (this hits Chrome's software/hardware decoder limits harder than Firefox).
-      const lazyVideos = document.querySelectorAll(
-        '.parallax-layer video, .p-brain-fixed video, .meteor-fly'
-      );
-      if ('IntersectionObserver' in window) {
-        const videoObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            const vid = entry.target;
-            if (entry.isIntersecting) {
-              // play() returns a promise; swallow autoplay-policy rejections
-              vid.play().catch(() => {});
-            } else {
-              vid.pause();
-            }
-          });
-        }, { rootMargin: '200px 0px', threshold: 0 });
-        lazyVideos.forEach(v => videoObserver.observe(v));
-      } else {
-        // No IntersectionObserver support: fall back to old behavior
-        lazyVideos.forEach(v => v.play().catch(() => {}));
-      }
 
       // Split text into letters for playfully interactive hover, keeping words together
       document.querySelectorAll('.split-word').forEach(el => {
@@ -2049,66 +1638,20 @@
         }
       });
 
-      // ---- Playful hover repulsion for all .word elements ----
-      // Fixed: previously called getBoundingClientRect() on every word, on every
-      // mousemove event (can fire 60+ times/sec) — this forces a synchronous layout
-      // recalculation each time (layout thrashing), which is the #1 perf cost in
-      // this file. Now we cache each word's center point and only refresh the cache
-      // on resize / scroll-end / after the fly-in animation finishes, instead of
-      // measuring on every single mouse move.
+      // Playful hover repulsion for all .word elements
       const words = document.querySelectorAll('.word');
-      const wordCenters = new WeakMap();
-
-      function cacheWordPositions() {
+      document.addEventListener('mousemove', (e) => {
         words.forEach(word => {
-          const rect = word.getBoundingClientRect();
-          wordCenters.set(word, {
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2
-          });
-        });
-      }
-      // Initial cache once layout has settled
-      requestAnimationFrame(() => requestAnimationFrame(cacheWordPositions));
-
-      // Refresh cache on resize (debounced) and after scrolling stops (not every scroll tick)
-      let resizeTimer;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(cacheWordPositions, 150);
-      });
-      let scrollEndTimer;
-      window.addEventListener('scroll', () => {
-        clearTimeout(scrollEndTimer);
-        scrollEndTimer = setTimeout(cacheWordPositions, 150);
-      }, { passive: true });
-      // Refresh once more after each fly-in animation settles (positions may shift)
-      document.querySelectorAll('.fly-letters').forEach(el => {
-        const mo = new MutationObserver(() => {
-          if (el.classList.contains('fly-done')) {
-            cacheWordPositions();
-            mo.disconnect();
-          }
-        });
-        mo.observe(el, { attributes: true, attributeFilter: ['class'] });
-      });
-
-      // Throttle the actual pointer-repulsion work to one rAF per frame instead
-      // of running full-width math synchronously inside the raw mousemove handler.
-      let mouseX = 0, mouseY = 0, mouseRafPending = false;
-
-      function applyRepulsion() {
-        mouseRafPending = false;
-        words.forEach(word => {
+          // Skip repulsion while letters are still flying in
           const parent = word.closest('.fly-letters');
           if (parent && parent.dataset.flown === '1' && !parent.classList.contains('fly-done')) return;
           if (parent && parent.dataset.flown !== '1') return;
 
-          const center = wordCenters.get(word);
-          if (!center) return;
-
-          const dx = center.x - mouseX;
-          const dy = center.y - mouseY;
+          const rect = word.getBoundingClientRect();
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + rect.height / 2;
+          const dx = x - e.clientX;
+          const dy = y - e.clientY;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < 180) {
@@ -2121,16 +1664,7 @@
             word.style.transform = `translate(0px, 0px) rotate(0deg) scale(1)`;
           }
         });
-      }
-
-      document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        if (!mouseRafPending) {
-          mouseRafPending = true;
-          requestAnimationFrame(applyRepulsion);
-        }
-      }, { passive: true });
+      });
 
       // Meteors roaming
       const meteors = document.querySelectorAll('.meteor-fly');
@@ -2187,7 +1721,9 @@
           if (y < minY - m) y = maxY + m;
           else if (y > maxY + m) y = minY - m;
 
-          meteor.style.transform = `translate3d(calc(${x}px - 50%), calc(${y}px - 50%), 0) rotate(${angle + graphicOffset}deg)`;
+          meteor.style.left = `${x}px`;
+          meteor.style.top = `${y}px`;
+          meteor.style.transform = `translate(-50%, -50%) rotate(${angle + graphicOffset}deg)`;
 
           requestAnimationFrame(update);
         }
@@ -2195,31 +1731,6 @@
       });
 
     })();
-
-      // Loader
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          document.getElementById('loader').classList.add('hidden');
-        }, 1000);
-      });
-
-      // Sidebar
-      const hamburgerBtn = document.getElementById('hamburgerBtn');
-      const mobileSidebar = document.getElementById('mobileSidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-      const sidebarLinks = document.querySelectorAll('.sidebar-link');
-
-      function toggleSidebar() {
-        mobileSidebar.classList.toggle('open');
-        sidebarOverlay.classList.toggle('active');
-      }
-
-      if (hamburgerBtn) {
-        hamburgerBtn.addEventListener('click', toggleSidebar);
-        sidebarOverlay.addEventListener('click', toggleSidebar);
-        sidebarLinks.forEach(link => link.addEventListener('click', toggleSidebar));
-      }
-
   </script>
 </body>
 
