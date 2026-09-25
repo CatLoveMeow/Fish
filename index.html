@@ -56,6 +56,12 @@
       height: 100%;
     }
 
+    /* Lock scrolling while loading */
+    body.is-loading {
+      overflow: hidden !important;
+      height: 100vh !important;
+    }
+
     /* By default, desktop images show, mobile-only images are hidden */
     .mobile-only {
       display: none !important;
@@ -674,7 +680,7 @@
 
       /* Saturn position on mobile */
       .parallax-container .p-saturn {
-        top: 3700px !important;
+        top: 3850px !important;
         right: -250px !important;
         width: 1000px !important;
         height: 1000px !important;
@@ -683,18 +689,18 @@
 
       /* Jupiter (.p-small3) position on mobile */
       .parallax-container .p-small3 {
-        top: 300px !important;
-        left: -10px !important;
-        width: 300px !important;
-        height: 280px !important;
+        top: 500px !important;
+        left: -15px !important;
+        width: 200px !important;
+        height: 180px !important;
       }
 
       /* Moon (.p-small4) position on mobile */
       .parallax-container .p-small4 {
         top: 2300px !important;
-        right: -30px !important;
-        width: 250px !important;
-        height: 300px !important;
+        right: -40px !important;
+        width: 150px !important;
+        height: 200px !important;
       }
 
       /* Stereo (.p-stere) position on mobile */
@@ -707,14 +713,14 @@
 
       /* CDs (.p-cd & .p-cdL) position on mobile */
       .parallax-container .p-cd {
-        top: 4700px !important;
+        top: 4850px !important;
         right: 20px !important;
         width: 130px !important;
         height: 130px !important;
       }
 
       .parallax-container .p-cdL {
-        top: 4700px !important;
+        top: 4850px !important;
         left: 20px !important;
         width: 130px !important;
         height: 130px !important;
@@ -1849,7 +1855,7 @@
   </style>
 </head>
 
-<body>
+<body class="is-loading">
 
 
   <div class="bg-stars" aria-hidden="true"></div>
@@ -2366,10 +2372,14 @@
 
 
     // Loader & Synchronized Hero Fly-In
+    // Loader & Synchronized Hero Fly-In
     window.addEventListener('load', () => {
       setTimeout(() => {
         const loader = document.getElementById('loader');
         loader.classList.add('hidden');
+
+        // Unlock scrolling once loader disappears
+        document.body.classList.remove('is-loading');
 
         // Trigger the hero fly-in animation right AFTER the loader clears
         setTimeout(() => {
