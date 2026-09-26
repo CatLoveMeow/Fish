@@ -2354,15 +2354,6 @@
 
     })();
 
-    // Ensure loader and pop-out animations replay fresh on every reload or navigation
-    window.addEventListener('pageshow', (event) => {
-      const loader = document.getElementById('loader');
-      if (loader) {
-        loader.classList.remove('hidden');
-        document.body.classList.add('is-loading');
-      }
-    });
-
     // Loader & Synchronized Hero Fly-In
     // Snappy Loader with Mobile Targeting
     function dismissLoader() {
