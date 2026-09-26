@@ -38,18 +38,16 @@ content = content.replace(
     'opacity: 0.6;\n    }',
     'opacity: 0.6;\n      will-change: transform;\n    }'
 )
-# For meteors specifically, if needed, will-change: transform is already there.
 
-# Remove drop-shadow from biggest
+# Remove drop-shadow from heaviest elements
 content = re.sub(r'filter: drop-shadow\(.*?rgba\(255, 107, 107, 0\.2\)\);', '', content) # octo
 content = re.sub(r'filter: drop-shadow\(.*?rgba\(57, 255, 20, 0\.2\)\);', '', content) # earth
 content = re.sub(r'filter: drop-shadow\(.*?rgba\(255, 69, 0, 0\.6\)\);', '', content) # meteor
 
 # 6. Videos: replace autoplay with preload="metadata"
-# find <video ... autoplay loop muted playsinline>
 content = re.sub(r'<video(.*?)autoplay', r'<video\1preload="metadata"', content)
 
-# 7. Replace mousemove
+# 7. Replace mousemove & add IntersectionObserver for smart video playing (Global Repulsion Restored)
 old_mouse = """      // Playful hover repulsion for all .word elements
       const words = document.querySelectorAll('.word');
       document.addEventListener('mousemove', (e) => {
@@ -78,8 +76,8 @@ old_mouse = """      // Playful hover repulsion for all .word elements
         });
       });"""
 
-new_mouse = """      // Playful hover repulsion just for SLCM
-      const words = document.querySelectorAll('.hero-title .word');
+new_mouse = """      // Playful hover repulsion for ALL .word elements across the page
+      const words = document.querySelectorAll('.word');
       let wordRects = [];
       
       function calcRects() {
@@ -151,7 +149,17 @@ if old_mouse in content:
 else:
     print("Could not find old mouse script!")
 
+# 8. Remove the problematic pageshow listener that causes the mobile loader bug
+pageshow_block = """window.addEventListener('pageshow', (event) => {
+      const loader = document.getElementById('loader');
+      if (loader) {
+        loader.classList.remove('hidden');
+        document.body.classList.add('is-loading');
+      }
+    });"""
+content = content.replace(pageshow_block, "")
+
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(content)
 
-print("Done")
+print("Done - Global letter repulsion restored with performance optimizations!")
