@@ -29,9 +29,11 @@ function calculateMarks() {
     }
 
     const storage = (typeof browser !== 'undefined' && browser.storage) ? browser.storage.local : chrome.storage.local;
+    const ddlSemester = document.getElementById('ddlSemester');
+    const currentSem = ddlSemester ? ddlSemester.value : '';
 
     storage.get('subjectGrades', (data) => {
-        const gradeMap = data.subjectGrades || {};
+        let gradeMap = data.subjectGrades || {};
         const rows = Array.from(table.rows).slice(1);
 
         rows.forEach(row => {
@@ -58,6 +60,11 @@ function calculateMarks() {
             const courseCode = match ? match[1] : null;
             const grade = courseCode ? gradeMap[courseCode] : null;
 
+            // Store course code in a data attribute so we can update it later after fetch
+            if (courseCode) {
+                row.setAttribute('data-course-code', courseCode);
+            }
+
             const tdTotal = row.insertCell(-1);
             tdTotal.innerText = hasValues ? rowSum.toFixed(2) : '-';
             tdTotal.style.textAlign = 'center';
@@ -65,27 +72,66 @@ function calculateMarks() {
             tdTotal.style.color = '#343a40';
 
             const tdGrade = row.insertCell(-1);
-            tdGrade.innerText = grade || '-';
+            tdGrade.classList.add('st-grade-cell');
+            tdGrade.innerText = grade || 'Loading...';
             tdGrade.style.textAlign = 'center';
             tdGrade.style.fontWeight = '600';
             tdGrade.style.color = '#343a40';
         });
 
-        if (!document.getElementById('st-grades-guide')) {
-            const guideDiv = document.createElement('div');
-            guideDiv.id = 'st-grades-guide';
-            guideDiv.style.marginTop = '15px';
-            guideDiv.style.padding = '15px';
-            guideDiv.style.backgroundColor = '#f8f9fa';
-            guideDiv.style.borderLeft = '4px solid #17a2b8';
-            guideDiv.style.borderRadius = '4px';
-            guideDiv.style.color = '#343a40';
-            guideDiv.style.fontSize = '14px';
-            guideDiv.innerHTML = '<strong>Tip:</strong> Grades missing? Please visit the <strong>Grades page</strong> first so the extension can sync them.';
-            
-            if (table.parentNode) {
-                table.parentNode.insertBefore(guideDiv, table.nextSibling);
-            }
+        // Background fetch for the current semester's grades (run at most once per session per semester)
+        const sessionFetchKey = `mujfish_grades_fetched_${currentSem}`;
+        if (currentSem && !sessionStorage.getItem(sessionFetchKey)) {
+            sessionStorage.setItem(sessionFetchKey, 'true');
+            const formData = new URLSearchParams();
+            formData.append("Enrollment", "");
+            formData.append("Semester", currentSem);
+
+            fetch('/Student/Academic/GetGradesForFaculty', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData.toString()
+            })
+            .then(res => res.json())
+            .then(gradeData => {
+                if (gradeData && gradeData.IsSuccessfull && gradeData.InternalMarksList) {
+                    let hasNewGrades = false;
+                    gradeData.InternalMarksList.forEach(item => {
+                        if (item.CourseCode && item.Grade && item.AcademicSession !== "Total") {
+                            gradeMap[item.CourseCode] = item.Grade;
+                            hasNewGrades = true;
+                            
+                            // Update the DOM dynamically
+                            const matchingRow = document.querySelector(`tr[data-course-code="${item.CourseCode}"]`);
+                            if (matchingRow) {
+                                const gradeCell = matchingRow.querySelector('.st-grade-cell');
+                                if (gradeCell) {
+                                    gradeCell.innerText = item.Grade;
+                                }
+                            }
+                        }
+                    });
+
+                    // Save back to storage so it's instantly available next time
+                    if (hasNewGrades) {
+                        storage.set({ subjectGrades: gradeMap });
+                        
+                        // Handle missing grades
+                        document.querySelectorAll('.st-grade-cell').forEach(cell => {
+                            if (cell.innerText === 'Loading...') cell.innerText = '-';
+                        });
+                    }
+                }
+            })
+            .catch(err => {
+                console.error("MUJFISH: Failed to fetch grades in background", err);
+                document.querySelectorAll('.st-grade-cell').forEach(cell => {
+                    if (cell.innerText === 'Loading...') cell.innerText = '-';
+                });
+            });
         }
     });
 }

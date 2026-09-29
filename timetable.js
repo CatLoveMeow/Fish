@@ -47,10 +47,12 @@
         let loadingIndicator = window.jQuery('#slcm-loading-indicator');
         if (eventsToProcess.length > 0) {
             if (!loadingIndicator.length) {
-                loadingIndicator = window.jQuery('<div id="slcm-loading-indicator" style="position: fixed; bottom: 20px; right: 20px; background: #34495e; color: white; padding: 10px 15px; border-radius: 5px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-family: sans-serif; font-size: 14px; transition: opacity 0.3s;"></div>');
+                loadingIndicator = window.jQuery('<div id="slcm-loading-indicator" style="position: fixed; bottom: 20px; right: 20px; background: #34495e; color: white; padding: 10px 15px; border-radius: 5px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); font-family: sans-serif; font-size: 14px; transition: opacity 0.3s; pointer-events: none;"></div>');
                 window.jQuery('body').append(loadingIndicator);
             }
             loadingIndicator.text(`Syncing Attendance... (0/${eventsToProcess.length})`).css({ opacity: '1', background: '#34495e' });
+        } else if (loadingIndicator.length) {
+            loadingIndicator.css('opacity', '0');
         }
 
         let index = 0;

@@ -1,7 +1,7 @@
 {
     "name": "MUJ FISH",
     "description": "Automate attendance math, track safe skips, total internal marks, predict your CGPA, and organize your dashboard in MUJ SLCM.",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "manifest_version": 3,
     "icons": {
         "128": "icon128.png"
