@@ -1,7 +1,7 @@
 {
     "name": "MUJ FISH",
     "description": "Automate attendance math, track safe skips, total internal marks, predict your CGPA, and organize your dashboard in MUJ SLCM.",
-    "version": "1.6.1",
+    "version": "1.7.0",
     "manifest_version": 3,
     "icons": {
         "128": "icon128.png"
@@ -12,7 +12,7 @@
     "content_scripts": [
         {
             "matches": [
-                "https://mujslcm.jaipur.manipal.edu/Student/Academic/AttendanceSummaryForStudent*"
+                "*://mujslcm.jaipur.manipal.edu/Student/Academic/AttendanceSummaryForStudent*"
             ],
             "js": [
                 "attendance.js"
@@ -21,7 +21,7 @@
         },
         {
             "matches": [
-                "https://mujslcm.jaipur.manipal.edu/Student/Academic/InternalMarkForStudent*"
+                "*://mujslcm.jaipur.manipal.edu/Student/Academic/InternalMarkForStudent*"
             ],
             "js": [
                 "marks_sum.js"
@@ -30,7 +30,7 @@
         },
         {
             "matches": [
-                "https://mujslcm.jaipur.manipal.edu/Student/Academic/GradesForStudent*"
+                "*://mujslcm.jaipur.manipal.edu/Student/Academic/GradesForStudent*"
             ],
             "js": [
                 "grades_parser.js"
@@ -39,7 +39,7 @@
         },
         {
             "matches": [
-                "https://mujslcm.jaipur.manipal.edu/Student/Academic/ViewTimeTableForStudent*"
+                "*://mujslcm.jaipur.manipal.edu/Student/Academic/ViewTimeTableForStudent*"
             ],
             "js": [
                 "timetable.js"
@@ -49,7 +49,7 @@
         },
         {
             "matches": [
-                "https://mujslcm.jaipur.manipal.edu/Student/Academic/CGPAGPAForStudent*"
+                "*://mujslcm.jaipur.manipal.edu/Student/Academic/CGPAGPAForStudent*"
             ],
             "js": [
                 "cgpa_predictor.js"
@@ -58,7 +58,7 @@
         },
         {
             "matches": [
-                "https://mujslcm.jaipur.manipal.edu/Home/Dashboard*"
+                "*://mujslcm.jaipur.manipal.edu/Home/Dashboard*"
             ],
             "js": [
                 "dashboard.js"
