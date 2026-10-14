@@ -207,9 +207,9 @@
         st.id = 'mf-tt-style';
         st.textContent =
             '#dvLoader{display:none!important}' +
-            '#slcm-loading-indicator{position:fixed;right:76px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:9999;opacity:0;pointer-events:none;' +
-            'max-width:calc(100vw - 92px);padding:5px 12px;border-radius:14px;color:#fff;' +
-            'font:12px/1.4 Poppins,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.25);cursor:pointer;' +
+            '#slcm-loading-indicator{position:fixed;right:80px;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:9999;opacity:0;pointer-events:none;' +
+            'max-width:calc(100vw - 130px);padding:6px 16px;border-radius:20px;color:#fff;' +
+            'font:13px/1.4 Poppins,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;' +
             'user-select:none;transition:opacity .3s,background .3s}' +
             '#slcm-loading-indicator:hover{opacity:1!important}' +
             /* Today column: subtle blue wash + highlighted date number */

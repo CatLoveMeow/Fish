@@ -36,35 +36,56 @@
     .mf-switch input:disabled + .mf-track{opacity:.5}
 
     /* timetable */
-    #mujfish-timetable{display:flex;flex-direction:column;gap:14px}
-    .mf-head{display:flex;justify-content:space-between;align-items:center;
-        border-bottom:2px solid #ebedf2;padding-bottom:10px}
-    .mf-head h6{margin:0;font-weight:600;color:#464457;font-size:1rem}
-    .mf-nav{display:flex;align-items:center;gap:4px;background:#f3f6f9;padding:3px 6px;border-radius:6px}
-    .mf-nav button{background:none;border:0;cursor:pointer;color:#555;font-size:1.2em;
-        line-height:1;padding:2px 8px;border-radius:4px}
-    .mf-nav button:hover{background:#e4e8ee}
-    .mf-date{min-width:84px;text-align:center;font-size:.85em;font-weight:700;color:#333}
-    .mf-today{font-size:.75em!important;font-weight:600;color:#5d78ff!important}
+    #mujfish-timetable{display:flex;flex-direction:column;gap:12px}
+    .mf-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:2px solid #ebedf2}
+    .mf-head-title{display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:#1e293b;text-decoration:none;cursor:pointer;transition:color .15s ease}
+    .mf-head-title:hover{color:#0284c7;text-decoration:none}
+    .mf-head-title i{font-size:12px;color:#94a3b8;transition:transform .15s ease,color .15s ease}
+    .mf-head-title:hover i{transform:translate(1px,-1px);color:#0284c7}
+    .mf-nav{display:inline-flex;align-items:center;gap:3px;background:#f3f6f9;padding:3px 5px;border-radius:6px}
+    .mf-nav button{background:transparent;border:0;cursor:pointer;color:#475569;font-size:13px;line-height:1;padding:3px 7px;border-radius:4px;font-weight:600;transition:all .15s ease}
+    .mf-nav button:hover{background:#ffffff;color:#0f172a;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+    .mf-date{min-width:76px;text-align:center;font-size:12px;font-weight:700;color:#1e293b;padding:0 3px}
+    .mf-today{font-size:11px!important;font-weight:700;color:#0284c7!important;background:#ffffff!important;box-shadow:0 1px 2px rgba(0,0,0,.05)!important}
     .mf-list{display:flex;flex-direction:column;gap:10px}
-    .mf-card{--c:#6c6c6c;border-left:4px solid var(--c);padding:10px 12px;background:#f8f9fa;
-        border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.05);min-height:42px}
-    .mf-time{font-size:.75em;color:#7a8190;margin-bottom:2px;font-variant-numeric:tabular-nums}
-    .mf-title{font-weight:500;font-size:.9em;margin-bottom:6px;color:#333;line-height:1.3}
-    .mf-status{font-size:.85em}
+    .mf-card{position:relative;background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid var(--c, #94a3b8);
+        border-radius:8px;padding:12px 14px;box-shadow:0 1px 3px rgba(15,23,42,.03);
+        transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+    .mf-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(15,23,42,.06);border-color:#cbd5e1}
+    .mf-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+    .mf-time{font-size:11.5px;font-weight:600;color:#64748b;font-variant-numeric:tabular-nums}
+    .mf-title{font-weight:700;font-size:13px;color:#1e293b;line-height:1.35;margin-bottom:6px}
+    .mf-meta-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+    .mf-chip{display:inline-flex;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:600;color:#475569}
+    .mf-status-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;line-height:1.2;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
+    .mf-status-present{background:#ecfdf5;color:#059669;border-color:#a7f3d0}
+    .mf-status-absent{background:#fef2f2;color:#e11d48;border-color:#fecdd3}
+    .mf-status-warn{background:#fffbeb;color:#d97706;border-color:#fde68a}
 
     /* summary */
     #mujfish-summary-container{margin-bottom:25px}
     #mujfish-summary-body{overflow-x:auto}
     .mf-table thead tr{background:#f3f6f9}
     .mf-c{text-align:center}
-    .mf-pill{display:inline-block;min-width:52px;padding:2px 8px;border-radius:10px;
+    .mf-pill{display:inline-block;min-width:50px;padding:2px 8px;border-radius:9999px;
         font-weight:700;font-size:.9em;text-align:center}
-    .mf-ok{background:#e6f6ec;color:#166534}
-    .mf-warn{background:#fff4d6;color:#92600a}
-    .mf-bad{background:#fde8e8;color:#b42318}
+    .mf-ok{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}
+    .mf-warn{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
+    .mf-bad{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
     .mf-low-att-banner{padding:8px 14px;margin-bottom:10px;border-radius:6px;
-        background:#fde8e8;border:1px solid #fca5a5;color:#b42318;font-size:13px;font-weight:500}
+        background:#fef2f2;border:1px solid #fecaca;color:#b42318;font-size:13px;font-weight:500}
+
+    /* notices and error cards */
+    .mf-notice{padding:12px 14px;border-radius:8px;background:#f8fafc;border:1px solid #e2e8f0;
+        color:#64748b;font-size:12.5px;font-weight:500;text-align:center}
+    .mf-error{display:flex;align-items:center;justify-content:space-between;gap:12px;
+        background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid #f43f5e;
+        border-radius:8px;padding:12px 14px;box-shadow:0 1px 3px rgba(15,23,42,.03)}
+    .mf-error-msg{font-weight:600;font-size:12.5px;color:#334155}
+    .mf-retry-btn{background:#f8fafc;border:1px solid #cbd5e1;color:#334155;
+        font-size:11.5px;font-weight:600;padding:4px 12px;border-radius:6px;
+        cursor:pointer;transition:all .15s ease}
+    .mf-retry-btn:hover{background:#ffffff;color:#0f172a;border-color:#94a3b8;box-shadow:0 1px 2px rgba(0,0,0,.05)}
     `;
 
     function injectStyles() {
@@ -102,7 +123,7 @@
     }
 
     function notice(kind, msg) {
-        return el('div', 'alert alert-' + kind, msg);
+        return el('div', 'mf-notice', msg);
     }
 
     const pad = (n) => String(n).padStart(2, '0');
@@ -223,45 +244,70 @@
         anchor.parentElement.insertBefore(bar, anchor);
     }
 
-    // ---------- Class status ----------
+    // ---------- Class status & parsing ----------
     function classify(raw) {
         let c = String(raw || '').replace('!important', '').trim().toLowerCase();
-        if (!/^#[0-9a-f]{3,8}$/.test(c)) c = '#6c6c6c'; // never trust server colours blindly
+        if (!/^#[0-9a-f]{3,8}$/.test(c)) c = '#64748b'; // never trust server colours blindly
         switch (c) {
             case '#3d9400':
-                return { color: c, bold: true, icon: 'la-check-circle', label: 'Attendance Marked', detail: true };
+                return { color: '#10b981', badgeClass: 'mf-status-present', label: 'Present', detail: true };
             case '#820c0c':
-                return { color: c, bold: true, icon: 'la-exclamation-circle', label: 'Rescheduled', detail: false };
+                return { color: '#f59e0b', badgeClass: 'mf-status-warn', label: 'Rescheduled', detail: false };
             case '#800000':
-                return { color: c, bold: true, icon: 'la-times-circle', label: 'Cancelled', detail: false };
+                return { color: '#f43f5e', badgeClass: 'mf-status-absent', label: 'Cancelled', detail: false };
             case '#6c6c6c':
             case '#808080':
-                return { color: '#6c6c6c', bold: false, icon: 'la-clock-o', label: 'Pending / Not Marked', detail: false };
+                return { color: '#94a3b8', badgeClass: '', label: 'Pending / Not Marked', detail: false };
             default:
-                return { color: c, bold: true, icon: 'la-info-circle', label: 'Scheduled Event', detail: true };
+                return { color: '#6366f1', badgeClass: '', label: 'Scheduled Event', detail: true };
         }
     }
 
     function setStatus(statusEl, s) {
-        statusEl.textContent = '';
-        statusEl.appendChild(icon(s.icon));
-        statusEl.appendChild(document.createTextNode(' ' + s.label));
-        statusEl.style.color = s.color;
-        statusEl.style.fontWeight = s.bold ? '500' : 'normal';
+        statusEl.className = 'mf-status-badge' + (s.badgeClass ? ' ' + s.badgeClass : '');
+        statusEl.textContent = s.label;
     }
 
     function applyAttendance(card, statusEl, type) {
+        const t = String(type || '').toLowerCase();
         statusEl.textContent = '';
-        statusEl.appendChild(icon('la-user'));
-        statusEl.appendChild(document.createTextNode(' '));
-        statusEl.appendChild(el('strong', null, type));
-        const t = type.toLowerCase();
-        const tint = t.includes('absent') ? '#e53935'
-            : t.includes('not considered') ? '#2196f3' : null;
-        if (tint) {
-            statusEl.style.color = tint;
-            card.style.setProperty('--c', tint);
+        if (t.includes('absent')) {
+            statusEl.className = 'mf-status-badge mf-status-absent';
+            statusEl.textContent = 'Absent';
+            card.style.setProperty('--c', '#f43f5e');
+        } else if (t.includes('not considered')) {
+            statusEl.className = 'mf-status-badge mf-status-warn';
+            statusEl.textContent = type;
+            card.style.setProperty('--c', '#0ea5e9');
+        } else if (t.includes('present')) {
+            statusEl.className = 'mf-status-badge mf-status-present';
+            statusEl.textContent = 'Present';
+            card.style.setProperty('--c', '#10b981');
+        } else {
+            statusEl.className = 'mf-status-badge';
+            statusEl.textContent = type;
         }
+    }
+
+    function parseEventDescription(raw) {
+        const text = String(raw || '').trim();
+        let room = '';
+        let sec = '';
+        let sem = '';
+
+        const roomMatch = text.match(/Room\s*(?:No\.?|Number)?\s*:\s*([^,]+)/i);
+        if (roomMatch) room = roomMatch[1].trim();
+
+        const secMatch = text.match(/Section\s*:\s*([^,]+)/i);
+        if (secMatch) sec = secMatch[1].trim();
+
+        const semMatch = text.match(/Semester\s*:\s*([^,]+)/i);
+        if (semMatch) sem = semMatch[1].trim();
+
+        const splitIdx = text.search(/,\s*(?:Room\s*(?:No\.?|Number)?|Section|Semester)\s*:/i);
+        const title = splitIdx !== -1 ? text.slice(0, splitIdx).trim() : text;
+
+        return { title: title || raw || 'Class', room, sec, sem };
     }
 
     // ---------- Timetable ----------
@@ -280,11 +326,14 @@
 
     function showError(container, msg, retry) {
         container.textContent = '';
-        const box = notice('danger', msg + ' ');
-        const b = el('button', 'btn btn-sm btn-outline-danger ml-2', 'Retry');
-        b.type = 'button';
-        b.addEventListener('click', retry);
-        box.appendChild(b);
+        const box = el('div', 'mf-error');
+        box.appendChild(el('span', 'mf-error-msg', msg));
+        if (typeof retry === 'function') {
+            const b = el('button', 'mf-retry-btn', 'Retry');
+            b.type = 'button';
+            b.addEventListener('click', retry);
+            box.appendChild(b);
+        }
         container.appendChild(box);
     }
 
@@ -302,13 +351,29 @@
             const card = el('div', 'mf-card');
             card.style.setProperty('--c', s.color);
 
-            const time = timeRange(item);
-            if (time) card.appendChild(el('div', 'mf-time', time));
-            card.appendChild(el('div', 'mf-title', item.Description || item.title || ''));
+            // Card head: time on left, status badge on right
+            const head = el('div', 'mf-card-head');
+            const timeStr = timeRange(item);
+            head.appendChild(el('div', 'mf-time', timeStr || '–'));
 
-            const status = el('div', 'mf-status');
+            const status = el('div');
             setStatus(status, s);
-            card.appendChild(status);
+            head.appendChild(status);
+            card.appendChild(head);
+
+            // Clean parsed title
+            const parsed = parseEventDescription(item.Description || item.title || '');
+            card.appendChild(el('div', 'mf-title', parsed.title));
+
+            // Metadata chips row (Room, Section, Semester)
+            if (parsed.room || parsed.sec || parsed.sem) {
+                const meta = el('div', 'mf-meta-row');
+                if (parsed.room) meta.appendChild(el('span', 'mf-chip', parsed.room));
+                if (parsed.sec) meta.appendChild(el('span', 'mf-chip', 'Sec ' + parsed.sec));
+                if (parsed.sem) meta.appendChild(el('span', 'mf-chip', 'Sem ' + parsed.sem));
+                card.appendChild(meta);
+            }
+
             wrap.appendChild(card);
 
             const eventId = item.EntryNo || item.id;
@@ -394,7 +459,10 @@
         root.id = 'mujfish-timetable';
 
         const head = el('div', 'mf-head');
-        head.appendChild(el('h6', null, 'Timetable'));
+        const titleLink = el('a', 'mf-head-title', 'Timetable');
+        titleLink.href = '/Student/Academic/ViewTimeTableForStudent';
+        titleLink.appendChild(icon('la-external-link'));
+        head.appendChild(titleLink);
 
         const nav = el('div', 'mf-nav');
         todayBtn = navBtn('Today', 'Jump to today', () => goTo(new Date()));
@@ -489,7 +557,7 @@
             if (below75.length) {
                 const banner = document.createElement('div');
                 banner.className = 'mf-low-att-banner';
-                banner.innerHTML = '<strong>\u26a0 ' + below75.length + ' course' + (below75.length > 1 ? 's' : '') + ' below 75%</strong> \u2014 attend urgently to avoid debarment risk.';
+                banner.innerHTML = '<strong>' + below75.length + ' course' + (below75.length > 1 ? 's' : '') + ' below 75%</strong> \u2014 attend urgently to avoid debarment risk.';
                 body.appendChild(banner); // banner first
             }
         }
@@ -512,7 +580,10 @@
 
         box = el('div');
         box.id = 'mujfish-summary-container';
-        box.appendChild(el('h6', null, 'Attendance Summary'));
+        const titleLink = el('a', 'mf-head-title', 'Attendance Summary');
+        titleLink.href = '/Student/Academic/AttendanceSummaryForStudent';
+        titleLink.appendChild(icon('la-external-link'));
+        box.appendChild(titleLink);
         box.appendChild(document.createElement('hr'));
         const body = el('div');
         body.id = 'mujfish-summary-body';

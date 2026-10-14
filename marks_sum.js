@@ -16,6 +16,33 @@
 
     const alive = () => { try { return !!ext.runtime.id; } catch (_) { return false; } };
 
+    function showToast(msg) {
+        let t = document.getElementById('st-toast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'st-toast';
+            t.style.cssText = 'position:fixed; bottom:24px; right:24px; background:#fff; border:1px solid #fecaca; border-radius:50px; padding:12px 20px; font-weight:600; font-size:13px; color:#991b1b; box-shadow:0 10px 25px -5px rgba(220,38,38,0.15); z-index:10000; opacity:0; pointer-events:none; display:flex; align-items:center; gap:10px;';
+            document.body.appendChild(t);
+        }
+        
+        t.innerHTML = '<span style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;background:#fee2e2;color:#dc2626;border-radius:50%;font-size:14px;font-weight:bold;">!</span><span>' + msg + '</span>';
+        
+        if (t._anim) t._anim.cancel();
+        t._anim = t.animate([
+            { opacity: 0, transform: 'translateY(30px) scale(0.6)' },
+            { opacity: 1, transform: 'translateY(-8px) scale(1.05)', offset: 0.6 },
+            { opacity: 1, transform: 'translateY(0) scale(1)' }
+        ], { duration: 450, easing: 'ease-out', fill: 'forwards' });
+        
+        if (t.dataset.tid) clearTimeout(parseInt(t.dataset.tid));
+        t.dataset.tid = setTimeout(() => {
+            t._anim = t.animate([
+                { opacity: 1, transform: 'translateY(0) scale(1)' },
+                { opacity: 0, transform: 'translateY(30px) scale(0.8)' }
+            ], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+        }, 3500);
+    }
+
     // Resolve null on ANY failure, so callers never mistake "failed" for "empty".
     const sGet = (keys) => new Promise((res) => {
         try { store.get(keys, (d) => res(ext.runtime.lastError ? null : (d || {}))); }
@@ -97,6 +124,7 @@
         Array.from(t.rows).slice(1).filter((r) =>
             r.id !== 'st-pred-gpa-row' &&
             !r.classList.contains('grand-total-row') &&
+            (!r.classList.contains('st-custom-row') || mem.predEnabled) &&
             r.cells.length >= 3 &&
             !(r.parentNode && r.parentNode.tagName === 'THEAD'));
 
@@ -196,9 +224,20 @@
       .st-custom-del:hover { background:#fee2e2; color:#b91c1c; text-decoration:none; }
       .st-pred-mode-on .st-custom-del { display:inline-block; }
 
-      #st-predict-toggle-container { margin-bottom:10px; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:4px; }
+      .st-custom-row { display:none; }
+      .st-pred-mode-on .st-custom-row { display:table-row; }
+
+      #st-predict-toggle-container { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; }
       #st-predict-toggle-container label { cursor:pointer; font-weight:600; font-size:13px; color:#495057;
-        user-select:none; margin:0; }
+        user-select:none; margin:0; display:inline-flex; align-items:center; transition:color 0.2s; }
+      #st-predict-toggle-container label:hover { color:#181c32; }
+      
+      .st-toggle-switch { appearance:none; -webkit-appearance:none; width:36px; height:20px; background:#e2e8f0; border-radius:20px; position:relative; cursor:pointer; outline:none; transition:background 0.3s, box-shadow 0.3s; margin:0 8px 0 0; flex-shrink:0; box-shadow:inset 0 1px 2px rgba(0,0,0,0.05); }
+      .st-toggle-switch::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.2); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+      .st-toggle-switch:checked { background:#10b981; }
+      .st-toggle-switch:checked::after { transform:translateX(16px); }
+      .st-toggle-switch:focus-visible { box-shadow:0 0 0 2px rgba(16,185,129,0.3); }
+
       #st-pred-gpa-row { display:none; }
       .st-pred-mode-on #st-pred-gpa-row { display:table-row; }
       #st-pred-gpa-row td { text-align:right; padding:12px 20px; font-weight:600; font-size:14px;
@@ -209,7 +248,7 @@
       @media (prefers-reduced-motion: reduce) { .st-seamless-input { transition:none; } }
       @media print {
         #st-predict-toggle-container, #st-pred-gpa-row,
-        .st-credits-col, .st-grade-input { display:none !important; }
+        .st-credits-col, .st-grade-input, .st-custom-row { display:none !important; }
         #kt_ViewTable[data-st-mode="predictor"] .st-injected-grade,
         #kt_ViewTable[data-st-mode="predictor"] .st-grade-cell,
         #kt_ViewTable[data-st-mode="pending"] .st-injected-grade,
@@ -346,6 +385,24 @@
             credits > 0 ? ' \u00B7 ' + credits + (credits === 1 ? ' credit' : ' credits') : '';
     }
 
+    function removeCustomRows(t) {
+        if (!t) return;
+        const delCodes = [];
+        t.querySelectorAll('.st-custom-row, tr[data-st-code^="CUS_"]').forEach((r) => {
+            const code = codeOf(r);
+            if (code) {
+                if (code in mem.predicted) delete mem.predicted[code];
+                if (code in mem.credits) delete mem.credits[code];
+                delCodes.push(code);
+            }
+            r.remove();
+        });
+        if (delCodes.length) {
+            patch('predictedGrades', {}, delCodes);
+            patch('courseCredits', {}, delCodes);
+        }
+    }
+
     function syncToggle(table, predictor) {
         let box = document.getElementById('st-predict-toggle-container');
 
@@ -355,7 +412,12 @@
                 box.remove();
             }
             document.body.classList.remove('st-pred-mode-on');
+            removeCustomRows(table);
             return;
+        }
+
+        if (!mem.predEnabled) {
+            removeCustomRows(table);
         }
 
         document.body.classList.toggle('st-pred-mode-on', mem.predEnabled);
@@ -374,9 +436,15 @@
         const label = document.createElement('label');
         const cb = document.createElement('input');
         cb.type = 'checkbox';
-        cb.style.marginRight = '8px';
+        cb.className = 'st-toggle-switch';
         cb.checked = mem.predEnabled;
-        label.append(cb, 'Enable GPA Predictor');
+
+        const textSpan = document.createElement('span');
+        textSpan.textContent = 'Enable GPA Predictor';
+        textSpan.style.lineHeight = '1';
+        textSpan.style.marginTop = '1px'; // Optical alignment adjustment
+
+        label.append(cb, textSpan);
 
         const reset = document.createElement('button');
         reset.type = 'button';
@@ -388,11 +456,21 @@
         addSubj.textContent = '+ Subject';
         addSubj.className = 'st-add-subj-btn';
 
+        const showExtras = mem.predEnabled ? '' : 'none';
+        reset.style.display = showExtras;
+        addSubj.style.display = showExtras;
+
         cb.addEventListener('change', () => {
             mem.predEnabled = cb.checked;
             sSet({ predEnabled: cb.checked });
             document.body.classList.toggle('st-pred-mode-on', cb.checked);
+            const extras = cb.checked ? '' : 'none';
+            reset.style.display = extras;
+            addSubj.style.display = extras;
             const t = getTable();
+            if (!cb.checked && t) {
+                removeCustomRows(t);
+            }
             if (t) updateGPA(t);
         });
 
@@ -400,6 +478,7 @@
         reset.addEventListener('click', () => {
             const t = getTable();
             if (!t) return;
+            removeCustomRows(t);
             const codes = [];
             dataRows(t).forEach((r) => {
                 const c = codeOf(r);
@@ -412,10 +491,11 @@
         addSubj.addEventListener('click', () => {
             const t = getTable();
             if (!t) return;
-            if (dataRows(t).length >= 10) { alert('Maximum 10 subjects allowed for prediction.'); return; }
+            if (dataRows(t).length >= 10) { showToast('Maximum 10 subjects allowed for prediction.'); return; }
 
             const tbody = t.tBodies[0] || t;
             const row = document.createElement('tr');
+            row.className = 'st-custom-row';
             const code = 'CUS_' + Math.random().toString(36).substr(2, 5).toUpperCase();
             row.dataset.stCode = code;
 
@@ -455,13 +535,13 @@
         });
 
         const infoWrapper = document.createElement('div');
-        infoWrapper.style.cssText = 'position: relative; display: inline-block; margin-left: 8px; vertical-align: middle; text-align: left;';
+        infoWrapper.style.cssText = 'position: relative; display: flex; align-items: center; margin-left: 4px;';
 
         const infoBtn = document.createElement('button');
         infoBtn.type = 'button';
         infoBtn.innerHTML = '&#9432;';
         infoBtn.className = 'btn btn-sm btn-link';
-        infoBtn.style.cssText = 'padding: 0; text-decoration: none; font-size: 16px; outline: none; box-shadow: none; color: #a1a5b7; border: none; background: transparent; cursor: pointer; transition: color 0.2s;';
+        infoBtn.style.cssText = 'padding: 0; text-decoration: none; font-size: 16px; outline: none; box-shadow: none; color: #a1a5b7; border: none; background: transparent; cursor: pointer; transition: color 0.2s; display: flex; align-items: center;';
         infoBtn.title = 'Predictor Guide';
 
         const infoPanel = document.createElement('div');
@@ -506,8 +586,22 @@
         document.addEventListener('click', closePanel);
 
         infoWrapper.append(infoBtn, infoPanel);
-        box.append(label, reset, addSubj, infoWrapper);
-        table.parentNode.insertBefore(box, table);
+        box.append(reset, addSubj, label, infoWrapper);
+
+        const dvDetail = document.getElementById('dvDetail');
+        const heading = dvDetail ? dvDetail.querySelector('h3') : null;
+
+        if (heading) {
+            heading.style.display = 'flex';
+            heading.style.justifyContent = 'space-between';
+            heading.style.alignItems = 'center';
+            box.style.marginTop = '6px'; // Nudge the whole block down slightly
+            heading.appendChild(box);
+        } else if (dvDetail && dvDetail.parentNode) {
+            dvDetail.parentNode.insertBefore(box, dvDetail);
+        } else {
+            table.parentNode.insertBefore(box, table);
+        }
     }
 
     // ---------- render (synchronous, idempotent) ----------
@@ -527,6 +621,8 @@
         const predictor = mode === 'predictor';
         table.dataset.stMode = mode;
         table.dataset.stSem = sem;
+
+        if (!predictor) removeCustomRows(table);
 
         const nativeCols = head.cells.length;
         const skip = Array.from(head.cells).map((c) =>
@@ -749,7 +845,7 @@
 
         take(document.getElementById('st-predict-toggle-container'));
         take(document.getElementById('st-pred-gpa-row'));
-        const sel = ['.st-credits-col', '.st-grade-input'];
+        const sel = ['.st-credits-col', '.st-grade-input', '.st-custom-row'];
         if (table.dataset.stMode !== 'grades') sel.push('.st-injected-grade', '.st-grade-cell');
         table.querySelectorAll(sel.join(',')).forEach(take);
 
