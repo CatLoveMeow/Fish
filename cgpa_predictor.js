@@ -5,7 +5,16 @@
     window.__mujCgpaPredictor = true;
 
     const ID = 'muj-cgpa-predictor-container';
-    const MAX_SEMS = 6, MAX_GPA = 10, MAX_CREDITS = 30;
+    const MF = typeof window !== 'undefined' ? window.MujFish : null;
+    const ACAD_CONST = (MF && MF.CONSTANTS && MF.CONSTANTS.ACADEMICS) || {
+        MAX_SEMS: 6,
+        MAX_GPA: 10,
+        MAX_CREDITS: 30
+    };
+    const MAX_SEMS = ACAD_CONST.MAX_SEMS;
+    const MAX_GPA = ACAD_CONST.MAX_GPA;
+    const MAX_CREDITS = ACAD_CONST.MAX_CREDITS;
+    const CREDITS_STORAGE_KEY = (MF && MF.CONSTANTS && MF.CONSTANTS.STORAGE_KEYS && MF.CONSTANTS.STORAGE_KEYS.PREDICTOR_CREDITS) || 'muj_predictor_credits';
     const W = 600, H = 160, PL = 34, PR = 20, PT = 24, PB = 26;
 
     const ICON_CHART = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>';
@@ -24,6 +33,19 @@
 #${ID} .muj-row{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;width:100%}
 #${ID} .muj-field{display:flex;align-items:center;gap:8px;margin:0;font-size:14px;font-weight:400;color:#555}
 #${ID} .muj-title{color:#2c3e50;font-size:16px}
+#${ID} .muj-stepper{display:inline-flex;align-items:center;background:#fff;border:1.5px solid #cbd5e1;border-radius:50px;padding:2px 3px 2px 8px;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:border-color .15s}
+#${ID} .muj-stepper:focus-within{border-color:#17a2b8;box-shadow:0 0 0 3px rgba(23,162,184,.15)}
+#${ID} .muj-stepper input{width:40px;padding:0;border:none;background:transparent;text-align:center;font-size:14px;font-weight:700;color:#1e293b;-moz-appearance:textfield;appearance:textfield}
+#${ID} .muj-stepper input::placeholder{color:#94a3b8;font-size:11px;font-weight:400 !important;font-style:normal;opacity:0.85}
+#${ID} .muj-stepper input:focus{outline:none}
+#${ID} .muj-stepper input::-webkit-outer-spin-button,#${ID} .muj-stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+#${ID} .muj-stepper-btns{display:flex;flex-direction:column;width:20px;height:26px;background:#17a2b8;border-radius:14px;overflow:hidden;flex-shrink:0}
+#${ID} .muj-stepper-btn{all:unset;display:flex;align-items:center;justify-content:center;height:50%;cursor:pointer;color:#fff;transition:background-color .15s,transform .1s}
+#${ID} .muj-stepper-btn:hover{background:#138496}
+#${ID} .muj-stepper-btn:active{background:#0e6877;transform:scale(0.92)}
+#${ID} .muj-stepper-btn:focus-visible{outline:none;background:#138496}
+#${ID} .muj-arrow-up{width:0;height:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent;border-bottom:4px solid #fff;display:block}
+#${ID} .muj-arrow-down{width:0;height:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent;border-top:4px solid #fff;display:block}
 #${ID} .muj-input{padding:6px 10px;width:90px;border:1px solid #cbd5e1;border-radius:6px;outline:none;font-size:14px;background:#fff;transition:border-color .2s,box-shadow .2s;user-select:auto;-webkit-user-select:auto}
 #${ID} .muj-input:focus{border-color:#17a2b8;box-shadow:0 0 0 3px rgba(23,162,184,.15)}
 @keyframes muj-pulse-error { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); } 70% { box-shadow: 0 0 0 8px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
@@ -46,6 +68,8 @@
 #${ID} .muj-chart{width:100%;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .35s ease}
 #${ID} .muj-chart-inner{margin:0 20px 16px 20px;border-top:1px solid #e2e8f0;padding-top:14px;display:flex;flex-direction:column;align-items:center}
 #${ID} .muj-svg{display:block;width:100%;max-width:600px;height:auto;overflow:visible;touch-action:none;user-select:none;-webkit-user-select:none}
+@media (max-width:520px){#${ID} .muj-header-btn{padding:14px 12px}#${ID} .muj-chart-inner{margin:0 10px 12px;padding-top:12px}#${ID} .muj-row{align-items:flex-start}#${ID} .muj-field{flex-wrap:wrap}#${ID} .muj-result{margin-left:0;flex-wrap:wrap;gap:6px}#${ID} .muj-input{width:82px}#${ID} .muj-chart-inner>div[style*='position:absolute']{position:static!important;justify-content:flex-end;margin-bottom:8px}}
+@media (prefers-reduced-motion:reduce){#${ID},#${ID} *,#${ID} *::before,#${ID} *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 @media print{#${ID}{display:none!important}}`;
 
     function injectStyles() {
@@ -64,18 +88,25 @@
             t.style.cssText = 'position:fixed; bottom:24px; right:24px; background:#fff; border:1px solid #fecaca; border-radius:50px; padding:12px 20px; font-weight:600; font-size:13px; color:#991b1b; box-shadow:0 10px 25px -5px rgba(220,38,38,0.15); z-index:10000; opacity:0; pointer-events:none; display:flex; align-items:center; gap:10px;';
             document.body.appendChild(t);
         }
-        
-        t.innerHTML = '<span style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;background:#fee2e2;color:#dc2626;border-radius:50%;font-size:14px;font-weight:bold;">!</span><span>' + msg + '</span>';
-        
+
+        // Build toast content with DOM APIs so messages are always treated as text.
+        t.replaceChildren();
+        const mark = document.createElement('span');
+        mark.style.cssText = 'display:flex;align-items:center;justify-content:center;width:24px;height:24px;background:#fee2e2;color:#dc2626;border-radius:50%;font-size:14px;font-weight:bold;flex:none;';
+        mark.textContent = '!';
+        const message = document.createElement('span');
+        message.textContent = String(msg ?? '');
+        t.append(mark, message);
+
         if (t._anim) t._anim.cancel();
         t._anim = t.animate([
             { opacity: 0, transform: 'translateY(30px) scale(0.6)' },
             { opacity: 1, transform: 'translateY(-8px) scale(1.05)', offset: 0.6 },
             { opacity: 1, transform: 'translateY(0) scale(1)' }
         ], { duration: 450, easing: 'ease-out', fill: 'forwards' });
-        
-        if (t.dataset.tid) clearTimeout(parseInt(t.dataset.tid));
-        t.dataset.tid = setTimeout(() => {
+
+        if (t._hideTimer) clearTimeout(t._hideTimer);
+        t._hideTimer = setTimeout(() => {
             t._anim = t.animate([
                 { opacity: 1, transform: 'translateY(0) scale(1)' },
                 { opacity: 0, transform: 'translateY(30px) scale(0.8)' }
@@ -84,9 +115,25 @@
     }
 
     const findTable = () => document.getElementById('kt_ViewTable') || document.querySelector('table');
-    const toNum = (cell) => (cell ? parseFloat(cell.textContent.trim()) : NaN); // textContent: no forced layout
+    const NUM_REGEX = /^\d+(\.\d+)?$/;
+    /**
+     * Parses numeric content from a table cell, returning NaN if invalid.
+     * Uses textContent to avoid forced layout reflows.
+     * @param {HTMLTableCellElement} cell
+     * @returns {number}
+     */
+    const toNum = (cell) => {
+        if (!cell) return NaN;
+        const s = cell.textContent.trim();
+        return NUM_REGEX.test(s) ? parseFloat(s) : NaN;
+    }; // textContent: no forced layout
 
     // ---------- Read the native table ----------
+    /**
+     * Extracts academic summary data from SLCM's CGPA / GPA table.
+     * @param {HTMLTableElement} table
+     * @returns {{ cgpa: number, credits: number, gpas: number[], lastCredits: number, sig: string } | null}
+     */
     function readData(table) {
         let cgpaIdx = -1, credIdx = -1;
         for (const row of table.rows) {
@@ -110,7 +157,7 @@
             let lastCredits = NaN;
             for (let i = start; i < row.cells.length; i += 2) {
                 const g = toNum(row.cells[i]);
-                if (!Number.isNaN(g) && g >= 0) { // skips "-" and NaN but allows 0.00
+                if (!Number.isNaN(g) && g >= 0 && g <= MAX_GPA) { // skips "-" and invalid grades but allows valid 0.00 to 10.00
                     gpas.push(g);
                     lastCredits = toNum(row.cells[i + 1]);
                 }
@@ -121,6 +168,11 @@
     }
 
     // ---------- Build the predictor ----------
+    /**
+     * Constructs and initializes the interactive CGPA predictor widget DOM.
+     * @param {{ cgpa: number, credits: number, gpas: number[], lastCredits: number, sig: string }} d
+     * @returns {HTMLElement | null}
+     */
     function build(d) {
         if (d.gpas.length >= MAX_SEMS) return null; // nothing left to predict
 
@@ -130,7 +182,7 @@
 
         const hintCredits = d.lastCredits >= 1 && d.lastCredits <= MAX_CREDITS ? d.lastCredits : NaN;
         let savedCredits = '';
-        try { savedCredits = localStorage.getItem('muj_predictor_credits') || ''; } catch(e) {}
+        try { savedCredits = localStorage.getItem(CREDITS_STORAGE_KEY) || ''; } catch (e) { }
         let gpaEmpty = false, interacted = false, open = false;
         let dragging = -1, rect = null, raf = 0, pendingY = 0, flashed = false, minGPA = 0;
 
@@ -152,7 +204,17 @@
                 <div class="muj-chart-inner" style="position:relative;">
                     <div class="muj-row" style="margin-bottom:20px; background:#f8fafc; padding:12px 16px; border-radius:8px; border:1px solid #e2e8f0; width:100%; transition: all 0.3s ease;">
                         <label class="muj-field">Credits / Sem:
-                            <input type="number" class="muj-input muj-credits" inputmode="numeric" step="1" min="1" max="${MAX_CREDITS}" placeholder="e.g. 22" aria-label="Credits per future semester" value="${savedCredits}">
+                            <div class="muj-stepper">
+                                <input type="number" class="muj-input muj-credits" inputmode="numeric" step="1" min="1" max="${MAX_CREDITS}" placeholder="e.g. 22" aria-label="Credits per future semester" value="${savedCredits}">
+                                <div class="muj-stepper-btns">
+                                    <button type="button" class="muj-stepper-btn muj-cred-up" aria-label="Increase credits">
+                                        <span class="muj-arrow-up"></span>
+                                    </button>
+                                    <button type="button" class="muj-stepper-btn muj-cred-down" aria-label="Decrease credits">
+                                        <span class="muj-arrow-down"></span>
+                                    </button>
+                                </div>
+                            </div>
                         </label>
                         <div class="muj-result" style="margin-left:auto;">
                             <span>New CGPA:</span><span class="muj-new">--</span>
@@ -176,12 +238,53 @@
         const newEl = $('.muj-new'), deltaEl = $('.muj-delta'), semsEl = $('.muj-sems');
         const chartBox = $('.muj-chart'), toggle = $('.muj-toggle');
         const addBtn = $('.muj-add'), remBtn = $('.muj-rem');
+        const credUp = $('.muj-cred-up'), credDown = $('.muj-cred-down');
+
+        const stepCredits = (d) => {
+            const current = validCredits();
+            const base = isNaN(current) ? (hintCredits || 20) : current;
+            const next = Math.max(1, Math.min(MAX_CREDITS, base + d));
+            credIn.value = next;
+            credIn.dispatchEvent(new Event('input', { bubbles: true }));
+        };
+
+        const setupCreditStepper = (btn, d) => {
+            if (!btn) return;
+            let timer = null, interval = null;
+            const stop = () => {
+                if (timer) { clearTimeout(timer); timer = null; }
+                if (interval) { clearInterval(interval); interval = null; }
+                window.removeEventListener('mouseup', stop);
+                window.removeEventListener('touchend', stop);
+            };
+            const start = (e) => {
+                if (e.button !== undefined && e.button !== 0) return;
+                stop();
+                stepCredits(d);
+                window.addEventListener('mouseup', stop);
+                window.addEventListener('touchend', stop);
+                timer = setTimeout(() => { interval = setInterval(() => stepCredits(d), 70); }, 320);
+            };
+            btn.addEventListener('mousedown', start);
+            btn.addEventListener('touchstart', start, { passive: true });
+            btn.addEventListener('mouseleave', stop);
+            btn.addEventListener('touchcancel', stop);
+            btn.addEventListener('click', (e) => e.preventDefault());
+        };
+        setupCreditStepper(credUp, 1);
+        setupCreditStepper(credDown, -1);
 
 
 
+        /**
+         * Validates the credits input field against bounds [1..MAX_CREDITS].
+         * @returns {number}
+         */
         const validCredits = () => {
-            const v = parseFloat(credIn.value);
-            return v >= 1 && v <= MAX_CREDITS ? v : NaN;
+            const s = (credIn.value || '').trim();
+            if (!NUM_REGEX.test(s)) return NaN;
+            const v = Number(s);
+            return Number.isInteger(v) && v >= 1 && v <= MAX_CREDITS ? v : NaN;
         };
 
         function updateScale() {
@@ -262,10 +365,11 @@
                 }
                 return;
             }
-            let pts = d.cgpa * d.credits, creds = d.credits;
-            for (const g of future) { pts += g * cr; creds += cr; }
-            const pred = Math.round((pts / creds) * 100) / 100;
-            const diff = Math.round((pred - d.cgpa) * 100) / 100;
+            const res = (MF && MF.MATH && MF.MATH.predictCgpa)
+                ? MF.MATH.predictCgpa(d.cgpa, d.credits, future, cr)
+                : null;
+            const pred = res ? res.newCgpa : Math.round(((d.cgpa * d.credits + future.reduce((a, g) => a + g * cr, 0)) / (d.credits + future.length * cr)) * 100) / 100;
+            const diff = res ? res.delta : Math.round((pred - d.cgpa) * 100) / 100;
 
             futureColor = diff > 0 ? '#059669' : diff < 0 ? '#e11d48' : '#0284c7';
             newEl.textContent = pred.toFixed(2);
@@ -323,7 +427,7 @@
             interacted = true;
             try { svg.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ }
             if (Number.isNaN(validCredits())) {
-                 showToast('Please enter credits to simulate.');
+                showToast('Please enter credits to simulate.');
             }
             calculate(); // shows the credits hint right away if missing
             render();
@@ -336,11 +440,14 @@
         ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => svg.addEventListener(ev, endDrag));
 
         // ---------- Inputs ----------
-        credIn.addEventListener('keydown', (e) => { if (['-', '+', 'e', 'E', '.'].includes(e.key)) e.preventDefault(); });
+        credIn.addEventListener('keydown', (e) => {
+            if (['-', '+', 'e', 'E', '.'].includes(e.key)) e.preventDefault();
+            if (e.key === 'Enter') credIn.blur();
+        });
 
         credIn.addEventListener('input', () => {
             if (parseFloat(credIn.value) > MAX_CREDITS) credIn.value = String(MAX_CREDITS);
-            try { localStorage.setItem('muj_predictor_credits', credIn.value); } catch(e) {}
+            try { localStorage.setItem(CREDITS_STORAGE_KEY, credIn.value); } catch (e) { }
             calculate();
             render();
         });
@@ -411,30 +518,102 @@
 
     // Debounced + idle: never competes with SLCM's own rendering
     let timer = 0;
+    let idleHandle = 0;
+    let observedTable = null;
+    let tableObserver = null;
+    let bodyObserver = null;
+    let replacementObserver = null;
+
+    function cleanup() {
+        const toast = document.getElementById('st-toast');
+        if (toast && toast._hideTimer) {
+            clearTimeout(toast._hideTimer);
+            toast._hideTimer = 0;
+        }
+        if (toast && toast._anim) {
+            toast._anim.cancel();
+            toast._anim = null;
+        }
+        if (timer) {
+            clearTimeout(timer);
+            timer = 0;
+        }
+        if (tableObserver) {
+            tableObserver.disconnect();
+            tableObserver = null;
+        }
+        if (bodyObserver) {
+            bodyObserver.disconnect();
+            bodyObserver = null;
+        }
+        if (replacementObserver) {
+            replacementObserver.disconnect();
+            replacementObserver = null;
+        }
+        if (idleHandle && window.cancelIdleCallback) {
+            window.cancelIdleCallback(idleHandle);
+            idleHandle = 0;
+        }
+    }
+
     function schedule() {
-        if (timer) return;
+        if (timer || idleHandle) return;
         timer = setTimeout(() => {
             timer = 0;
-            if (window.requestIdleCallback) requestIdleCallback(sync, { timeout: 800 });
-            else sync();
+            if (window.requestIdleCallback) {
+                idleHandle = window.requestIdleCallback(() => {
+                    idleHandle = 0;
+                    sync();
+                }, { timeout: 800 });
+            } else sync();
         }, 120);
     }
 
     function start() {
         const table = findTable();
         if (!table) return false;
-        // Watch ONLY the table (our UI lives outside it, so we never trigger ourselves)
-        new MutationObserver(schedule).observe(table, { childList: true, subtree: true, characterData: true });
+        if (tableObserver) tableObserver.disconnect();
+        if (replacementObserver) replacementObserver.disconnect();
+        observedTable = table;
+        // Watch table contents for grade/credit edits.
+        tableObserver = new MutationObserver(schedule);
+        tableObserver.observe(table, { childList: true, subtree: true, characterData: true });
+        // SLCM can replace the whole table after an AJAX refresh. Watch its parent
+        // only for replacement, not every descendant mutation.
+        const parent = table.parentElement;
+        if (parent) {
+            replacementObserver = new MutationObserver(() => {
+                const latest = findTable();
+                if (latest && latest !== observedTable) {
+                    start();
+                    schedule();
+                } else if (!observedTable.isConnected) {
+                    if (tableObserver) tableObserver.disconnect();
+                    schedule();
+                }
+            });
+            replacementObserver.observe(parent, { childList: true, subtree: true });
+        }
         schedule();
         return true;
     }
 
     function boot() {
         if (start()) return;
+        if (bodyObserver) bodyObserver.disconnect();
         // Table not in DOM yet: wait cheaply, then stop observing the whole body
-        const bo = new MutationObserver(() => { if (start()) bo.disconnect(); });
-        bo.observe(document.body, { childList: true, subtree: true });
+        bodyObserver = new MutationObserver(() => {
+            if (start()) {
+                if (bodyObserver) {
+                    bodyObserver.disconnect();
+                    bodyObserver = null;
+                }
+            }
+        });
+        bodyObserver.observe(document.body, { childList: true, subtree: true });
     }
+
+    window.addEventListener('pagehide', cleanup, { once: true });
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
     else boot();

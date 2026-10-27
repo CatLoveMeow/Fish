@@ -1,7 +1,7 @@
 {
     "name": "MUJ FISH",
-    "description": "Automate attendance math, track safe skips, total internal marks, predict your CGPA, and organize your dashboard in MUJ SLCM.",
-    "version": "1.7.3",
+    "description": "Automate attendance math, safe skips, internal marks, survey feedback, predict CGPA, and organize your dashboard in MUJ SLCM.",
+    "version": "1.9",
     "manifest_version": 3,
     "icons": {
         "128": "icon128.png"
@@ -15,6 +15,7 @@
                 "*://mujslcm.jaipur.manipal.edu/Student/Academic/AttendanceSummaryForStudent*"
             ],
             "js": [
+                "common.js",
                 "attendance.js"
             ],
             "run_at": "document_idle"
@@ -24,6 +25,7 @@
                 "*://mujslcm.jaipur.manipal.edu/Student/Academic/InternalMarkForStudent*"
             ],
             "js": [
+                "common.js",
                 "marks_sum.js"
             ],
             "run_at": "document_idle"
@@ -33,6 +35,7 @@
                 "*://mujslcm.jaipur.manipal.edu/Student/Academic/GradesForStudent*"
             ],
             "js": [
+                "common.js",
                 "grades_parser.js"
             ],
             "run_at": "document_idle"
@@ -52,6 +55,7 @@
                 "*://mujslcm.jaipur.manipal.edu/Student/Academic/CGPAGPAForStudent*"
             ],
             "js": [
+                "common.js",
                 "cgpa_predictor.js"
             ],
             "run_at": "document_idle"
@@ -61,15 +65,27 @@
                 "*://mujslcm.jaipur.manipal.edu/Home/Dashboard*"
             ],
             "js": [
+                "common.js",
                 "dashboard.js"
             ],
             "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "*://mujslcm.jaipur.manipal.edu/Student/Survey/FeedbackList*",
+                "*://mujslcm.jaipur.manipal.edu/Student/Survey/Feedback*"
+            ],
+            "js": [
+                "feedback.js"
+            ],
+            "run_at": "document_idle",
+            "world": "MAIN"
         }
     ],
     "browser_specific_settings": {
         "gecko": {
             "id": "studenttool@muj",
-            "strict_min_version": "109.0"
+            "strict_min_version": "128.0"
         }
     }
 }
