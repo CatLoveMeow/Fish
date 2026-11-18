@@ -16,28 +16,23 @@
 
     const alive = () => { try { return !!ext.runtime.id; } catch (_) { return false; } };
 
-    function showToast(msg) {
+    function showToast(msg, type = 'warn') {
+        const isSuccess = type === 'success';
         const TOAST_ID = 'st-toast';
         let toast = document.getElementById(TOAST_ID);
 
         if (!toast) {
             toast = document.createElement('div');
             toast.id = TOAST_ID;
-            toast.setAttribute('role', 'alert');
-            toast.setAttribute('aria-live', 'assertive');
             toast.style.cssText = [
                 'position:fixed',
                 'bottom:24px',
                 'right:24px',
-                'background:#fff',
-                'border:1px solid #fecaca',
                 'border-radius:50px',
-                'padding:12px 20px',
+                'padding:10px 18px',
                 'font-weight:600',
                 'font-size:13px',
-                'color:#991b1b',
-                'box-shadow:0 10px 25px -5px rgba(220,38,38,.15)',
-                'z-index:10000',
+                'z-index:1030',
                 'opacity:0',
                 'pointer-events:none',
                 'display:flex',
@@ -47,19 +42,17 @@
             ].join(';');
 
             const icon = document.createElement('span');
+            icon.className = 'st-toast-icon';
             icon.setAttribute('aria-hidden', 'true');
-            icon.textContent = '!';
             icon.style.cssText = [
                 'display:flex',
                 'align-items:center',
                 'justify-content:center',
-                'width:24px',
-                'height:24px',
-                'flex:0 0 24px',
-                'background:#fee2e2',
-                'color:#dc2626',
+                'width:22px',
+                'height:22px',
+                'flex:0 0 22px',
                 'border-radius:50%',
-                'font-size:14px',
+                'font-size:12px',
                 'font-weight:bold'
             ].join(';');
 
@@ -69,6 +62,33 @@
 
             toast.append(icon, message);
             document.body.appendChild(toast);
+        }
+
+        toast.setAttribute('role', isSuccess ? 'status' : 'alert');
+        toast.setAttribute('aria-live', isSuccess ? 'polite' : 'assertive');
+
+        if (isSuccess) {
+            toast.style.background = '#ffffff';
+            toast.style.border = '1px solid #bbf7d0';
+            toast.style.color = '#14532d';
+            toast.style.boxShadow = '0 10px 25px -5px rgba(16,185,129,.18)';
+            const icon = toast.querySelector('.st-toast-icon');
+            if (icon) {
+                icon.textContent = '\u2713'; // checkmark
+                icon.style.background = '#dcfce7';
+                icon.style.color = '#16a34a';
+            }
+        } else {
+            toast.style.background = '#ffffff';
+            toast.style.border = '1px solid #fecaca';
+            toast.style.color = '#991b1b';
+            toast.style.boxShadow = '0 10px 25px -5px rgba(220,38,38,.18)';
+            const icon = toast.querySelector('.st-toast-icon');
+            if (icon) {
+                icon.textContent = '!';
+                icon.style.background = '#fee2e2';
+                icon.style.color = '#dc2626';
+            }
         }
 
         // Cancel any previous hide operation before showing a newer message.
@@ -162,7 +182,7 @@
     }
 
     // ---------- constants ----------
-    const KEYS = ['subjectGrades', 'courseCredits', 'predictedGrades', 'predEnabled', 'noGrades', 'customSubjects'];
+    const KEYS = ['subjectGrades', 'courseCredits', 'predictedGrades', 'predEnabled', 'noGrades', 'customSubjects', 'muj_academic_baseline'];
     const POINTS = { 'A+': 10, 'A': 9, 'B': 8, 'C': 7, 'D': 6, 'E': 5, 'F': 0, 'S': 10 };
     const CREDIT_OPTS = ['-', '4', '3', '2', '1', '0'];
     const GRADE_OPTS = ['-', '10', '9', '8', '7', '6', '5', '4', '3', '2', '1', '0',
@@ -176,7 +196,7 @@
     const MAX_BACKOFF_MS = 10 * 60 * 1000;
 
     // ---------- state (in-memory copy of storage => synchronous render, no blink) ----------
-    const mem = { grades: {}, credits: {}, predicted: {}, predEnabled: false, noGrades: {}, customSubjects: {} };
+    const mem = { grades: {}, credits: {}, predicted: {}, predEnabled: false, noGrades: {}, customSubjects: {}, baseline: null };
     let ready = false;
     let stopped = false;
     let lastSem = '';
@@ -187,31 +207,66 @@
     const fails = {};
     const lastOk = {};                     // in-memory fallback if sessionStorage is blocked
 
-    sGet(KEYS).then((d) => {
-        if (d) {
-            mem.grades = d.subjectGrades || {};
-            mem.credits = d.courseCredits || {};
-            mem.predicted = d.predictedGrades || {};
-            mem.predEnabled = !!d.predEnabled;
-            mem.noGrades = d.noGrades || {};
-            mem.customSubjects = d.customSubjects || {};
+    (async () => {
+        if (window.MujFish && typeof window.MujFish.ensureStudentSession === 'function') {
+            try { await window.MujFish.ensureStudentSession(); } catch (_) { }
         }
-        ready = true;
-        run();
-    });
+        sGet(KEYS).then((d) => {
+            if (d) {
+                mem.grades = d.subjectGrades || {};
+                mem.credits = d.courseCredits || {};
+                mem.predicted = d.predictedGrades || {};
+                mem.predEnabled = !!d.predEnabled;
+                mem.noGrades = d.noGrades || {};
+                mem.customSubjects = d.customSubjects || {};
+                mem.baseline = d.muj_academic_baseline || null;
+            }
+            if (!mem.baseline) syncCGPABaseline();
+            ready = true;
+            run();
+        });
+    })();
 
-    // Merge (never replace) grades saved by the Grades-page parser.
+    // Merge (never replace) grades saved by the Grades-page parser, and sync baseline changes.
     try {
         ext.storage.onChanged.addListener((ch, area) => {
-            if (area === 'local' && ch.subjectGrades && ch.subjectGrades.newValue &&
-                typeof ch.subjectGrades.newValue === 'object') {
-                Object.assign(mem.grades, ch.subjectGrades.newValue);
+            if (area === 'local') {
+                if (ch.subjectGrades && ch.subjectGrades.newValue && typeof ch.subjectGrades.newValue === 'object') {
+                    Object.assign(mem.grades, ch.subjectGrades.newValue);
+                }
+                if (ch.muj_academic_baseline) {
+                    mem.baseline = ch.muj_academic_baseline.newValue || null;
+                    const table = getTable();
+                    if (table && mem.predEnabled) updateGPA(table);
+                }
             }
         });
     } catch (_) { /* ignore */ }
 
     // ---------- helpers (textContent, not innerText: no forced layout) ----------
     const getTable = () => document.getElementById('kt_ViewTable');
+
+    let isSyncingBaseline = false;
+    async function syncCGPABaseline(force = false) {
+        if (isSyncingBaseline) return;
+        if (!force && mem.baseline && (Date.now() - (mem.baseline.lastSynced || 0) < 24 * 3600 * 1000)) {
+            return;
+        }
+        if (window.MujFish && typeof window.MujFish.syncBaseline === 'function') {
+            isSyncingBaseline = true;
+            try {
+                const b = await window.MujFish.syncBaseline();
+                if (b) {
+                    mem.baseline = b;
+                    const t = getTable();
+                    if (t && mem.predEnabled) updateGPA(t);
+                }
+            } finally {
+                isSyncingBaseline = false;
+            }
+            return;
+        }
+    }
 
     const dataRows = (t) =>
         Array.from(t.rows).slice(1).filter((r) =>
@@ -497,8 +552,23 @@
 
       #st-pred-gpa-row { display:none; }
       .st-pred-mode-on #st-pred-gpa-row { display:table-row; }
-      #st-pred-gpa-row td { text-align:right; padding:12px 20px; font-weight:600; font-size:13px;
+      #st-pred-gpa-row td { padding:10px 18px; font-weight:600; font-size:13px;
         color:#172033; border-top:2px solid #cbd5e1!important; background:#f8fafc!important; }
+      .st-pred-bar-wrap { display:flex; justify-content:space-between; align-items:center; width:100%; box-sizing:border-box; flex-wrap:wrap; gap:10px; }
+      .st-pred-cgpa-col { display:inline-flex; align-items:center; position:relative; }
+      .st-cgpa-display-wrap { display:inline-flex; align-items:center; gap:6px; font-size:13px; }
+      .st-cgpa-val { color:#0f172a; font-weight:800; font-size:15px; font-variant-numeric:tabular-nums; }
+      .st-cgpa-delta { display:inline-block; padding:1px 6px; border-radius:4px; font-size:11px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.3; }
+      .st-delta-pos { background:#dcfce7; color:#15803d; }
+      .st-delta-neg { background:#fee2e2; color:#b91c1c; }
+      .st-delta-zero { background:#f1f5f9; color:#64748b; }
+      .st-cgpa-sub { color:#64748b; font-weight:500; font-size:12px; }
+      .st-cgpa-btn-icon { background:transparent; border:none; color:#94a3b8; font-size:12px; cursor:pointer; padding:2px 5px; border-radius:4px; display:inline-flex; align-items:center; transition:color 0.15s, background 0.15s; }
+      .st-cgpa-btn-icon:hover { color:#1e293b; background:#e2e8f0; }
+      .st-cgpa-set-pill { background:#f1f5f9; border:1px dashed #cbd5e1; color:#475569; border-radius:6px; padding:3px 8px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:border-color 0.15s, background 0.15s; }
+      .st-cgpa-set-pill:hover { background:#e2e8f0; border-color:#94a3b8; color:#1e293b; }
+      .st-cgpa-popover { position:absolute; left:0; bottom:calc(100% + 8px); z-index:100; width:260px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12); text-align:left; cursor:default; }
+      .st-pred-gpa-col { display:inline-flex; align-items:center; margin-left:auto; }
       #st-pred-gpa-val { color:#172033; font-weight:800; font-size:16px; margin-left:8px; font-variant-numeric:tabular-nums; }
       #st-pred-gpa-sub { color:#667085; font-weight:500; font-size:12px; }
 
@@ -574,6 +644,13 @@
         el.addEventListener('blur', () => {
             if (el.value === '') { el.value = '-'; el.dispatchEvent(new Event('change')); }
         });
+        el.addEventListener('input', () => {
+            const raw = el.value.trim().toUpperCase();
+            const v = normalize(raw);
+            if (opts.includes(v) || v === '-') {
+                onCommit(v);
+            }
+        });
         el.addEventListener('change', () => {
             let v = normalize(el.value.trim().toUpperCase());
             if (!opts.includes(v)) v = '-';
@@ -627,19 +704,215 @@
             row.id = 'st-pred-gpa-row';
             const td = document.createElement('td');
             td.colSpan = (table.rows[0] && table.rows[0].cells.length) || 20;
-            td.append('Predicted Semester GPA: ');
+
+            const wrap = document.createElement('div');
+            wrap.className = 'st-pred-bar-wrap';
+
+            // Left side: Projected CGPA
+            const cgpaBox = document.createElement('div');
+            cgpaBox.className = 'st-pred-cgpa-col';
+            cgpaBox.id = 'st-pred-cgpa-col';
+
+            // Right side: Semester GPA
+            const gpaBox = document.createElement('div');
+            gpaBox.className = 'st-pred-gpa-col';
+            gpaBox.append('Calculated Semester GPA: ');
             const val = document.createElement('span');
             val.id = 'st-pred-gpa-val';
             val.setAttribute('aria-live', 'polite');
             const sub = document.createElement('span');
             sub.id = 'st-pred-gpa-sub';
-            td.append(val, sub);
+            gpaBox.append(val, sub);
+
+            wrap.append(cgpaBox, gpaBox);
+            td.appendChild(wrap);
             row.appendChild(td);
             (table.tBodies[0] || table).appendChild(row);
         }
-        document.getElementById('st-pred-gpa-val').textContent = credits > 0 ? (points / credits).toFixed(2) : '-';
-        document.getElementById('st-pred-gpa-sub').textContent =
-            credits > 0 ? ' \u00B7 ' + credits + (credits === 1 ? ' credit' : ' credits') : '';
+
+        const valEl = document.getElementById('st-pred-gpa-val');
+        if (valEl) valEl.textContent = credits > 0 ? (points / credits).toFixed(2) : '-';
+        const subEl = document.getElementById('st-pred-gpa-sub');
+        if (subEl) subEl.textContent = credits > 0 ? ' \u00B7 ' + credits + (credits === 1 ? ' credit' : ' credits') : '';
+
+        renderCGPACol(credits, points);
+    }
+
+    let cgpaPopover = null;
+    function closeCGPAPopover() {
+        if (!cgpaPopover) return;
+        cgpaPopover.remove();
+        cgpaPopover = null;
+    }
+    document.addEventListener('click', (e) => {
+        if (cgpaPopover && !cgpaPopover.contains(e.target)) closeCGPAPopover();
+    });
+
+    function renderCGPACol(semCredits, semPoints) {
+        const col = document.getElementById('st-pred-cgpa-col');
+        if (!col) return;
+        col.textContent = '';
+
+        const baseline = mem.baseline;
+        const baseWrap = document.createElement('div');
+        baseWrap.className = 'st-cgpa-display-wrap';
+
+        if (baseline && typeof baseline.cgpa === 'number' && typeof baseline.credits === 'number') {
+            const baseCredits = baseline.credits;
+            const basePoints = typeof baseline.points === 'number' ? baseline.points : (baseline.cgpa * baseCredits);
+
+            const SEM_ORDER = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+            const ddl = document.getElementById('ddlSemester');
+            const semVal = lastSem || (ddl && ddl.value) || '';
+            const cleanSem = semVal.replace(/semester/i, '').trim().toUpperCase();
+            const viewIdx = SEM_ORDER.indexOf(cleanSem) + 1;
+            const semsCompleted = baseline.semsCompleted || 0;
+            const alreadyInBaseline = semsCompleted > 0 && viewIdx > 0 && viewIdx <= semsCompleted;
+
+            let newCgpa = baseline.cgpa;
+            let delta = 0;
+            let totalCredits = baseCredits;
+            const isProjecting = semCredits > 0 && !alreadyInBaseline;
+
+            if (isProjecting) {
+                totalCredits = baseCredits + semCredits;
+                newCgpa = (basePoints + semPoints) / totalCredits;
+                newCgpa = Math.round(newCgpa * 100) / 100;
+                delta = Math.round((newCgpa - baseline.cgpa) * 100) / 100;
+            }
+
+            const lbl = document.createElement('span');
+            lbl.textContent = isProjecting ? 'Projected CGPA: ' : 'Current CGPA: ';
+            lbl.style.color = '#475569';
+
+            const val = document.createElement('span');
+            val.className = 'st-cgpa-val';
+            val.textContent = newCgpa.toFixed(2);
+
+            baseWrap.append(lbl, val);
+
+            if (isProjecting) {
+                const deltaEl = document.createElement('span');
+                const isPos = delta > 0;
+                const isNeg = delta < 0;
+                deltaEl.className = 'st-cgpa-delta ' + (isPos ? 'st-delta-pos' : isNeg ? 'st-delta-neg' : 'st-delta-zero');
+                deltaEl.textContent = (isPos ? '+' : '') + delta.toFixed(2);
+                baseWrap.appendChild(deltaEl);
+            }
+
+            const sub = document.createElement('span');
+            sub.className = 'st-cgpa-sub';
+            sub.textContent = ' \u00B7 ' + totalCredits + ' credits' + (alreadyInBaseline ? ` (Sem ${cleanSem} verified)` : '');
+            baseWrap.appendChild(sub);
+
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'st-cgpa-btn-icon';
+            editBtn.innerHTML = '&#9998;';
+            editBtn.title = 'Adjust baseline CGPA or sync';
+            editBtn.setAttribute('aria-label', 'Adjust baseline CGPA');
+            editBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleCGPAPopover(col);
+            };
+            baseWrap.appendChild(editBtn);
+        } else {
+            const setBtn = document.createElement('button');
+            setBtn.type = 'button';
+            setBtn.className = 'st-cgpa-set-pill';
+            setBtn.innerHTML = 'Projected CGPA: <span style="text-decoration:underline;">Set Baseline</span> &#9998;';
+            setBtn.title = 'Enter your current CGPA and completed credits to project CGPA';
+            setBtn.onclick = (e) => {
+                e.stopPropagation();
+                toggleCGPAPopover(col);
+            };
+            baseWrap.appendChild(setBtn);
+        }
+
+        col.appendChild(baseWrap);
+    }
+
+    function toggleCGPAPopover(anchor) {
+        if (cgpaPopover) {
+            closeCGPAPopover();
+            return;
+        }
+
+        const pop = document.createElement('div');
+        pop.className = 'st-cgpa-popover';
+        pop.onclick = (e) => e.stopPropagation();
+
+        const currentCgpa = (mem.baseline && typeof mem.baseline.cgpa === 'number') ? mem.baseline.cgpa : '';
+        const currentCredits = (mem.baseline && typeof mem.baseline.credits === 'number') ? mem.baseline.credits : '';
+
+        pop.innerHTML = `
+            <div style="font-weight:700;color:#0f172a;font-size:13px;margin-bottom:2px;">Cumulative Baseline</div>
+            <div style="font-size:11px;color:#64748b;margin-bottom:10px;">Prior completed semesters baseline:</div>
+            <div style="display:flex;gap:8px;margin-bottom:10px;">
+                <label style="flex:1;font-size:11px;font-weight:600;color:#334155;">
+                    Current CGPA
+                    <input type="number" step="0.01" min="0" max="10" class="st-cgpa-in-cgpa" value="${currentCgpa}" placeholder="e.g. 8.50" style="width:100%;margin-top:4px;padding:5px 8px;font-size:12px;border:1px solid #cbd5e1;border-radius:6px;outline:none;box-sizing:border-box;" />
+                </label>
+                <label style="flex:1;font-size:11px;font-weight:600;color:#334155;">
+                    Completed Credits
+                    <input type="number" step="1" min="0" max="300" class="st-cgpa-in-cred" value="${currentCredits}" placeholder="e.g. 80" style="width:100%;margin-top:4px;padding:5px 8px;font-size:12px;border:1px solid #cbd5e1;border-radius:6px;outline:none;box-sizing:border-box;" />
+                </label>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                <button type="button" class="st-cgpa-btn-sync" style="background:#f1f5f9;border:1px solid #cbd5e1;color:#475569;border-radius:5px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer;">&#8635; Sync</button>
+                <div style="display:flex;gap:6px;">
+                    <button type="button" class="st-cgpa-btn-cancel" style="background:transparent;border:none;color:#64748b;padding:4px 8px;font-size:11px;cursor:pointer;">Cancel</button>
+                    <button type="button" class="st-cgpa-btn-save" style="background:#10b981;border:none;color:#ffffff;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;">Save</button>
+                </div>
+            </div>
+        `;
+
+        pop.querySelector('.st-cgpa-btn-cancel').onclick = closeCGPAPopover;
+
+        const cgpaIn = pop.querySelector('.st-cgpa-in-cgpa');
+        const credIn = pop.querySelector('.st-cgpa-in-cred');
+        const syncBtn = pop.querySelector('.st-cgpa-btn-sync');
+        const saveBtn = pop.querySelector('.st-cgpa-btn-save');
+
+        syncBtn.onclick = async () => {
+            syncBtn.disabled = true;
+            syncBtn.textContent = 'Syncing...';
+            await syncCGPABaseline(true);
+            if (mem.baseline) {
+                cgpaIn.value = mem.baseline.cgpa;
+                credIn.value = mem.baseline.credits;
+            }
+            syncBtn.disabled = false;
+            syncBtn.innerHTML = '&#8635; Sync';
+            showToast('Academic baseline synced', 'success');
+        };
+
+        saveBtn.onclick = () => {
+            const c = parseFloat(cgpaIn.value);
+            const cr = parseInt(credIn.value, 10);
+            if (isNaN(c) || c < 0 || c > 10 || isNaN(cr) || cr < 0) {
+                showToast('Please enter valid CGPA (0–10) and Credits (≥ 0).', 'warn');
+                return;
+            }
+            const baseline = {
+                cgpa: Math.round(c * 100) / 100,
+                credits: cr,
+                points: Math.round(c * cr * 100) / 100,
+                semsCompleted: (mem.baseline && mem.baseline.semsCompleted) || 0,
+                lastSynced: Date.now(),
+                manual: true
+            };
+            mem.baseline = baseline;
+            sSet({ muj_academic_baseline: baseline });
+            closeCGPAPopover();
+            const table = getTable();
+            if (table && mem.predEnabled) updateGPA(table);
+            showToast('Baseline saved', 'success');
+        };
+
+        anchor.style.position = 'relative';
+        anchor.appendChild(pop);
+        cgpaPopover = pop;
     }
 
     function removeCustomRows(t) {
@@ -711,7 +984,7 @@
     function addCustomSubject(table, courseInfo) {
         if (!table) return;
         if (dataRows(table).length >= 10) {
-            showToast('Maximum 10 subjects allowed for prediction.');
+            showToast('Maximum 10 subjects allowed for calculation.');
             return;
         }
 
@@ -795,7 +1068,7 @@
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'st-add-menu-item';
-            btn.title = `Add ${course.display} to predictor`;
+            btn.title = `Add ${course.display} to calculator`;
 
             const codeSpan = document.createElement('span');
             codeSpan.className = 'st-add-menu-code';
@@ -887,14 +1160,14 @@
         slider.className = 'st-slider';
 
         const textSpan = document.createElement('span');
-        textSpan.textContent = 'Enable GPA Predictor';
+        textSpan.textContent = 'Enable GPA Calculator';
         textSpan.style.lineHeight = '1';
 
         label.append(cb, slider, textSpan);
 
         const reset = document.createElement('button');
         reset.type = 'button';
-        reset.textContent = 'Reset predictions';
+        reset.textContent = 'Reset calculator';
         reset.className = 'st-reset';
 
         const addSubjWrapper = document.createElement('div');
@@ -964,7 +1237,7 @@
             const t = getTable();
             if (!t) return;
             if (dataRows(t).length >= 10) {
-                showToast('Maximum 10 subjects allowed for prediction.');
+                showToast('Maximum 10 subjects allowed for calculation.');
                 return;
             }
 
@@ -1007,13 +1280,13 @@
         infoBtn.innerHTML = '&#9432;';
         infoBtn.className = 'btn btn-sm btn-link';
         infoBtn.style.cssText = 'padding: 0; text-decoration: none; font-size: 16px; outline: none; box-shadow: none; color: #a1a5b7; border: none; background: transparent; cursor: pointer; transition: color 0.2s; display: flex; align-items: center;';
-        infoBtn.title = 'Predictor Guide';
+        infoBtn.title = 'Calculator Guide';
 
         const infoPanel = document.createElement('div');
         infoPanel.style.cssText = 'position:absolute;right:0;top:calc(100% + 8px);z-index:100;width:240px;visibility:hidden;pointer-events:none;background:#ffffff;border:1px solid #e4e6ef;border-radius:6px;padding:12px;font-size:12px;color:#5e6278;box-shadow:0 4px 12px rgba(0,0,0,0.1);opacity:0;transform:translateY(-4px);transition:opacity 0.2s,transform 0.2s;cursor:default;';
         infoPanel.innerHTML = `
-            <div style="font-weight: 600; color: #3f4254; margin-bottom: 4px; font-size: 13px;">Predictor Guide</div>
-            <div style="line-height: 1.5;">Enable the predictor to experiment with your scores. You can edit existing grades or add new subjects to see your potential GPA.</div>
+            <div style="font-weight: 600; color: #3f4254; margin-bottom: 4px; font-size: 13px;">Calculator Guide</div>
+            <div style="line-height: 1.5;">Enable the calculator to calculate your GPA. You can select grades or add new subjects to calculate your semester GPA.</div>
         `;
 
         let isPanelOpen = false;
@@ -1052,6 +1325,7 @@
         const closeAllPanels = () => {
             closePanel();
             closeMenu();
+            closeCGPAPopover();
         };
         box._closePanelFn = closeAllPanels;
         document.addEventListener('click', closeAllPanels);
@@ -1078,6 +1352,7 @@
 
     // ---------- render (synchronous, idempotent) ----------
     function teardown(table) {
+        closeCGPAPopover();
         table.querySelectorAll(INJECTED).forEach((el) => el.remove());
         const g = document.getElementById('st-pred-gpa-row');
         if (g) g.remove();
@@ -1184,7 +1459,7 @@
                     if (span) setGradeText(span, code && mem.grades[code]);
                 });
             }
-        } catch (e) { console.debug('MUJFISH refresh failed', e); }
+        } catch (_) { }
     }
 
     // ---------- background check (server is the source of truth; never blocks the UI) ----------
@@ -1296,15 +1571,88 @@
 
         try {
             render(table, computeMode(items, sem), sem);   // same frame as the table, from memory
-        } catch (e) {
-            console.debug('MUJFISH render failed', e);
+        } catch (_) {
             try { teardown(table); } catch (_) { /* ignore */ }   // leave SLCM's own table untouched
             return;
         }
         idle(() => {
             revalidate(sem);
             fetchAttendanceCourses();
+            cacheCurrentMarks(table, sem);
         });                     // background only, off the critical path
+    }
+
+    async function cacheCurrentMarks(table, sem) {
+        if (!table || !sem) return;
+        try {
+            const head = table.rows[0];
+            if (!head) return;
+
+            const cleanSem = (ROMAN_MAP[sem.toUpperCase()] || sem).toUpperCase();
+            if (!cleanSem) return;
+
+            const idx = [], headers = [];
+            Array.from(head.cells).forEach((c, i) => {
+                if (i < 2 || /\bst-injected-/.test(c.className) ||
+                    /^(Credits|Grade|Total)$/i.test(c.textContent.trim())) return;
+                idx.push(i);
+                headers.push(c.textContent.trim());
+            });
+
+            const rows = [];
+            dataRows(table).forEach((r) => {
+                if (r.classList.contains('st-custom-row')) return;
+                const values = idx.map((i) => (r.cells[i] ? r.cells[i].textContent.trim() : '') || '-');
+                let total = 0, any = false;
+                values.forEach((v) => {
+                    const n = parseFloat(v);
+                    if (!isNaN(n)) { total += n; any = true; }
+                });
+                values.push(any ? total.toFixed(2).replace(/\.00$/, '') : '-');
+                rows.push({
+                    sNo: r.cells[0] ? r.cells[0].textContent.trim() : '',
+                    name: r.cells[1] ? r.cells[1].textContent.trim() : '',
+                    code: codeOf(r),
+                    values
+                });
+            });
+
+            if (!rows.length) return;
+            headers.push('Total');
+
+            const stored = await sGet(['muj_marks_cache', 'muj_current_semester']);
+            if (!stored) return;
+            const cacheBySem = stored.muj_marks_cache || {};
+            const record = {
+                sem: cleanSem,
+                headers,
+                rows,
+                lastUpdated: Date.now()
+            };
+            cacheBySem[cleanSem] = record;
+            const payload = { muj_marks_cache: cacheBySem };
+
+            let currentSem = stored && stored.muj_current_semester;
+            if (!currentSem && typeof detectCurrentSemester === 'function') {
+                currentSem = await detectCurrentSemester();
+                if (currentSem) payload.muj_current_semester = currentSem;
+            }
+
+            const currentRoman = currentSem ? (ROMAN_MAP[currentSem.toUpperCase()] || currentSem).toUpperCase() : null;
+            const currentNum = currentRoman ? (SEM_INT_MAP[currentRoman] || 0) : 0;
+            const viewedNum = SEM_INT_MAP[cleanSem] || 0;
+
+            // If this is the current semester OR it's a higher semester with verified marks rows,
+            // promote current semester and update the dashboard's active marks cache.
+            const isHigherWithMarks = viewedNum > currentNum && rows.length > 0;
+            if ((currentRoman && currentRoman === cleanSem) || isHigherWithMarks) {
+                payload.muj_internal_marks_cache = record;
+                if (isHigherWithMarks) {
+                    payload.muj_current_semester = cleanSem;
+                }
+            }
+            await sSet(payload);
+        } catch (_) { }
     }
 
     // ---------- print: SLCM prints #dvDetail.innerHTML in a popup (no CSS), so strip our UI first ----------
@@ -1370,6 +1718,99 @@
         observed = root;
     }
 
+    const ROMAN_MAP = {
+        '1': 'I', '2': 'II', '3': 'III', '4': 'IV', '5': 'V',
+        '6': 'VI', '7': 'VII', '8': 'VIII', '9': 'IX', '10': 'X',
+        'I': 'I', 'II': 'II', 'III': 'III', 'IV': 'IV', 'V': 'V',
+        'VI': 'VI', 'VII': 'VII', 'VIII': 'VIII', 'IX': 'IX', 'X': 'X'
+    };
+
+    const SEM_INT_MAP = {
+        'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
+        'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
+        '1': 1, '2': 2, '3': 3, '4': 4, '5': 5,
+        '6': 6, '7': 7, '8': 8, '9': 9, '10': 10
+    };
+
+    async function detectCurrentSemester() {
+        if (typeof MujFish !== 'undefined' && MujFish.detectCurrentSemester) {
+            return await MujFish.detectCurrentSemester();
+        }
+        try {
+            const d = await sGet(['muj_current_semester', 'muj_internal_marks_cache']);
+            if (d && d.muj_current_semester) return d.muj_current_semester;
+            if (d && d.muj_internal_marks_cache && d.muj_internal_marks_cache.sem) {
+                const s = d.muj_internal_marks_cache.sem.replace(/semester/i, '').trim();
+                if (s) return s;
+            }
+        } catch (_) { }
+
+        try {
+            const res = await fetch('/Employee/EmployeeDirectory/IndexStudent', { credentials: 'same-origin' });
+            if (res.ok) {
+                const html = await res.text();
+                const m = html.match(/Semester\s*<\/label>\s*<input[^>]*value=["']([^"']+)["']/i) ||
+                          html.match(/Semester[^<]*<\/[a-z]+>\s*<[a-z]+[^>]*>([^<]+)<\/[a-z]+>/i) ||
+                          html.match(/Semester\s*[:\-]?\s*(VIII|VII|VI|IV|IX|III|II|X|V|I|\d{1,2})\b/);
+                if (m && m[1]) {
+                    const v = m[1].trim();
+                    sSet({ muj_current_semester: v });
+                    return v;
+                }
+            }
+        } catch (_) { }
+
+        return null;
+    }
+
+    async function autoSelectSemester() {
+        if (stopped) return;
+        let target = null;
+        const hashMatch = /^#sem=([A-Za-z0-9]{1,4})$/i.exec(location.hash);
+        if (hashMatch) {
+            target = hashMatch[1].toUpperCase();
+        } else {
+            try {
+                const s = sessionStorage.getItem('muj_auto_open_sem');
+                if (s) {
+                    target = s.toUpperCase();
+                    sessionStorage.removeItem('muj_auto_open_sem');
+                }
+            } catch (_) { }
+        }
+
+        if (!target) return;
+
+        const targetRoman = (ROMAN_MAP[target] || target).toUpperCase();
+        const ddl = document.getElementById('ddlSemester');
+        const btn = document.getElementById('btnSearch') || document.querySelector('button[type="submit"], input[type="submit"]');
+        if (!ddl || !btn) return;
+
+        for (let i = 1; i < ddl.options.length; i++) {
+            const opt = ddl.options[i];
+            const txt = opt.text.trim().toUpperCase();
+            const val = opt.value.trim().toUpperCase();
+            if (txt === targetRoman || val === targetRoman || val === target ||
+                (ROMAN_MAP[val] && ROMAN_MAP[val] === targetRoman)) {
+                if (ddl.selectedIndex !== i) {
+                    ddl.selectedIndex = i;
+                    ddl.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                try {
+                    if (location.hash) {
+                        history.replaceState(null, '', location.pathname + location.search);
+                    }
+                } catch (_) { }
+                const table = getTable();
+                if (!table || table.rows.length <= 1) {
+                    btn.click();
+                }
+                return;
+            }
+        }
+    }
+
     attach();
+    idle(autoSelectSemester);
     window.addEventListener('pagehide', () => { stopped = true; try { obs.disconnect(); } catch (_) { /* ignore */ } });
 })();

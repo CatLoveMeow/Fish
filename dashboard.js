@@ -19,7 +19,11 @@
     const MAX_REMOUNTS = 3;
 
     // Not the dashboard (or already injected): do nothing at all
-    if (!document.getElementById('kt_ViewEvent')) return;
+    const hasDashboardLayout = Boolean(
+        document.querySelector('.col-md-9, .col-lg-9') &&
+        document.querySelector('.col-md-3, .col-lg-3')
+    );
+    if (!hasDashboardLayout && !document.getElementById('kt_ViewEvent')) return;
     if (document.getElementById('mf-bar')) return;
 
     const api = (typeof chrome !== 'undefined' && chrome.storage) ? chrome
@@ -53,7 +57,7 @@
     .mf-switch input:focus-visible + .mf-track{outline:3px solid #356ae64d;outline-offset:3px}
     .mf-switch input:disabled + .mf-track{opacity:.5}
 
-    #mujfish-timetable{display:flex;flex-direction:column;gap:16px;color:var(--mf-ink);font-family:inherit}
+    #mujfish-timetable{display:flex;flex-direction:column;gap:16px;color:var(--mf-ink);font-family:inherit;margin-top:12px;margin-bottom:24px}
     .mf-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 0 13px;border-bottom:1px solid var(--mf-line)}
     .mf-head-title{display:inline-flex;align-items:center;gap:8px;font-size:16px;font-weight:750;letter-spacing:-.025em;color:var(--mf-ink);text-decoration:none;cursor:pointer;transition:color .16s ease}
     .mf-head-title:hover{color:var(--mf-accent);text-decoration:none}
@@ -156,7 +160,57 @@
     #mujfish-classes-container .mf-meta-row{gap:4px;margin-top:5px;align-items:center}
     #mujfish-classes-container .mf-chip{font-size:9.5px;padding:3px 6px;line-height:1.25}
     #mujfish-classes-container .mf-attendance-hint{font-weight:650}
-    #mujfish-summary-container{margin-bottom:18px}
+    #mujfish-summary-container{margin-top:12px;margin-bottom:24px}
+
+    /* Exam Schedule Widget (Left Column) */
+    #mujfish-exam-schedule{margin-top:12px;margin-bottom:24px;width:100%;min-width:0}
+    #mujfish-exam-schedule .mf-head{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding-bottom:10px;width:100%;min-width:0;border-bottom:1px solid var(--mf-line)}
+    #mujfish-exam-cards-container{display:flex;flex-direction:column;gap:8px;max-height:430px;overflow-y:auto;overscroll-behavior-y:contain;padding-right:4px;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+    #mujfish-exam-cards-container::-webkit-scrollbar{width:5px}
+    #mujfish-exam-cards-container::-webkit-scrollbar-track{background:transparent}
+    #mujfish-exam-cards-container::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px}
+    #mujfish-exam-cards-container::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+    #mujfish-exam-cards-container .mf-card{min-width:0;padding:11px 12px;border-radius:10px;background:#fff;border:1px solid var(--mf-line);border-left:3px solid var(--c);box-shadow:var(--mf-shadow);transition:transform .15s ease,box-shadow .15s ease;box-sizing:border-box}
+    #mujfish-exam-cards-container .mf-card:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+    #mujfish-exam-cards-container .mf-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+    #mujfish-exam-cards-container .mf-time{font-size:11px;font-weight:600;color:var(--mf-muted);line-height:1.45}
+    #mujfish-exam-cards-container .mf-status-badge{font-size:10px;padding:2px 7px;border-radius:999px;white-space:nowrap}
+    #mujfish-exam-cards-container .mf-title{font-size:12.5px;font-weight:700;color:var(--mf-ink);line-height:1.35;margin-bottom:6px}
+    #mujfish-exam-cards-container .mf-meta-row{display:flex;gap:4px;margin-top:5px;align-items:center;flex-wrap:wrap}
+    #mujfish-exam-cards-container .mf-chip{font-size:9.5px;font-weight:650;padding:2px 6px;border-radius:4px;background:var(--mf-soft);color:var(--mf-muted);border:1px solid var(--mf-line)}
+    .mf-summary-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .mf-summary-tabs{display:inline-flex;background:#f1f5f9;border-radius:8px;padding:3px;gap:3px}
+    .mf-tab-btn{border:none;background:transparent;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;color:#64748b;cursor:pointer;transition:all .15s ease}
+    .mf-tab-btn:hover{color:#1e293b}
+    .mf-tab-btn.active{background:#ffffff;color:#0f172a;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    .mf-summary-actions{display:inline-flex;align-items:center;gap:8px}
+    .mf-summary-head-left{display:inline-flex;align-items:center;gap:8px}
+    .mf-notice-jump-link{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;background:#f8fafc;border:1px solid #cbd5e1;font-size:11px;font-weight:600;color:#0f172a;text-decoration:none;cursor:pointer;transition:all .15s ease}
+    .mf-notice-jump-link:hover{background:#f1f5f9;border-color:#94a3b8;color:#0284c7}
+    .mf-sync-btn{background:transparent;border:1px solid #cbd5e1;color:#64748b;font-size:14px;border-radius:6px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:all .18s ease;line-height:1}
+    .mf-sync-btn:hover{color:#0f172a;border-color:#94a3b8;background:#f1f5f9}
+    .mf-sync-icon{display:inline-block;line-height:1}
+    .mf-spinning{animation:mf-spin .65s linear infinite;display:inline-block}
+    @keyframes mf-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .mf-marks-dashboard-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;box-sizing:border-box}
+    .mf-marks-cgpa-col{display:inline-flex;align-items:center;gap:6px;color:#334155}
+    .mf-marks-cgpa-col strong{font-weight:800;color:#0f172a;font-size:13px}
+    .mf-cgpa-val{display:inline-block;cursor:pointer;transition:filter .25s ease,opacity .25s ease;user-select:none;padding:0 2px;border-radius:4px}
+    .mf-cgpa-blurred{filter:blur(5.5px);opacity:0.55}
+    .mf-cgpa-blurred:hover{filter:blur(3.5px);opacity:0.8}
+    .mf-footer-sync-btn{background:transparent;border:none;color:#3b82f6;font-size:11px;font-weight:600;cursor:pointer;padding:1px 5px;border-radius:4px;transition:all .15s ease;display:inline-flex;align-items:center;gap:4px;text-decoration:none}
+    .mf-footer-sync-btn:hover:not(:disabled){background:#e0f2fe;color:#0284c7}
+    .mf-footer-sync-btn:disabled{opacity:0.45;cursor:default}
+    .mf-marks-sem-col{color:#64748b}
+    .mf-marks-pred-link{color:#3b82f6;font-weight:600;text-decoration:none}
+    .mf-marks-pred-link:hover{text-decoration:underline}
+
+    /* Official exam table row highlight */
+    tr.mf-next-exam > td{background:#f5f8ff!important}
+    tr.mf-next-exam > td:first-child{box-shadow:inset 3px 0 0 var(--mf-accent)}
+
+    .mf-slim-notice{padding:10px 12px;border:1px dashed var(--mf-line);border-radius:8px;font-size:11.5px;font-weight:600;color:var(--mf-muted);text-align:center;background:var(--mf-soft)}
+
     @media(max-width:600px){
       #mujfish-classes-container .mf-card{padding:11px}
       #mujfish-classes-container .mf-status-badge{max-width:52%}
@@ -244,13 +298,29 @@
             method: 'POST',
             body: new URLSearchParams(params),
             credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
             signal: ctl.signal
         })
             .then((res) => {
+                if (res.redirected && res.url && res.url.includes('/Account/Login')) {
+                    const err = new Error('SESSION_EXPIRED');
+                    err.isSessionExpired = true;
+                    throw err;
+                }
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 return res.text();
             })
-            .then((txt) => JSON.parse(txt)) // login/error HTML pages throw here
+            .then((txt) => {
+                if (txt.includes('/Account/Login') || (txt.includes('<html') && txt.includes('Login'))) {
+                    const err = new Error('SESSION_EXPIRED');
+                    err.isSessionExpired = true;
+                    throw err;
+                }
+                return JSON.parse(txt);
+            })
             .finally(() => {
                 clearTimeout(t);
                 if (signal) signal.removeEventListener('abort', onAbort);
@@ -288,23 +358,27 @@
     }
 
     // If a fixed-height portal container is cutting the page short, let it grow.
-    // Only touches ancestors whose content is actually overflowing.
+    // Confined strictly to the dashboard column hierarchy so ancestors above it are untouched.
     function freeHeight(node) {
         try {
-            for (let p = node.parentElement; p && p !== document.body && p !== document.documentElement; p = p.parentElement) {
+            const col = node ? node.closest('.col-md-9, .col-lg-9') : null;
+            if (!col) return;
+            for (let p = node.parentElement; p; p = p.parentElement) {
                 if (getComputedStyle(p).overflowY === 'visible' && p.scrollHeight > p.clientHeight + 2) {
                     p.style.setProperty('height', 'auto', 'important');
                     p.style.setProperty('max-height', 'none', 'important');
                 }
+                if (p === col) break;
             }
         } catch (e) { }
     }
 
-    // ---------- Page anchors ----------
+    // ---------- Page anchors & Placement Engine ----------
     function getColumns() {
+        const col9 = document.querySelector('.col-md-9, .col-lg-9');
+        const leftCol = col9 ? col9.previousElementSibling : document.querySelector('.col-md-3, .col-lg-3');
         const ev = document.getElementById('kt_ViewEvent');
-        const col9 = ev && (ev.closest('.col-md-9') || ev.closest('.col-lg-9'));
-        return { ev, col9, leftCol: col9 ? col9.previousElementSibling : null };
+        return { ev, col9, leftCol };
     }
 
     // ---------- Toggle ----------
@@ -415,9 +489,15 @@
         return { title: title || raw || 'Class', room, sec, sem };
     }
 
+    function safeSkipCount(p, n, T) {
+        const v = (MF && MF.MATH && MF.MATH.safeSkips) ? MF.MATH.safeSkips(p, n, T, ROUND_UP_MARGIN) : 0;
+        return Number.isFinite(v) ? v : 0;
+    }
+
     // ---------- Course lookup (links timetable classes to the summary numbers) ----------
     let courses = [];     // { code, key, p, n } from the attendance summary
     let skipChips = [];   // eligible class forecast chips for the currently displayed day
+    let todayClassesList = null; // cached today's timetable events to carry forward into tomorrow
 
     // Summary names look like "CSE3141 : PREDICTIVE ANALYTICS".
     // Timetable titles look like "BTECH-005 PREDICTIVE ANALYTICS" (a program code, not the course code),
@@ -470,6 +550,20 @@
         const allowedDate = viewing.getTime() === today.getTime() || viewing.getTime() === tomorrow.getTime();
         const missedByCourse = new Map();
 
+        // When viewing tomorrow, carry forward today's still-eligible unmarked classes
+        if (viewing.getTime() === tomorrow.getTime() && Array.isArray(todayClassesList)) {
+            todayClassesList.forEach((it) => {
+                const s = classify(it.eventColorCode);
+                const eligible = s.label === 'Pending / Not Marked' || s.label === 'Scheduled Event';
+                if (!eligible || attCache.has(it.EntryNo || it.id)) return;
+                const c = findCourse(parseEventDescription(it.Description || '').title);
+                if (c) {
+                    const k = c.code || c.name || norm(c.name);
+                    missedByCourse.set(k, (missedByCourse.get(k) || 0) + 1);
+                }
+            });
+        }
+
         skipChips.forEach((s) => {
             if (!s.chip.isConnected) return;
             s.chip.hidden = true;
@@ -485,9 +579,12 @@
             const needed = classesNeeded(c.p, c.n + missed, target);
             const hintCls = needed > 0 ? 'mf-hint-bad' : projected < target + 5 ? 'mf-hint-warn' : 'mf-hint-ok';
 
+            const safe = safeSkipCount(c.p, c.n, target);
+            const safeMsg = safe > 0 ? ` (Can safely skip ${safe} ${safe === 1 ? 'class' : 'classes'})` : '';
+
             s.chip.className = 'mf-chip mf-attendance-hint';
             s.chip.innerHTML = `Skip: <span class="mf-hint-val ${hintCls}">${projected.toFixed(1)}%</span>`;
-            s.chip.title = `Projected attendance if you skip this and ${missed - 1} earlier eligible ${missed === 2 ? 'class' : 'classes'} of this subject: ${projected.toFixed(1)}%. Target: ${target}%. Forecast only; SLCM records are unchanged.`;
+            s.chip.title = `Projected attendance if you skip this and ${missed - 1} earlier eligible ${missed === 2 ? 'class' : 'classes'} of this subject: ${projected.toFixed(1)}%. Target: ${target}%.${safeMsg} Forecast only; SLCM records are unchanged.`;
             s.chip.setAttribute('aria-label', `Projected attendance if skipped: ${projected.toFixed(1)} percent.`);
             s.chip.hidden = false;
         });
@@ -581,7 +678,8 @@
             container.classList.remove('mf-scrollable');
             container.style.maxHeight = '';
             if (hint) hint.style.display = 'none';
-            container.appendChild(notice('No classes scheduled for this date.'));
+            container.appendChild(el('div', 'mf-slim-notice', 'No classes scheduled for today'));
+            syncBaselineAlignment();
             return [];
         }
         const wrap = el('div', 'mf-list');
@@ -666,6 +764,7 @@
         container.appendChild(wrap);
         fillChips();
         adjustClassesScroll(wrap);
+        syncBaselineAlignment();
         return jobs;
     }
 
@@ -687,6 +786,19 @@
                 const list = Array.isArray(data)
                     ? data.filter((x) => x && typeof x === 'object').sort(byStart)
                     : [];
+                if (sameDay(viewDate, new Date())) {
+                    todayClassesList = list;
+                } else if (!todayClassesList) {
+                    // Seed today's classes in background so tomorrow's forecast can carry forward
+                    postForm('/Student/Academic/GetStudentCalenderEventList', {
+                        Year: '', Month: '', Type: 'agendaDay', Dated: apiDate(new Date()), PreNext: '3'
+                    }, ctl.signal).then((todayData) => {
+                        if (Array.isArray(todayData)) {
+                            todayClassesList = todayData.filter((x) => x && typeof x === 'object').sort(byStart);
+                            fillChips();
+                        }
+                    }).catch(() => { });
+                }
                 const jobs = renderClasses(container, list, ctl.signal);
                 return runLimited(jobs, MAX_CONCURRENT_DETAILS, ctl.signal);
             })
@@ -777,16 +889,513 @@
         return root;
     }
 
-    // Hide (never remove) the portal's own left column content, then append ours
     function mountTimetable() {
         const { leftCol } = getColumns();
         if (!leftCol) return null;
-        if (!leftCol.querySelector('#mujfish-timetable')) {
-            Array.from(leftCol.children).forEach((ch) => ch.classList.add('mf-hidden'));
-            leftCol.appendChild(buildTimetable());
+        let box = leftCol.querySelector('#mujfish-timetable');
+        if (!box) {
+            box = buildTimetable();
+            leftCol.insertBefore(box, leftCol.firstChild);
             loadClasses();
+        } else if (leftCol.firstChild !== box) {
+            leftCol.insertBefore(box, leftCol.firstChild);
         }
+        syncBaselineAlignment();
         return leftCol;
+    }
+
+    // ---------- Exam Mode, Next Exam Strip & Glance Bar ----------
+    function findExamTable(col9) {
+        if (!col9) return null;
+        const tables = Array.from(col9.querySelectorAll('table'));
+        for (const tbl of tables) {
+            const headers = Array.from(tbl.querySelectorAll('th'));
+            if (!headers.length) continue;
+            let dIdx = -1, cIdx = -1, tIdx = -1, rIdx = -1, cdIdx = -1, sIdx = -1, stIdx = -1;
+            headers.forEach((th, idx) => {
+                const txt = (th.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+                if (/\bdate\b/.test(txt)) dIdx = idx;
+                else if (/\b(course\s*name|subject)\b/.test(txt)) cIdx = idx;
+                else if (/\bcourse\s*code\b/.test(txt)) cdIdx = idx;
+                else if (/\btime\b/.test(txt)) tIdx = idx;
+                else if (/\b(room|venue)\b/.test(txt)) rIdx = idx;
+                else if (/\bseat\b/.test(txt)) sIdx = idx;
+                else if (/\bstatus\b/.test(txt)) stIdx = idx;
+            });
+            if (dIdx !== -1 && cIdx !== -1) {
+                return { tbl, dIdx, cIdx, tIdx, rIdx, cdIdx, sIdx, stIdx };
+            }
+        }
+        return null;
+    }
+
+    function isExamMode(col9) {
+        return Boolean(findExamTable(col9));
+    }
+
+    function parseAllExams(col9) {
+        const found = findExamTable(col9);
+        if (!found) return [];
+
+        const { tbl: examTable, dIdx: dateIdx, cIdx: courseIdx, tIdx: timeIdx, rIdx: roomIdx, cdIdx: codeIdx, sIdx: seatIdx, stIdx: statusIdx } = found;
+
+        const MONTH_MAP = {
+            jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+            jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11
+        };
+        const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        const rows = Array.from(examTable.querySelectorAll('tbody tr:not(.dataTables_empty)'));
+        if (!rows.length) return [];
+
+        const now = Date.now();
+        const candidateExams = [];
+        let hasAttention = statusIdx === -1;
+
+        rows.forEach((r) => {
+            if (!r.cells[dateIdx] || !r.cells[courseIdx]) return;
+            const dateText = (r.cells[dateIdx].textContent || '').replace(/\s+/g, ' ').trim();
+            const courseText = (r.cells[courseIdx].textContent || '').replace(/\s+/g, ' ').trim();
+            const courseCode = codeIdx !== -1 && r.cells[codeIdx]
+                ? (r.cells[codeIdx].textContent || '').replace(/\s+/g, ' ').trim() : '';
+            const timeText = timeIdx !== -1 && r.cells[timeIdx]
+                ? (r.cells[timeIdx].textContent || '').replace(/\s+/g, ' ').trim() : '';
+            const roomText = roomIdx !== -1 && r.cells[roomIdx]
+                ? (r.cells[roomIdx].textContent || '').replace(/\s+/g, ' ').trim() : '';
+
+            // Seat text spacing fix: "Seat 65 · Row 5, Col 7"
+            let seatText = '';
+            if (seatIdx !== -1 && r.cells[seatIdx]) {
+                const cell = r.cells[seatIdx];
+                const textPieces = [];
+                cell.childNodes.forEach((node) => {
+                    const t = (node.textContent || '').replace(/\s+/g, ' ').trim();
+                    if (t) textPieces.push(t);
+                });
+                if (textPieces.length > 1) {
+                    seatText = textPieces.join(' · ');
+                } else {
+                    const raw = (cell.textContent || '').replace(/\s+/g, ' ').trim();
+                    seatText = raw.replace(/^(\d+)\s*(?:Row|r)\b/i, '$1 · Row');
+                }
+            }
+
+            // Status check: flag attention if any row is not "Scheduled"
+            if (statusIdx !== -1 && r.cells[statusIdx]) {
+                const sText = (r.cells[statusIdx].textContent || '').replace(/\s+/g, ' ').trim();
+                if (sText && !/^\s*scheduled\s*$/i.test(sText)) {
+                    hasAttention = true;
+                }
+            }
+
+            const dm = dateText.match(/\b(\d{1,2})[\s\-]+([A-Za-z]{3})[\s\-]+(\d{4})\b/);
+            if (!dm) return;
+
+            const day = parseInt(dm[1], 10);
+            const monthName = dm[2].toLowerCase();
+            const year = parseInt(dm[3], 10);
+            if (!Object.prototype.hasOwnProperty.call(MONTH_MAP, monthName)) return;
+            const month = MONTH_MAP[monthName];
+
+            let endTimeMs = new Date(year, month, day, 23, 59, 59, 999).getTime();
+            let startTimeMs = new Date(year, month, day, 0, 0, 0, 0).getTime();
+
+            const tm = timeText.match(/(\d{1,2}):(\d{2})(?:\s*[-–—~to]+\s*(\d{1,2}):(\d{2}))?\s*(AM|PM)?/i);
+            if (tm) {
+                const sH = parseInt(tm[1], 10);
+                const sM = parseInt(tm[2], 10);
+                const eH = tm[3] ? parseInt(tm[3], 10) : sH;
+                const eM = tm[4] ? parseInt(tm[4], 10) : sM;
+                const ampm = (tm[5] || '').toUpperCase();
+
+                let adjEH = eH;
+                if (ampm === 'PM' && adjEH < 12) adjEH += 12;
+                if (ampm === 'AM' && adjEH === 12) adjEH = 0;
+
+                let adjSH = sH;
+                if (ampm === 'PM' && adjSH < 12 && tm[3]) adjSH += 12;
+                if (ampm === 'AM' && adjSH === 12) adjSH = 0;
+
+                const parsedEnd = new Date(year, month, day, adjEH, eM, 0, 0).getTime();
+                if (!isNaN(parsedEnd)) endTimeMs = parsedEnd;
+                const parsedStart = new Date(year, month, day, adjSH, sM, 0, 0).getTime();
+                if (!isNaN(parsedStart)) startTimeMs = parsedStart;
+
+                // Fix: 09:30–12:30 PM (start becomes 21:30 which is after end)
+                if (startTimeMs > endTimeMs) {
+                    startTimeMs -= 12 * 3600 * 1000;
+                }
+            }
+
+            const isPast = endTimeMs < now;
+            const dateObj = new Date(year, month, day);
+            const weekday = DAY_NAMES[dateObj.getDay()];
+
+            candidateExams.push({
+                row: r,
+                course: courseText,
+                courseCode,
+                day,
+                monthName: dm[2],
+                year,
+                dateObj,
+                weekday,
+                startTimeMs,
+                endTimeMs,
+                timeText,
+                roomText,
+                seatText,
+                isPast
+            });
+        });
+
+        rows.forEach((r) => r.classList.remove('mf-next-exam'));
+        if (!candidateExams.length) return [];
+
+        candidateExams.sort((a, b) => a.startTimeMs - b.startTimeMs);
+        candidateExams.hasAttention = hasAttention;
+        candidateExams.examTable = examTable;
+
+        const firstUpcoming = candidateExams.find((e) => !e.isPast);
+        if (firstUpcoming) {
+            firstUpcoming.isNext = true;
+            firstUpcoming.row.classList.add('mf-next-exam');
+
+            const todayMid = new Date(); todayMid.setHours(0, 0, 0, 0);
+            const examMid = new Date(firstUpcoming.dateObj); examMid.setHours(0, 0, 0, 0);
+            const diffDays = Math.round((examMid - todayMid) / (24 * 60 * 60 * 1000));
+
+            if (diffDays <= 0) {
+                firstUpcoming.relText = 'Today';
+                firstUpcoming.isSoon = true;
+            } else if (diffDays === 1) {
+                firstUpcoming.relText = 'Tomorrow';
+                firstUpcoming.isSoon = true;
+            } else {
+                firstUpcoming.relText = `in ${diffDays} days`;
+                firstUpcoming.isSoon = false;
+            }
+        }
+
+        return candidateExams;
+    }
+
+    function scrollToOfficialExamTable(col9, examTable) {
+        let tbl = examTable;
+        if (!tbl) {
+            const found = findExamTable(col9);
+            tbl = found ? found.tbl : null;
+        }
+        if (!tbl) {
+            const tables = Array.from((col9 || document).querySelectorAll('table'));
+            tbl = tables.find((t) => !t.closest('#mujfish-summary-container, #mujfish-timetable, #mujfish-exam-schedule'));
+        }
+        if (!tbl) return;
+
+        // Find the "Student Examination Schedule" heading or closest section wrapper directly associated with this table
+        let target = null;
+        let prev = tbl.previousElementSibling;
+        while (prev) {
+            if (/examination\s*schedule|seating\s*plan/i.test(prev.textContent || '')) {
+                target = prev;
+                break;
+            }
+            prev = prev.previousElementSibling;
+        }
+
+        if (!target) {
+            let p = tbl.parentElement;
+            while (p && p !== col9 && p !== document.body) {
+                const h = Array.from(p.querySelectorAll('h1, h2, h3, h4, h5, h6, strong, b, .portlet-title, .card-title')).find((el) => {
+                    if (el.contains(tbl)) return false;
+                    return /examination\s*schedule|seating\s*plan/i.test(el.textContent || '');
+                });
+                if (h) {
+                    target = h;
+                    break;
+                }
+                p = p.parentElement;
+            }
+        }
+
+        if (!target) target = tbl;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function buildExamScheduleWidget(col9) {
+        const root = el('div');
+        root.id = 'mujfish-exam-schedule';
+
+        const head = el('div', 'mf-head');
+        const titleRow = el('div', 'mf-title-row');
+        titleRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:8px;';
+
+        const title = el('span', 'mf-head-title', 'Exam Schedule');
+        title.style.cursor = 'default';
+
+        const officialLink = el('a', 'mf-official-link');
+        officialLink.innerHTML = '<span>View official table</span> <span style="font-size:10px;">&darr;</span>';
+        officialLink.style.cssText = 'font-size:11px;font-weight:600;color:#0f172a;background:#f8fafc;border:1px solid #cbd5e1;padding:3px 9px;border-radius:6px;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .15s ease;box-shadow:0 1px 2px rgba(0,0,0,0.04);white-space:nowrap;flex-shrink:0;';
+        officialLink.title = 'Scroll down to the official university examination table';
+        officialLink.onclick = (e) => {
+            e.preventDefault();
+            scrollToOfficialExamTable(col9);
+        };
+        officialLink.onmouseenter = () => { officialLink.style.background = '#f1f5f9'; officialLink.style.borderColor = '#94a3b8'; officialLink.style.color = '#0284c7'; };
+        officialLink.onmouseleave = () => { officialLink.style.background = '#f8fafc'; officialLink.style.borderColor = '#cbd5e1'; officialLink.style.color = '#0f172a'; };
+
+        titleRow.append(title, officialLink);
+        head.appendChild(titleRow);
+
+        const alertBanner = el('div', 'mf-exam-alert-banner');
+        alertBanner.id = 'mf-exam-alert-banner';
+        alertBanner.style.display = 'none';
+        head.appendChild(alertBanner);
+
+        root.appendChild(head);
+
+        const container = el('div');
+        container.id = 'mujfish-exam-cards-container';
+        root.appendChild(container);
+
+        renderExamCards(container, col9);
+        return root;
+    }
+
+    function renderExamCards(container, col9) {
+        container.textContent = '';
+        const exams = parseAllExams(col9);
+
+        const banner = document.getElementById('mf-exam-alert-banner');
+        const officialLink = document.querySelector('#mujfish-exam-schedule .mf-official-link');
+        if (banner) {
+            if (exams && exams.hasAttention) {
+                if (officialLink) officialLink.style.display = 'none';
+                banner.textContent = '';
+                banner.style.cssText = 'display:flex;align-items:center;gap:6px;padding:8px 10px;margin-top:2px;border-radius:7px;background:var(--mf-amber-bg);border:1px solid #eed69b;color:var(--mf-amber);font-size:11px;font-weight:650;line-height:1.35;cursor:pointer;width:100%;box-sizing:border-box;';
+                banner.innerHTML = '<span>&#9888;</span><span>Some exams need attention &mdash; check official table below &darr;</span>';
+                banner.onclick = () => {
+                    scrollToOfficialExamTable(col9, exams && exams.examTable);
+                };
+            } else {
+                banner.style.display = 'none';
+                if (officialLink) officialLink.style.display = 'inline-flex';
+            }
+        }
+
+        if (!exams || !exams.length) {
+            const fallback = el('div', 'mf-slim-notice');
+            fallback.style.cssText = 'padding:14px;cursor:pointer;text-align:center;color:var(--mf-accent);font-weight:650;';
+            fallback.innerHTML = 'Exam schedule below &darr;';
+            fallback.onclick = () => {
+                scrollToOfficialExamTable(col9);
+            };
+            container.appendChild(fallback);
+            syncBaselineAlignment();
+            return;
+        }
+
+        exams.forEach((ex) => {
+            const card = el('div', 'mf-card mf-exam-card' + (ex.isNext ? ' mf-exam-card-next' : ''));
+            card.style.setProperty('--c', ex.isNext ? 'var(--mf-accent)' : '#94a3b8');
+            card.style.cursor = 'pointer';
+            card.title = 'Click to scroll to seating row';
+
+            const cardHead = el('div', 'mf-card-head');
+            const timeWrap = el('div', 'mf-time');
+            timeWrap.textContent = `${ex.weekday} ${ex.day} ${ex.monthName} · ${ex.timeText || ''}`;
+            cardHead.appendChild(timeWrap);
+
+            if (ex.isNext) {
+                const badge = el('span', 'mf-status-badge' + (ex.isSoon ? ' mf-rel-soon' : ''), ex.relText || 'Next Exam');
+                badge.style.background = 'var(--mf-amber-bg)';
+                badge.style.color = 'var(--mf-amber)';
+                badge.style.fontWeight = '700';
+                cardHead.appendChild(badge);
+            } else if (ex.isPast) {
+                const badge = el('span', 'mf-status-badge', 'Completed');
+                badge.style.background = '#f1f5f9';
+                badge.style.color = '#94a3b8';
+                cardHead.appendChild(badge);
+            }
+            card.appendChild(cardHead);
+
+            const titleEl = el('div', 'mf-title', ex.course);
+            card.appendChild(titleEl);
+
+            const metaRow = el('div', 'mf-meta-row');
+            if (ex.roomText) {
+                metaRow.appendChild(el('span', 'mf-chip', 'Room ' + ex.roomText));
+            }
+            if (ex.seatText) {
+                metaRow.appendChild(el('span', 'mf-chip', 'Seat ' + ex.seatText));
+            }
+            if (ex.courseCode) {
+                metaRow.appendChild(el('span', 'mf-chip', ex.courseCode));
+            }
+            card.appendChild(metaRow);
+
+            card.onclick = () => {
+                if (ex.row) ex.row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            };
+
+            container.appendChild(card);
+        });
+
+        requestAnimationFrame(() => {
+            const nextCard = container.querySelector('.mf-exam-card-next');
+            if (nextCard) {
+                const targetScroll = Math.max(0, nextCard.offsetTop - container.offsetTop - 6);
+                container.scrollTo({ top: targetScroll, behavior: 'smooth' });
+            } else {
+                container.scrollTop = 0;
+            }
+        });
+        syncBaselineAlignment();
+    }
+
+    function mountExamSchedule(col9) {
+        const { leftCol } = getColumns();
+        if (!leftCol) return null;
+        let box = leftCol.querySelector('#mujfish-exam-schedule');
+        if (!box) {
+            box = buildExamScheduleWidget(col9);
+            leftCol.insertBefore(box, leftCol.firstChild);
+        } else {
+            const container = box.querySelector('#mujfish-exam-cards-container');
+            if (container) renderExamCards(container, col9);
+            if (leftCol.firstChild !== box) {
+                leftCol.insertBefore(box, leftCol.firstChild);
+            }
+        }
+        syncBaselineAlignment();
+        return leftCol;
+    }
+
+    let examObs = null;
+    function setupExamObserver(col9) {
+        if (!col9) return;
+        if (examObs) examObs.disconnect();
+
+        examObs = new MutationObserver((mutations) => {
+            const hasExternal = mutations.some((m) => {
+                const t = m.target;
+                if (!t) return false;
+                if (t.closest && t.closest('#mujfish-summary-container')) return false;
+                if (t.id && (t.id.startsWith('mujfish-') || t.id === 'mf-bar')) return false;
+                return true;
+            });
+            if (hasExternal) {
+                mountExamSchedule(col9);
+                updateNoticeLink();
+                syncBaselineAlignment();
+            }
+        });
+
+        examObs.observe(col9, { childList: true, subtree: true });
+        setTimeout(() => {
+            if (examObs) {
+                examObs.disconnect();
+                examObs = null;
+            }
+        }, 3500);
+    }
+
+    let resizeHandler = null;
+    let baselineResizeObs = null;
+
+    function setupBaselineObserver() {
+        if (typeof ResizeObserver !== 'function') return;
+        if (!baselineResizeObs) {
+            baselineResizeObs = new ResizeObserver(() => {
+                syncBaselineAlignment();
+            });
+        }
+        const leftBox = document.getElementById('mujfish-exam-schedule') || document.getElementById('mujfish-timetable');
+        const rightBox = document.getElementById('mujfish-summary-container');
+        if (leftBox) baselineResizeObs.observe(leftBox);
+        if (rightBox) baselineResizeObs.observe(rightBox);
+    }
+
+    function setupResizeListener() {
+        if (resizeHandler) return;
+        let resizeTimer = null;
+        resizeHandler = () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(syncBaselineAlignment, 100);
+        };
+        window.addEventListener('resize', resizeHandler);
+    }
+
+    function syncBaselineAlignment() {
+        setupResizeListener();
+        setupBaselineObserver();
+        requestAnimationFrame(() => {
+            const { col9, leftCol } = getColumns();
+            const leftBox = document.getElementById('mujfish-exam-schedule') || document.getElementById('mujfish-timetable');
+            const rightBox = document.getElementById('mujfish-summary-container');
+            if (!leftBox || !rightBox) return;
+
+            // Keep observing both boxes if they exist
+            if (baselineResizeObs) {
+                baselineResizeObs.observe(leftBox);
+                baselineResizeObs.observe(rightBox);
+            }
+
+            const BASE_GAP = 24;
+
+            // On mobile / narrow screens (stacked single column < 768px), keep natural spacing
+            if (window.innerWidth < 768) {
+                leftBox.style.marginBottom = BASE_GAP + 'px';
+                rightBox.style.marginBottom = BASE_GAP + 'px';
+                return;
+            }
+
+            // Check if there is actual native content below our left widget
+            const hasNativeLeft = leftCol && Array.from(leftCol.children).some((el) => {
+                if (!el || el === leftBox || el.nodeType !== 1) return false;
+                if (el.id && el.id.startsWith('mujfish-')) return false;
+                if (el.className && /(?:^|\s)mf-/.test(el.className)) return false;
+                if (!el.offsetHeight && !el.offsetWidth) return false;
+                return (el.textContent || '').trim().length > 0;
+            });
+
+            // Check if there is actual native content below our right widget
+            const hasNativeRight = col9 && Array.from(col9.children).some((el) => {
+                if (!el || el === rightBox || el.nodeType !== 1) return false;
+                if (el.id && el.id.startsWith('mujfish-')) return false;
+                if (el.className && /(?:^|\s)mf-/.test(el.className)) return false;
+                if (!el.offsetHeight && !el.offsetWidth) return false;
+                return (el.textContent || '').trim().length > 0;
+            });
+
+            // If only one side has content below, or neither does, use default gap (no phantom whitespace)
+            if (!hasNativeLeft || !hasNativeRight) {
+                leftBox.style.marginBottom = BASE_GAP + 'px';
+                rightBox.style.marginBottom = BASE_GAP + 'px';
+                return;
+            }
+
+            // Both sides have content below -> balance visual bottom edges so both lower panels start at the exact same pixel line
+            const leftRect = leftBox.getBoundingClientRect();
+            const rightRect = rightBox.getBoundingClientRect();
+
+            const leftBottom = leftRect.bottom;
+            const rightBottom = rightRect.bottom;
+
+            if (leftBottom > rightBottom + 2) {
+                const diff = Math.round(leftBottom - rightBottom);
+                rightBox.style.marginBottom = (BASE_GAP + diff) + 'px';
+                leftBox.style.marginBottom = BASE_GAP + 'px';
+            } else if (rightBottom > leftBottom + 2) {
+                const diff = Math.round(rightBottom - leftBottom);
+                leftBox.style.marginBottom = (BASE_GAP + diff) + 'px';
+                rightBox.style.marginBottom = BASE_GAP + 'px';
+            } else {
+                leftBox.style.marginBottom = BASE_GAP + 'px';
+                rightBox.style.marginBottom = BASE_GAP + 'px';
+            }
+        });
     }
 
     // ---------- Summary ----------
@@ -815,10 +1424,28 @@
         return el('span', 'mf-pill ' + cls, value != null && value !== '' ? String(value) : '–');
     }
 
+    let activeSummaryTab = 'attendance';
+    let userSelectedTab = false;
+    let marksData = null;
+    let marksAbortCtl = null;
+    let lastManualSyncTime = 0;
+    const MANUAL_SYNC_COOLDOWN_MS = 60 * 1000;
+
     function renderSummary(body, data) {
         body.textContent = '';
         const ok = data && data.IsSuccessfull === true && Array.isArray(data.AttendanceSummaryList);
         const kind = ok ? data.ErrorMessage : null;
+
+        // Auto-switch to marks if attendance is CLOSED ("Approved" / end of sem) and user hasn't explicitly chosen
+        if (kind === 'CLOSED' && !userSelectedTab && activeSummaryTab !== 'marks') {
+            switchSummaryTab('marks');
+            return true;
+        }
+
+        if (activeSummaryTab === 'marks') {
+            loadMarks();
+            return true;
+        }
 
         if (!ok || (kind !== 'UPCOMING' && kind !== 'CLOSED')) {
             body.appendChild(notice(data && data.ErrorMessage === 'OPEN'
@@ -875,13 +1502,726 @@
             body.appendChild(banner);
         }
         body.appendChild(table);
+        syncBaselineAlignment();
         return true;
     }
 
     // Re-draw from the data we already have (no new request)
     function rerenderSummary() {
-        if (summaryBody && summaryBody.isConnected && summaryData) renderSummary(summaryBody, summaryData);
+        if (activeSummaryTab === 'marks') {
+            loadMarks();
+        } else {
+            if (summaryBody && summaryBody.isConnected && summaryData) renderSummary(summaryBody, summaryData);
+        }
         fillChips();
+    }
+
+    function switchSummaryTab(tab) {
+        activeSummaryTab = tab;
+        const btnAtt = document.getElementById('mf-tab-att');
+        const btnMarks = document.getElementById('mf-tab-marks');
+        const link = document.getElementById('mf-summary-link');
+        const linkText = link && link.querySelector('.mf-head-title-text');
+
+        if (btnAtt) btnAtt.classList.toggle('active', tab === 'attendance');
+        if (btnMarks) btnMarks.classList.toggle('active', tab === 'marks');
+
+        if (link && linkText) {
+            link.hidden = false;
+            if (tab === 'marks') {
+                link.href = '/Student/Academic/InternalMarkForStudent';
+                linkText.textContent = 'Internal Marks ';
+            } else {
+                link.href = '/Student/Academic/AttendanceSummaryForStudent';
+                linkText.textContent = 'Attendance ';
+            }
+        }
+
+        if (tab === 'marks') {
+            loadMarks();
+        } else {
+            rerenderSummary();
+        }
+        syncBaselineAlignment();
+    }
+
+    const ROMAN_MAP = {
+        '1': 'I', '2': 'II', '3': 'III', '4': 'IV', '5': 'V',
+        '6': 'VI', '7': 'VII', '8': 'VIII', '9': 'IX', '10': 'X',
+        'I': 'I', 'II': 'II', 'III': 'III', 'IV': 'IV', 'V': 'V',
+        'VI': 'VI', 'VII': 'VII', 'VIII': 'VIII', 'IX': 'IX', 'X': 'X'
+    };
+
+    function normSem(s) {
+        if (!s) return '';
+        if (MF && typeof MF.normSem === 'function') return MF.normSem(s);
+        const clean = String(s).replace(/semester/i, '').trim().toUpperCase();
+        return ROMAN_MAP[clean] || clean;
+    }
+
+    async function detectCurrentSemester() {
+        if (typeof MujFish !== 'undefined' && MujFish.detectCurrentSemester) {
+            return await MujFish.detectCurrentSemester();
+        }
+        const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
+        try {
+            const cached = await new Promise((res) => storage.get(['muj_current_semester', 'muj_sem_checked_at', 'muj_internal_marks_cache'], res));
+            const isFresh = cached && cached.muj_sem_checked_at && (Date.now() - cached.muj_sem_checked_at < FOURTEEN_DAYS);
+            if (isFresh && cached.muj_current_semester) return cached.muj_current_semester;
+            if (isFresh && cached.muj_internal_marks_cache && cached.muj_internal_marks_cache.sem) {
+                const s = cached.muj_internal_marks_cache.sem.replace(/semester/i, '').trim();
+                if (s) return s;
+            }
+        } catch (_) { }
+
+        try {
+            const res = await fetch('/Employee/EmployeeDirectory/IndexStudent', { credentials: 'same-origin' });
+            if (res.ok) {
+                const html = await res.text();
+                const m = html.match(/id=["']txtSemester["'][^>]*value=["']([^"']+)["']/i) ||
+                    html.match(/name=["']Semester["'][^>]*value=["']([^"']+)["']/i) ||
+                    html.match(/value=["']([^"']+)["'][^>]*id=["']txtSemester["']/i);
+                if (m && m[1]) {
+                    const v = normSem(m[1].trim());
+                    if (v) {
+                        try { storage.set({ muj_current_semester: v, muj_sem_checked_at: Date.now() }); } catch (_) { }
+                        return v;
+                    }
+                }
+            }
+        } catch (_) { }
+
+        return null;
+    }
+
+    function renderSemesterPicker(body, isManual = false, currentSem = null, prevData = null) {
+        body.textContent = '';
+        const wrap = el('div', 'mf-sem-picker-wrap');
+        wrap.style.cssText = 'text-align:center;padding:22px 16px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;margin:8px 0;';
+
+        const titleText = isManual ? 'Select Semester' : 'Unable to auto-detect current semester';
+        const title = el('div', '', titleText);
+        title.style.cssText = 'font-weight:700;font-size:13px;color:#1e293b;margin-bottom:4px;';
+
+        const subText = isManual ? 'Choose a semester to view internal marks:' : 'Select your semester to load internal marks:';
+        const sub = el('div', '', subText);
+        sub.style.cssText = 'font-size:12px;color:#64748b;margin-bottom:14px;';
+
+        const pills = el('div', 'mf-sem-pills');
+        pills.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:380px;margin:0 auto;';
+
+        const sems = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'];
+        const normCurrent = normSem(currentSem);
+
+        sems.forEach((s) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'mf-sem-pill-btn';
+            btn.textContent = s;
+            const isSelected = normCurrent && normCurrent === s;
+            if (isSelected) {
+                btn.style.cssText = 'border:1px solid #0f172a;background:#0f172a;color:#ffffff;font-weight:700;font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s ease;box-shadow:0 1px 2px rgba(0,0,0,0.08);';
+                btn.title = `Currently viewing Semester ${s}`;
+            } else {
+                btn.style.cssText = 'border:1px solid #cbd5e1;background:#ffffff;color:#1e293b;font-weight:600;font-size:12px;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s ease;';
+                btn.onmouseenter = () => { btn.style.borderColor = '#94a3b8'; btn.style.background = '#f8fafc'; };
+                btn.onmouseleave = () => { btn.style.borderColor = '#cbd5e1'; btn.style.background = '#ffffff'; };
+            }
+            btn.onclick = async () => {
+                btn.disabled = true;
+                btn.textContent = '...';
+                if (!isManual) {
+                    try {
+                        await new Promise((res) => storage.set({
+                            muj_current_semester: s,
+                            muj_sem_checked_at: Date.now()
+                        }, res));
+                    } catch (_) { }
+                }
+                marksData = null;
+                body.textContent = '';
+                body.appendChild(notice(`Loading Semester ${s} marks...`));
+                await loadMarks(false, s);
+            };
+            pills.appendChild(btn);
+        });
+
+        wrap.append(title, sub, pills);
+
+        if (isManual && prevData && prevData.rows && prevData.rows.length) {
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.style.cssText = 'background:none;border:none;margin-top:14px;font-size:11.5px;color:#64748b;cursor:pointer;text-decoration:none;padding:2px 6px;transition:color .15s ease;display:inline-block;';
+            cancelBtn.onmouseenter = () => { cancelBtn.style.color = '#0f172a'; };
+            cancelBtn.onmouseleave = () => { cancelBtn.style.color = '#64748b'; };
+            cancelBtn.onclick = () => {
+                renderMarks(body, prevData);
+            };
+            wrap.appendChild(cancelBtn);
+        }
+
+        body.appendChild(wrap);
+    }
+
+    function renderEmptyMarksState(body, sem) {
+        body.appendChild(notice(sem ? `No internal marks recorded for Semester ${sem} yet.` : 'No internal marks recorded for this semester yet.'));
+    }
+
+    function renderMarks(body, data) {
+        body.textContent = '';
+        if (!data || !data.rows || !data.rows.length) {
+            renderEmptyMarksState(body, data && data.sem);
+            renderMarksFooter(body, data);
+            return;
+        }
+
+        const table = el('table', 'table table-striped table-bordered table-hover mf-table');
+        const thead = document.createElement('thead');
+        const trHead = document.createElement('tr');
+        trHead.appendChild(el('th', 'mf-c', 'S. No.'));
+        trHead.appendChild(el('th', '', 'Course Name'));
+
+        const activeCols = [];
+        data.headers.forEach((h, idx) => {
+            const hasData = data.rows.some((r) => r.values && r.values[idx] && r.values[idx] !== '-' && r.values[idx] !== '');
+            if (hasData || /total/i.test(h)) {
+                activeCols.push({ title: h, idx });
+                trHead.appendChild(el('th', 'mf-c', h));
+            }
+        });
+        thead.appendChild(trHead);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        data.rows.forEach((r, i) => {
+            const tr = document.createElement('tr');
+            tr.appendChild(td(r.sNo || (i + 1), true));
+            tr.appendChild(td(r.name || '', false));
+            activeCols.forEach((col) => {
+                const val = (r.values && r.values[col.idx]) ?? '-';
+                const cell = td(val, true);
+                if (/total/i.test(col.title) && val !== '-') {
+                    cell.style.fontWeight = '700';
+                    cell.style.color = '#0f172a';
+                }
+                tr.appendChild(cell);
+            });
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        body.appendChild(table);
+
+        renderMarksFooter(body, data);
+        syncBaselineAlignment();
+    }
+
+    function fmtAge(ts) {
+        if (!ts) return '';
+        const diff = Math.floor((Date.now() - ts) / 1000);
+        if (diff < 60) return 'Updated just now';
+        if (diff < 3600) return `Updated ${Math.floor(diff / 60)}m ago`;
+        if (diff < 86400) return `Updated ${Math.floor(diff / 3600)}h ago`;
+        return `Updated ${Math.floor(diff / 86400)}d ago`;
+    }
+
+    async function syncCGPABaseline() {
+        if (MF && typeof MF.syncBaseline === 'function') {
+            return await MF.syncBaseline();
+        }
+        try {
+            const res = await fetch('/Student/Academic/GetCGPAGPAForFaculty', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({ Enrollment: '', AcademicYear: '', ProgramCode: '' })
+            });
+            if (res.redirected && res.url && res.url.includes('/Account/Login')) {
+                const err = new Error('SESSION_EXPIRED');
+                err.isSessionExpired = true;
+                throw err;
+            }
+            if (!res.ok) return null;
+            const txt = await res.text();
+            if (txt.includes('/Account/Login') || (txt.includes('<html') && txt.includes('Login'))) {
+                const err = new Error('SESSION_EXPIRED');
+                err.isSessionExpired = true;
+                throw err;
+            }
+            const d = JSON.parse(txt);
+            const it = d && d.IsSuccessfull === true && Array.isArray(d.InternalMarksList) ? d.InternalMarksList[0] : null;
+            if (!it) return null;
+
+            const num = (v) => { const n = parseFloat(v); return Number.isFinite(n) ? n : NaN; };
+            const cgpa = num(it.CGPA), credits = num(it.TotalCredits);
+            if (!(cgpa >= 0 && cgpa <= 10) || !(credits > 0)) return null;
+
+            let points = 0, sems = 0;
+            const semGpas = {};
+            ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'].forEach((r) => {
+                const g = num(it['GPASemester' + r]), c = num(it['CreditsSemester' + r]);
+                if (g > 0 && c > 0) {
+                    sems++;
+                    points += g * c;
+                    semGpas[r] = { gpa: g, credits: c };
+                }
+            });
+            if (points <= 0 || Math.abs(points / credits - cgpa) > 0.1) points = cgpa * credits;
+
+            const b = { cgpa, credits, points, semsCompleted: sems, semGpas, lastSynced: Date.now() };
+            try { storage.set({ muj_academic_baseline: b }); } catch (_) { }
+            return b;
+        } catch (_) { }
+        return null;
+    }
+
+    function renderMarksFooter(body, data) {
+        const footer = el('div', 'mf-marks-dashboard-footer');
+        const left = el('div', 'mf-marks-cgpa-col');
+        left.innerHTML = '<span style="color:#64748b;">Loading baseline...</span>';
+
+        const updateLeft = (baseline) => {
+            left.textContent = '';
+            const targetSem = normSem(data && data.sem);
+            const semGpas = baseline && baseline.semGpas;
+            const semInfo = targetSem && semGpas && semGpas[targetSem];
+
+            const isFinalized = Boolean(semInfo && typeof semInfo.gpa === 'number' && semInfo.gpa > 0);
+
+            if (isFinalized) {
+                const gpaVal = semInfo.gpa;
+                const credsVal = semInfo.credits;
+                const credsText = (!Number.isNaN(credsVal) && credsVal > 0) ? ` <span style="color:#64748b;font-size:11px;">(${credsVal} cr)</span>` : '';
+                const gpaWrap = document.createElement('span');
+                gpaWrap.innerHTML = `Semester ${targetSem} GPA: <strong>${gpaVal.toFixed(2)}</strong>${credsText}`;
+                left.appendChild(gpaWrap);
+                return; // Completed past semester: marks and GPA are permanently sealed, no sync button needed
+            }
+
+            const notReleasedSpan = document.createElement('span');
+            notReleasedSpan.style.cssText = 'color:#64748b;font-size:12px;';
+            notReleasedSpan.textContent = 'GPA not released';
+            left.appendChild(notReleasedSpan);
+
+            if (data && data.lastUpdated) {
+                const sep = document.createElement('span');
+                sep.style.cssText = 'color:#cbd5e1;margin:0 2px;';
+                sep.textContent = '\u00B7';
+
+                const timeSpan = document.createElement('span');
+                timeSpan.style.cssText = 'color:#94a3b8;font-size:11px;font-weight:normal;';
+                timeSpan.textContent = fmtAge(data.lastUpdated);
+
+                left.append(sep, timeSpan);
+            }
+
+            const sep2 = document.createElement('span');
+            sep2.style.cssText = 'color:#cbd5e1;margin:0 2px;';
+            sep2.textContent = '\u00B7';
+
+            const syncBtn = document.createElement('button');
+            syncBtn.type = 'button';
+            syncBtn.className = 'mf-footer-sync-btn';
+            syncBtn.setAttribute('aria-label', 'Refresh marks and CGPA now');
+
+            let cooldownTimer = null;
+            const updateCooldown = () => {
+                const now = Date.now();
+                const lastSync = Math.max(
+                    lastManualSyncTime,
+                    (data && typeof data.lastUpdated === 'number') ? data.lastUpdated : 0
+                );
+                const elapsed = now - lastSync;
+                if (elapsed < MANUAL_SYNC_COOLDOWN_MS) {
+                    const remainingSec = Math.max(1, Math.ceil((MANUAL_SYNC_COOLDOWN_MS - elapsed) / 1000));
+                    syncBtn.disabled = true;
+                    syncBtn.title = `Please wait ${remainingSec}s before syncing again`;
+                    syncBtn.innerHTML = '<span class="mf-sync-icon">&#8635;</span> Sync';
+
+                    clearTimeout(cooldownTimer);
+                    cooldownTimer = setTimeout(() => {
+                        if (!syncBtn.isConnected) return;
+                        updateCooldown();
+                    }, 1000);
+                } else {
+                    clearTimeout(cooldownTimer);
+                    syncBtn.disabled = false;
+                    syncBtn.title = 'Refresh marks and CGPA now';
+                    syncBtn.innerHTML = '<span class="mf-sync-icon">&#8635;</span> Sync';
+                }
+            };
+
+            syncBtn.addEventListener('mouseenter', () => {
+                const lastSync = Math.max(
+                    lastManualSyncTime,
+                    (data && typeof data.lastUpdated === 'number') ? data.lastUpdated : 0
+                );
+                const elapsed = Date.now() - lastSync;
+                if (elapsed < MANUAL_SYNC_COOLDOWN_MS) {
+                    const remainingSec = Math.max(1, Math.ceil((MANUAL_SYNC_COOLDOWN_MS - elapsed) / 1000));
+                    syncBtn.title = `Please wait ${remainingSec}s before syncing again`;
+                }
+            });
+
+            let sessionExpiredTimer = null;
+            const showSessionExpired = () => {
+                syncBtn.disabled = true;
+                syncBtn.title = 'Session expired. Please log in again to sync.';
+                syncBtn.style.color = '#ef4444';
+                syncBtn.innerHTML = '<span style="font-size:11px;">⚠️ Session Expired</span>';
+                clearTimeout(cooldownTimer);
+                clearTimeout(sessionExpiredTimer);
+                sessionExpiredTimer = setTimeout(() => {
+                    if (!syncBtn.isConnected) return;
+                    syncBtn.style.color = '';
+                    updateCooldown();
+                }, 3500);
+            };
+
+            syncBtn.onclick = (e) => {
+                e.preventDefault();
+                const lastSync = Math.max(
+                    lastManualSyncTime,
+                    (data && typeof data.lastUpdated === 'number') ? data.lastUpdated : 0
+                );
+                if (Date.now() - lastSync < MANUAL_SYNC_COOLDOWN_MS) return;
+
+                syncBtn.disabled = true;
+                syncBtn.title = 'Syncing marks and CGPA...';
+                syncBtn.innerHTML = '<span class="mf-sync-icon mf-spinning">&#8635;</span> Syncing...';
+
+                Promise.allSettled([
+                    loadMarks(true),
+                    syncCGPABaseline()
+                ]).then((results) => {
+                    const isExp = results.some((r) => r.status === 'rejected' && r.reason && r.reason.isSessionExpired);
+                    if (isExp) {
+                        showSessionExpired();
+                        return;
+                    }
+                    lastManualSyncTime = Date.now();
+                    const newBase = results[1] && results[1].status === 'fulfilled' ? results[1].value : null;
+                    if (newBase) updateLeft(newBase);
+                    else updateCooldown();
+                }).catch((err) => {
+                    if (err && err.isSessionExpired) {
+                        showSessionExpired();
+                        return;
+                    }
+                    lastManualSyncTime = Date.now();
+                    updateCooldown();
+                });
+            };
+
+            updateCooldown();
+            left.append(sep2, syncBtn);
+        };
+
+        try {
+            storage.get(['muj_academic_baseline'], async (d) => {
+                let baseline = d && d.muj_academic_baseline;
+                const cgpaVal = baseline ? (typeof baseline.cgpa === 'number' ? baseline.cgpa : parseFloat(baseline.cgpa)) : NaN;
+                if (Number.isNaN(cgpaVal) || cgpaVal <= 0 || !baseline.semGpas) {
+                    baseline = await syncCGPABaseline();
+                }
+                updateLeft(baseline);
+            });
+        } catch (_) {
+            updateLeft(null);
+        }
+
+        const right = el('div', 'mf-marks-sem-col');
+        const semBtn = document.createElement('a');
+        semBtn.className = 'mf-marks-pred-link';
+        const setSem = (s) => {
+            if (!s) {
+                semBtn.href = '/Student/Academic/InternalMarkForStudent';
+                semBtn.textContent = 'Open Internal Marks \u2192';
+                semBtn.title = 'Open Internal Marks page';
+                return;
+            }
+            semBtn.href = `/Student/Academic/InternalMarkForStudent#sem=${s}`;
+            semBtn.textContent = `Semester ${s} \u2192`;
+            semBtn.title = `Open Semester ${s} Internal Marks directly`;
+        };
+        const initialSem = normSem(data && data.sem);
+        if (initialSem) {
+            setSem(initialSem);
+        } else {
+            detectCurrentSemester().then((c) => {
+                const s = normSem(c);
+                if (s) setSem(s);
+            }).catch(() => { });
+        }
+
+        const changeLink = document.createElement('button');
+        changeLink.type = 'button';
+        changeLink.textContent = 'change';
+        changeLink.title = 'Switch semester view';
+        changeLink.style.cssText = 'background:none;border:none;padding:0;margin:0;font-size:11px;color:#94a3b8;cursor:pointer;text-decoration:none;line-height:1;transition:color .15s ease;';
+        changeLink.onmouseenter = () => { changeLink.style.color = '#2563eb'; };
+        changeLink.onmouseleave = () => { changeLink.style.color = '#94a3b8'; };
+        changeLink.onclick = (e) => {
+            e.preventDefault();
+            renderSemesterPicker(body, true, initialSem, data);
+        };
+
+        const sep = document.createElement('span');
+        sep.style.cssText = 'color:#cbd5e1;margin:0 5px;';
+        sep.textContent = '\u00B7';
+
+        right.append(changeLink, sep, semBtn);
+
+        footer.append(left, right);
+        body.appendChild(footer);
+    }
+
+    async function fetchMarksDirect(sem, signal) {
+        const d = await postForm('/Student/Academic/GetInternalMarkForFaculty', {
+            Enrollment: '',
+            Semester: sem
+        }, signal);
+
+        if (!d || d.IsSuccessfull !== true || !Array.isArray(d.InternalMarksList)) {
+            throw new Error('Bad payload or empty list');
+        }
+
+        const clean = (v) => (v == null || v === '' || v === 'null') ? '-' : String(v).trim();
+        const rows = d.InternalMarksList.map((it, i) => {
+            const vals = [it.MTE1, it.MTE2, it.CWS, it.RESESSION, it.PRS].map(clean);
+            let total = 0;
+            let hasAny = false;
+            vals.forEach((v) => {
+                const n = parseFloat(v);
+                if (!isNaN(n)) { total += n; hasAny = true; }
+            });
+            vals.push(hasAny ? total.toFixed(2).replace(/\.00$/, '') : '-');
+            return {
+                sNo: String(i + 1),
+                name: it.CourseID || it.CourseCode || `Course ${i + 1}`,
+                values: vals
+            };
+        });
+
+        return {
+            sem,
+            headers: ['MTE 1', 'MTE 2', 'CWS', 'RE-SESSION', 'PRS', 'Total'],
+            rows,
+            lastUpdated: Date.now()
+        };
+    }
+
+    async function fetchMarksFromPage(semVal, signal) {
+        const getRes = await fetch('/Student/Academic/InternalMarkForStudent', {
+            credentials: 'same-origin',
+            signal
+        });
+        if (getRes.redirected && getRes.url && getRes.url.includes('/Account/Login')) {
+            const err = new Error('SESSION_EXPIRED');
+            err.isSessionExpired = true;
+            throw err;
+        }
+        if (!getRes.ok) throw new Error('HTTP ' + getRes.status);
+        const html = await getRes.text();
+        if (html.includes('/Account/Login') && (html.includes('<html') || html.includes('Login'))) {
+            const err = new Error('SESSION_EXPIRED');
+            err.isSessionExpired = true;
+            throw err;
+        }
+        const parser = new DOMParser();
+        let doc = parser.parseFromString(html, 'text/html');
+
+        let table = doc.getElementById('kt_ViewTable');
+        const ddl = doc.getElementById('ddlSemester');
+
+        if ((!table || !table.rows || table.rows.length < 2) && ddl) {
+            const targetRoman = (ROMAN_MAP[semVal.toUpperCase()] || semVal).toUpperCase();
+            let actualVal = semVal;
+            for (let i = 1; i < ddl.options.length; i++) {
+                const opt = ddl.options[i];
+                const txt = opt.text.trim().toUpperCase();
+                const val = opt.value.trim().toUpperCase();
+                if (txt === targetRoman || val === targetRoman || (ROMAN_MAP[val] && ROMAN_MAP[val] === targetRoman)) {
+                    actualVal = opt.value;
+                    break;
+                }
+            }
+
+            const postRes = await fetch('/Student/Academic/InternalMarkForStudent', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    Semester: actualVal,
+                    ddlSemester: actualVal,
+                    btnSearch: 'Find'
+                }).toString(),
+                signal
+            });
+            if (postRes.ok) {
+                const postHtml = await postRes.text();
+                doc = parser.parseFromString(postHtml, 'text/html');
+                table = doc.getElementById('kt_ViewTable');
+            }
+        }
+
+        if (!table || !table.rows || table.rows.length < 2) {
+            throw new Error('No internal marks table returned from page');
+        }
+
+        const head = table.rows[0];
+        const rawHeaders = Array.from(head.cells).map((c) => c.textContent.trim());
+        const headers = rawHeaders.slice(2).filter((h) => !/^(Credits|Grade)$/i.test(h));
+
+        const rows = [];
+        for (let i = 1; i < table.rows.length; i++) {
+            const r = table.rows[i];
+            if (r.cells.length < 3 || r.classList.contains('grand-total-row')) continue;
+            const sNo = r.cells[0] ? r.cells[0].textContent.trim() : '';
+            const name = r.cells[1] ? r.cells[1].textContent.trim() : '';
+            const values = [];
+            for (let j = 2; j < r.cells.length; j++) {
+                values.push(r.cells[j] ? r.cells[j].textContent.trim() : '-');
+            }
+            rows.push({ sNo, name, values });
+        }
+
+        if (!rows.length) throw new Error('No rows in table');
+
+        return {
+            sem: semVal,
+            headers,
+            rows,
+            lastUpdated: Date.now()
+        };
+    }
+
+    function loadMarks(force = false, targetSem = null) {
+        if (!summaryBody || !summaryBody.isConnected) return Promise.resolve();
+        if (activeSummaryTab !== 'marks') return Promise.resolve();
+
+        const reqSem = targetSem ? normSem(targetSem) : null;
+        if (!force && !reqSem && marksData && marksData.rows && marksData.rows.length) {
+            renderMarks(summaryBody, marksData);
+            return Promise.resolve();
+        }
+        if (!force && reqSem && marksData && normSem(marksData.sem) === reqSem && marksData.rows && marksData.rows.length) {
+            renderMarks(summaryBody, marksData);
+            return Promise.resolve();
+        }
+
+        if (!force && (!marksData || !marksData.rows || (reqSem && normSem(marksData.sem) !== reqSem))) {
+            summaryBody.textContent = '';
+            summaryBody.appendChild(notice(reqSem ? `Loading Semester ${reqSem} marks...` : 'Loading internal marks...'));
+        }
+
+        return new Promise(async (resolve, reject) => {
+            if (MF && typeof MF.ensureStudentSession === 'function') {
+                const sess = await MF.ensureStudentSession();
+                if (sess && sess.changed) {
+                    marksData = null;
+                    lastManualSyncTime = 0;
+                }
+            }
+
+            storage.get(['muj_internal_marks_cache', 'muj_marks_cache', 'muj_current_semester'], async (cached) => {
+                let currentSem = reqSem || (cached && cached.muj_current_semester);
+                if (!currentSem && typeof detectCurrentSemester === 'function') {
+                    currentSem = await detectCurrentSemester();
+                }
+                const cleanSem = currentSem ? (ROMAN_MAP[currentSem.toUpperCase()] || currentSem).toUpperCase() : null;
+
+                let bestCached = null;
+                if (cleanSem && cached && cached.muj_marks_cache && cached.muj_marks_cache[cleanSem]) {
+                    bestCached = cached.muj_marks_cache[cleanSem];
+                } else if (cached && cached.muj_internal_marks_cache) {
+                    const intSem = (ROMAN_MAP[String(cached.muj_internal_marks_cache.sem || '').toUpperCase()] || '').toUpperCase();
+                    if (!cleanSem || !intSem || intSem === cleanSem) {
+                        bestCached = cached.muj_internal_marks_cache;
+                    }
+                }
+
+                if (!force && bestCached && bestCached.rows && bestCached.rows.length) {
+                    marksData = bestCached;
+                    if (activeSummaryTab === 'marks') {
+                        renderMarks(summaryBody, marksData);
+                    }
+                    resolve();
+                    return;
+                }
+
+                if (marksAbortCtl) marksAbortCtl.abort();
+                const ctl = marksAbortCtl = new AbortController();
+
+                try {
+                    const currentSem = cleanSem || (typeof detectCurrentSemester === 'function' ? await detectCurrentSemester() : null);
+                    const targetRoman = currentSem ? (ROMAN_MAP[currentSem.toUpperCase()] || currentSem).toUpperCase() : null;
+                    if (!targetRoman) {
+                        if (!marksData && activeSummaryTab === 'marks') {
+                            renderSemesterPicker(summaryBody, false);
+                        }
+                        resolve();
+                        return;
+                    }
+                    let result = null;
+
+                    // 1) Try calling the direct JSON endpoint with Roman numeral
+                    try {
+                        result = await fetchMarksDirect(targetRoman, ctl.signal);
+                    } catch (_) {
+                        // 2) Fallback to integer (e.g. '5') if Roman failed
+                        const semNum = Object.keys(ROMAN_MAP).find((k) => ROMAN_MAP[k] === targetRoman && /^\d+$/.test(k));
+                        if (semNum) {
+                            try { result = await fetchMarksDirect(semNum, ctl.signal); } catch (_) { }
+                        }
+                    }
+
+                    // 3) Fallback to page POST if direct API didn't return rows
+                    if (!result || !result.rows || !result.rows.length) {
+                        try {
+                            result = await fetchMarksFromPage(targetRoman, ctl.signal);
+                        } catch (_) { }
+                    }
+
+                    if (ctl.signal.aborted || !summaryBody.isConnected) { resolve(); return; }
+
+                    if (result && result.rows && result.rows.length) {
+                        marksData = result;
+                        const cacheBySem = (cached && cached.muj_marks_cache) || {};
+                        cacheBySem[targetRoman] = result;
+                        try {
+                            storage.set({
+                                muj_internal_marks_cache: result,
+                                muj_marks_cache: cacheBySem
+                            });
+                        } catch (_) { }
+                        if (activeSummaryTab === 'marks') {
+                            renderMarks(summaryBody, marksData);
+                        }
+                    } else if (!marksData && activeSummaryTab === 'marks') {
+                        summaryBody.textContent = '';
+                        renderEmptyMarksState(summaryBody, targetRoman);
+                        renderMarksFooter(summaryBody, { sem: targetRoman, lastUpdated: Date.now() });
+                    }
+                    resolve();
+                } catch (err) {
+                    if (ctl.signal.aborted || !summaryBody.isConnected) { resolve(); return; }
+                    if (err && err.isSessionExpired) {
+                        reject(err);
+                        return;
+                    }
+                    if (!marksData && activeSummaryTab === 'marks') {
+                        summaryBody.textContent = '';
+                        renderEmptyMarksState(summaryBody, targetRoman);
+                        renderMarksFooter(summaryBody, { sem: targetRoman, lastUpdated: Date.now() });
+                    }
+                    resolve();
+                }
+            });
+        });
     }
 
     function findEventsHeader(col9) {
@@ -889,27 +2229,150 @@
             .find((h) => h.textContent.includes('List of Events'));
     }
 
+    function findNativeNotice(col9) {
+        if (!col9) return null;
+        const examTbl = findExamTable(col9);
+        const examTblEl = examTbl ? examTbl.tbl : null;
+        const ev = document.getElementById('kt_ViewEvent');
+        const evHeader = findEventsHeader(col9);
+
+        // 1) Any alert/warning/notice container anywhere in col9 (outside extension UI)
+        const alerts = Array.from(col9.querySelectorAll('.alert, [class*="alert-"], .kt-alert, .notice, [class*="notice"], .warning')).filter((el) => {
+            if (el.closest && el.closest('#mujfish-summary-container, #mujfish-timetable, #mujfish-exam-schedule, #mf-bar')) return false;
+            if (/class\s*coordinator/i.test(el.textContent || '')) return false;
+            return (el.textContent || '').trim().length > 0;
+        });
+        if (alerts.length) return alerts[0];
+
+        // 2) Any other non-extension child of col9 that is not the exam table, events list, or class coordinator info
+        const children = Array.from(col9.children);
+        for (const child of children) {
+            if (!child || child.nodeType !== 1) continue;
+            if (child.id === 'mujfish-summary-container' || child.id === 'mf-bar') continue;
+            if (child.className && /(?:^|\s)mf-/.test(child.className)) continue;
+            if (examTblEl && (child === examTblEl || child.contains(examTblEl))) continue;
+            if (ev && (child === ev || child.contains(ev))) continue;
+            if (evHeader && (child === evHeader || child.contains(evHeader))) continue;
+            if (!child.offsetHeight && !child.offsetWidth) continue;
+            const txt = (child.textContent || '').trim();
+            if (!txt.length) continue;
+            if (/class\s*coordinator/i.test(txt)) continue;
+            return child;
+        }
+        return null;
+    }
+
+    function updateNoticeLink() {
+        const { col9 } = getColumns();
+        const container = document.getElementById('mujfish-summary-container');
+        if (!container || !col9) return;
+        const leftWrap = container.querySelector('.mf-summary-head-left');
+        if (!leftWrap) return;
+
+        const noticeEl = findNativeNotice(col9);
+        let existingLink = container.querySelector('.mf-notice-jump-link');
+
+        if (noticeEl) {
+            if (!existingLink) {
+                existingLink = el('a', 'mf-notice-jump-link');
+                existingLink.title = 'Scroll to official portal notice';
+                existingLink.innerHTML = '<span>Official notice below</span> <span style="font-size:10px;">&darr;</span>';
+                existingLink.onclick = (e) => {
+                    e.preventDefault();
+                    noticeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                };
+                leftWrap.appendChild(existingLink);
+            }
+        } else if (existingLink) {
+            existingLink.remove();
+        }
+    }
+
+    let noticeObs = null;
+    function setupNoticeObserver(col9) {
+        if (!col9) return;
+        if (noticeObs) noticeObs.disconnect();
+        noticeObs = new MutationObserver((mutations) => {
+            const hasExternal = mutations.some((m) => {
+                const t = m.target;
+                if (!t) return false;
+                if (t.closest && t.closest('#mujfish-summary-container')) return false;
+                if (t.id && (t.id.startsWith('mujfish-') || t.id === 'mf-bar')) return false;
+                return true;
+            });
+            if (hasExternal) {
+                updateNoticeLink();
+                syncBaselineAlignment();
+            }
+        });
+        noticeObs.observe(col9, { childList: true, subtree: true });
+    }
+
     function mountSummary() {
-        const { ev, col9 } = getColumns();
-        if (!ev) return null;
+        const { col9 } = getColumns();
+        if (!col9) return null;
 
         let box = document.getElementById('mujfish-summary-container');
-        if (box) return box.querySelector('#mujfish-summary-body');
+        if (box) {
+            updateNoticeLink();
+            return box.querySelector('#mujfish-summary-body');
+        }
 
         box = el('div');
         box.id = 'mujfish-summary-container';
-        const titleLink = el('a', 'mf-head-title', 'Attendance Summary');
+
+        const head = el('div', 'mf-summary-head');
+        const leftWrap = el('div', 'mf-summary-head-left');
+
+        const tabsWrap = el('div', 'mf-summary-tabs');
+
+        const tabAtt = el('button', 'mf-tab-btn active', 'Attendance');
+        tabAtt.type = 'button';
+        tabAtt.id = 'mf-tab-att';
+        tabAtt.setAttribute('aria-label', 'Show Attendance Summary');
+
+        const tabMarks = el('button', 'mf-tab-btn', 'Internal Marks');
+        tabMarks.type = 'button';
+        tabMarks.id = 'mf-tab-marks';
+        tabMarks.setAttribute('aria-label', 'Show Current Semester Internal Marks');
+
+        tabsWrap.append(tabAtt, tabMarks);
+        leftWrap.appendChild(tabsWrap);
+
+        const actionsWrap = el('div', 'mf-summary-actions');
+
+        const titleLink = el('a', 'mf-head-title', '');
+        titleLink.id = 'mf-summary-link';
         titleLink.href = '/Student/Academic/AttendanceSummaryForStudent';
-        titleLink.appendChild(icon('la-external-link'));
-        box.appendChild(titleLink);
+        titleLink.onclick = () => {
+            try { sessionStorage.removeItem('muj_auto_open_sem'); } catch (_) { }
+        };
+        const linkText = el('span', 'mf-head-title-text', 'Attendance ');
+        titleLink.append(linkText, icon('la-external-link'));
+
+        actionsWrap.append(titleLink);
+        head.append(leftWrap, actionsWrap);
+        box.appendChild(head);
         box.appendChild(document.createElement('hr'));
+
         const body = el('div');
         body.id = 'mujfish-summary-body';
         box.appendChild(body);
 
-        const anchor = findEventsHeader(col9) || ev.parentElement;
-        if (!anchor || !anchor.parentElement) return null;
-        anchor.parentElement.insertBefore(box, anchor);
+        tabAtt.addEventListener('click', () => {
+            userSelectedTab = true;
+            switchSummaryTab('attendance');
+        });
+
+        tabMarks.addEventListener('click', () => {
+            userSelectedTab = true;
+            switchSummaryTab('marks');
+        });
+
+        col9.insertBefore(box, col9.firstChild);
+
+        updateNoticeLink();
+        setupNoticeObserver(col9);
 
         body.appendChild(notice('Loading attendance...'));
         return body;
@@ -924,7 +2387,7 @@
             const next = header.nextElementSibling;
             if (next && next.tagName === 'HR') next.classList.add('mf-hidden');
         }
-        if (ev && ev.parentElement) ev.parentElement.classList.add('mf-hidden');
+        if (ev && ev.querySelectorAll && ev.querySelectorAll('tr').length <= 1) ev.classList.add('mf-hidden');
     }
 
     function loadSummary() {
@@ -980,27 +2443,99 @@
         } catch (e) { }
     }
 
-    // ---------- Lifecycle ----------
-    function init() {
-        try {
-            const leftCol = mountTimetable();
-            loadSummary();
-            watchTarget();
+    let ratchetObs = null;
+    function setupRatchetObserver(col9, leftCol) {
+        if (!col9 && !leftCol) return;
+        if (ratchetObs) ratchetObs.disconnect();
 
-            // Re-mount if the portal removes our widget; watch direct children only.
+        ratchetObs = new MutationObserver((mutations) => {
+            const hasExternal = mutations.some((m) => {
+                const t = m.target;
+                if (!t) return false;
+                if (t.id && (t.id.startsWith('mujfish-') || t.id === 'mf-bar' || t.id === 'mf-next-exam')) return false;
+                if (t.className && /(?:^|\s)mf-/.test(t.className)) return false;
+                return true;
+            });
+            if (!hasExternal) return;
+
+            if (col9) {
+                const s = col9.querySelector('#mujfish-summary-container');
+                if (s && col9.firstChild !== s) col9.insertBefore(s, col9.firstChild);
+            }
             if (leftCol) {
+                const tt = leftCol.querySelector('#mujfish-timetable');
+                if (tt && leftCol.firstChild !== tt) leftCol.insertBefore(tt, leftCol.firstChild);
+            }
+            syncBaselineAlignment();
+        });
+
+        const cfg = { childList: true, subtree: true };
+        if (col9) ratchetObs.observe(col9, cfg);
+        if (leftCol) ratchetObs.observe(leftCol, cfg);
+
+        // Disconnect after 3.5s once late portal AJAX settles
+        setTimeout(() => {
+            if (ratchetObs) {
+                ratchetObs.disconnect();
+                ratchetObs = null;
+            }
+        }, 3500);
+    }
+
+    // ---------- Lifecycle ----------
+    async function init() {
+        try {
+            if (MF && typeof MF.ensureStudentSession === 'function') {
+                const sess = await MF.ensureStudentSession();
+                if (sess && sess.changed) {
+                    marksData = null;
+                    lastManualSyncTime = 0;
+                }
+            }
+            const { col9, leftCol } = getColumns();
+            const examMode = isExamMode(col9);
+
+            if (examMode) {
+                // Clear any legacy collapse state
+                try {
+                    sessionStorage.removeItem('mujfish_summary_collapsed');
+                    sessionStorage.removeItem('mujfish_exams_collapsed');
+                } catch (_) { }
+
+                // 1) Left column: Scrollable Exam Schedule Cards at top of leftCol
+                mountExamSchedule(col9);
+                setupExamObserver(col9);
+
+                // 2) Right column: Attendance & Internal Marks at top of col9
+                loadSummary();
+                watchTarget();
+            } else {
+                // Classic Mode (normal semester): Timetable on left, Attendance/Marks on right
+                mountTimetable();
+                loadSummary();
+                watchTarget();
+                setupRatchetObserver(col9, leftCol);
+
+                // Re-mount if the portal removes our widgets; watch direct children only.
                 if (remountObs) remountObs.disconnect();
                 let remounts = 0;
                 remountObs = new MutationObserver(() => {
-                    if (leftCol.querySelector('#mujfish-timetable')) return;
-                    if (++remounts > MAX_REMOUNTS) {
+                    let needed = false;
+                    if (leftCol && !leftCol.querySelector('#mujfish-timetable')) {
+                        needed = true;
+                        idle(() => { try { mountTimetable(); } catch (e) { } });
+                    }
+                    if (col9 && !col9.querySelector('#mujfish-summary-container')) {
+                        needed = true;
+                        idle(() => { try { mountSummary(); } catch (e) { } });
+                    }
+                    if (needed && ++remounts > MAX_REMOUNTS) {
                         if (remountObs) remountObs.disconnect();
                         remountObs = null;
-                        return;
                     }
-                    idle(() => { try { mountTimetable(); } catch (e) { } });
                 });
-                remountObs.observe(leftCol, { childList: true });
+                if (leftCol) remountObs.observe(leftCol, { childList: true });
+                if (col9) remountObs.observe(col9, { childList: true });
             }
         } catch (e) {
             // Never let an extension error interfere with the portal.
@@ -1014,6 +2549,14 @@
             clearTimeout(navTimer);
             navTimer = null;
         }
+        if (examObs) {
+            examObs.disconnect();
+            examObs = null;
+        }
+        if (ratchetObs) {
+            ratchetObs.disconnect();
+            ratchetObs = null;
+        }
         if (remountObs) {
             remountObs.disconnect();
             remountObs = null;
@@ -1025,6 +2568,18 @@
         if (visibilityHandler) {
             document.removeEventListener('visibilitychange', visibilityHandler);
             visibilityHandler = null;
+        }
+        if (resizeHandler) {
+            window.removeEventListener('resize', resizeHandler);
+            resizeHandler = null;
+        }
+        if (baselineResizeObs) {
+            baselineResizeObs.disconnect();
+            baselineResizeObs = null;
+        }
+        if (noticeObs) {
+            noticeObs.disconnect();
+            noticeObs = null;
         }
     }, { once: true });
 

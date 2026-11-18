@@ -11,7 +11,7 @@
         MAX_GPA: 10,
         MAX_CREDITS: 30
     };
-    const MAX_SEMS = ACAD_CONST.MAX_SEMS;
+    const MAX_SEMS = ACAD_CONST.MAX_SEMS || 6;
     const MAX_GPA = ACAD_CONST.MAX_GPA;
     const MAX_CREDITS = ACAD_CONST.MAX_CREDITS;
     const CREDITS_STORAGE_KEY = (MF && MF.CONSTANTS && MF.CONSTANTS.STORAGE_KEYS && MF.CONSTANTS.STORAGE_KEYS.PREDICTOR_CREDITS) || 'muj_predictor_credits';
@@ -85,7 +85,7 @@
         if (!t) {
             t = document.createElement('div');
             t.id = 'st-toast';
-            t.style.cssText = 'position:fixed; bottom:24px; right:24px; background:#fff; border:1px solid #fecaca; border-radius:50px; padding:12px 20px; font-weight:600; font-size:13px; color:#991b1b; box-shadow:0 10px 25px -5px rgba(220,38,38,0.15); z-index:10000; opacity:0; pointer-events:none; display:flex; align-items:center; gap:10px;';
+            t.style.cssText = 'position:fixed; bottom:24px; right:24px; background:#fff; border:1px solid #fecaca; border-radius:50px; padding:12px 20px; font-weight:600; font-size:13px; color:#991b1b; box-shadow:0 10px 25px -5px rgba(220,38,38,0.15); z-index:1030; opacity:0; pointer-events:none; display:flex; align-items:center; gap:10px;';
             document.body.appendChild(t);
         }
 
@@ -155,14 +155,20 @@
 
             const gpas = [];
             let lastCredits = NaN;
+            let totalPoints = 0;
             for (let i = start; i < row.cells.length; i += 2) {
                 const g = toNum(row.cells[i]);
+                const c = toNum(row.cells[i + 1]);
                 if (!Number.isNaN(g) && g >= 0 && g <= MAX_GPA) { // skips "-" and invalid grades but allows valid 0.00 to 10.00
                     gpas.push(g);
-                    lastCredits = toNum(row.cells[i + 1]);
+                    lastCredits = c;
+                    if (!Number.isNaN(c) && c > 0) {
+                        totalPoints += g * c;
+                    }
                 }
             }
-            return { cgpa, credits, gpas, lastCredits, sig: [cgpa, credits, gpas.join(',')].join('|') };
+            if (totalPoints <= 0) totalPoints = cgpa * credits;
+            return { cgpa, credits, gpas, lastCredits, points: totalPoints, sig: [cgpa, credits, gpas.join(',')].join('|') };
         }
         return null;
     }
@@ -254,22 +260,21 @@
             const stop = () => {
                 if (timer) { clearTimeout(timer); timer = null; }
                 if (interval) { clearInterval(interval); interval = null; }
-                window.removeEventListener('mouseup', stop);
-                window.removeEventListener('touchend', stop);
+                ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => window.removeEventListener(ev, stop));
             };
             const start = (e) => {
                 if (e.button !== undefined && e.button !== 0) return;
                 stop();
                 stepCredits(d);
-                window.addEventListener('mouseup', stop);
-                window.addEventListener('touchend', stop);
+                ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => window.addEventListener(ev, stop));
                 timer = setTimeout(() => { interval = setInterval(() => stepCredits(d), 70); }, 320);
             };
-            btn.addEventListener('mousedown', start);
-            btn.addEventListener('touchstart', start, { passive: true });
-            btn.addEventListener('mouseleave', stop);
-            btn.addEventListener('touchcancel', stop);
-            btn.addEventListener('click', (e) => e.preventDefault());
+            btn.addEventListener('pointerdown', start);
+            btn.addEventListener('contextmenu', (e) => e.preventDefault());
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (e.detail === 0) stepCredits(d);
+            });
         };
         setupCreditStepper(credUp, 1);
         setupCreditStepper(credDown, -1);
@@ -366,9 +371,10 @@
                 return;
             }
             const res = (MF && MF.MATH && MF.MATH.predictCgpa)
-                ? MF.MATH.predictCgpa(d.cgpa, d.credits, future, cr)
+                ? MF.MATH.predictCgpa(d.cgpa, d.credits, future, cr, d.points)
                 : null;
-            const pred = res ? res.newCgpa : Math.round(((d.cgpa * d.credits + future.reduce((a, g) => a + g * cr, 0)) / (d.credits + future.length * cr)) * 100) / 100;
+            const pts = (Number.isFinite(d.points) && d.points > 0) ? d.points : d.cgpa * d.credits;
+            const pred = res ? res.newCgpa : Math.round(((pts + future.reduce((a, g) => a + g * cr, 0)) / (d.credits + future.length * cr)) * 100) / 100;
             const diff = res ? res.delta : Math.round((pred - d.cgpa) * 100) / 100;
 
             futureColor = diff > 0 ? '#059669' : diff < 0 ? '#e11d48' : '#0284c7';
@@ -492,7 +498,32 @@
             currentSig = '';
             return;
         }
+
         if (existing && data.sig === currentSig) return; // nothing changed
+
+        // Cache academic baseline for other pages like marks_sum.js only when data actually changes
+        try {
+            const api = (typeof chrome !== 'undefined' && chrome.storage) ? chrome
+                : (typeof browser !== 'undefined' && browser.storage) ? browser : null;
+            if (api && api.storage && api.storage.local) {
+                const key = (MF && MF.CONSTANTS && MF.CONSTANTS.STORAGE_KEYS && MF.CONSTANTS.STORAGE_KEYS.ACADEMIC_BASELINE) || 'muj_academic_baseline';
+                api.storage.local.get([key], (res) => {
+                    const prev = res && res[key];
+                    const pts = data.points || (data.cgpa * data.credits);
+                    if (!prev || prev.cgpa !== data.cgpa || prev.credits !== data.credits || prev.points !== pts || prev.semsCompleted !== data.gpas.length) {
+                        api.storage.local.set({
+                            [key]: {
+                                cgpa: data.cgpa,
+                                credits: data.credits,
+                                points: pts,
+                                semsCompleted: data.gpas.length,
+                                lastSynced: Date.now()
+                            }
+                        });
+                    }
+                });
+            }
+        } catch (_) { }
 
         if (existing) existing.remove();
         currentSig = data.sig;
@@ -613,7 +644,10 @@
         bodyObserver.observe(document.body, { childList: true, subtree: true });
     }
 
-    window.addEventListener('pagehide', cleanup, { once: true });
+    window.addEventListener('pagehide', cleanup);
+    window.addEventListener('pageshow', (e) => {
+        if (e.persisted) boot();
+    });
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
     else boot();

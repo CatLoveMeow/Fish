@@ -21,7 +21,7 @@
     const STORAGE_KEY_BATCH = 'mujfish_fb_batch';
     const STORAGE_KEY_SINGLE = 'mujfish_fb_single';
     const SESSION_KEY_BATCH_ACTIVE = 'mujfish_fb_batch_active';
-    const BATCH_TTL_MS = 5 * 60 * 1000;
+    const BATCH_TTL_MS = 30 * 60 * 1000; // 30 minutes
     const SINGLE_TTL_MS = 60 * 1000;
     const MAX_REMARK = 250;          // portal limit
     const MAX_ATTEMPTS = 2;          // tries per course before the batch gives up on it
@@ -105,6 +105,27 @@
         return next;
     }
 
+    function getStudentId() {
+        if (typeof window !== 'undefined' && window.MujFish && typeof window.MujFish.detectStudentId === 'function') {
+            return window.MujFish.detectStudentId(document);
+        }
+        try {
+            const userEl = document.querySelector('.kt-header__topbar-username');
+            if (userEl) {
+                const txt = userEl.innerText || userEl.textContent || '';
+                const m = txt.match(/\b(\d{8,11})\s*::/);
+                if (m && m[1]) return m[1].trim();
+            }
+            const topbar = document.querySelector('.kt-header__topbar, #kt_header_topbar');
+            if (topbar) {
+                const m = topbar.textContent.match(/\b(\d{8,11})\s*::\s*([A-Za-z\s.]+)/) ||
+                          topbar.textContent.match(/\b(\d{8,11})\b/);
+                if (m && m[1]) return m[1].trim();
+            }
+        } catch (_) { }
+        return null;
+    }
+
     // Active batch, or null.
     // Tied to this browser tab via sessionStorage so fresh tab/page opens NEVER resume stale batches.
     function getBatch() {
@@ -117,11 +138,38 @@
             storage.remove(STORAGE_KEY_BATCH);
             return null;
         }
-        if (Date.now() - (b.lastActive || b.startedAt || 0) > BATCH_TTL_MS) {
+
+        // TTL check: 30 minutes from createdAt (or startedAt fallback)
+        const created = b.createdAt || b.startedAt;
+        if (!created || typeof created !== 'number' || (Date.now() - created > BATCH_TTL_MS)) {
             try { sessionStorage.removeItem(SESSION_KEY_BATCH_ACTIVE); } catch (_) { }
             storage.remove(STORAGE_KEY_BATCH);
             return null;
         }
+
+        // Student ID check: Fail-closed
+        // 1. If batch has no studentId, treat as invalid and purge
+        if (!b.studentId || typeof b.studentId !== 'string') {
+            try { sessionStorage.removeItem(SESSION_KEY_BATCH_ACTIVE); } catch (_) { }
+            storage.remove(STORAGE_KEY_BATCH);
+            return null;
+        }
+
+        // 2. Detect current student ID on this page
+        const currentId = getStudentId();
+        // If current student ID cannot be detected on this page, fail-closed: do not auto-continue!
+        // Leave the batch in storage until ID is known, but return null to prevent unverified submissions.
+        if (!currentId) {
+            return null;
+        }
+
+        // 3. If current student ID differs from batch owner, purge immediately!
+        if (b.studentId.trim() !== currentId.trim()) {
+            try { sessionStorage.removeItem(SESSION_KEY_BATCH_ACTIVE); } catch (_) { }
+            storage.remove(STORAGE_KEY_BATCH);
+            return null;
+        }
+
         if (!b.attempts) b.attempts = {};
         return b;
     }
@@ -237,7 +285,7 @@
         #mf-fb-toast{position:fixed;bottom:24px;right:24px;max-width:min(420px,calc(100vw - 32px));padding:10px 18px;
             background:#fff;border:1px solid #e2e8f0;border-radius:50px;color:#1e293b;overflow-wrap:anywhere;
             font:600 13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-            box-shadow:0 10px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.06);z-index:10000;
+            box-shadow:0 10px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.06);z-index:1030;
             opacity:0;transform:translateY(18px);pointer-events:none;transition:opacity .18s,transform .18s}
         #mf-fb-toast.show{opacity:1;transform:none}
         #mf-fb-toast.err{border-color:#fecaca;color:#991b1b}
@@ -560,16 +608,19 @@
 
             try { sessionStorage.setItem(SESSION_KEY_BATCH_ACTIVE, '1'); } catch (_) { }
 
+            const sid = getStudentId();
             storage.set(STORAGE_KEY_BATCH, {
                 active: true,
+                studentId: sid || null,
+                createdAt: Date.now(),
+                startedAt: Date.now(),
+                lastActive: Date.now(),
                 mode: cfg.mode,
                 remarkPreset: cfg.remarkPreset,
                 customRemark: cfg.customRemark,
                 autoSubmit: cfg.autoSubmit,
                 total: items.length,
-                attempts: {},
-                startedAt: Date.now(),
-                lastActive: Date.now()
+                attempts: {}
             });
             showToast(`Starting auto-fill for ${items.length} course${items.length > 1 ? 's' : ''}...`);
             renderCard(true);
@@ -876,18 +927,8 @@
                     storage.set(STORAGE_KEY_BATCH, b);
                 }
             }
-            if (shouldAutoSubmit) {
-                // Auto-accept portal confirmation modal if present during auto-submit
-                const origConfirm = window.confirm;
-                window.confirm = () => true;
-                try {
-                    submitBtn.click();
-                } finally {
-                    setTimeout(() => { window.confirm = origConfirm; }, 1000);
-                }
-            } else {
-                submitBtn.click();
-            }
+            // Native pass-through: trigger native submit and allow the browser's confirm dialog to prompt the user
+            submitBtn.click();
         }
 
         function cancelAuto(message) {

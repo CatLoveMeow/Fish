@@ -69,7 +69,7 @@
         cursor:pointer;line-height:1;padding:0;transition:all .15s;font-style:italic;font-family:serif}
     .st-info:hover{background:#cbd5e1;color:#1e293b}
     .st-info:focus-visible{outline:2px solid #356ae6;outline-offset:2px}
-    .st-pop{display:none;position:absolute;top:calc(100% + 8px);left:14px;z-index:9999;
+    .st-pop{display:none;position:absolute;top:calc(100% + 8px);left:14px;z-index:1030;
         background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:12px 14px;
         box-shadow:0 10px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);
         min-width:240px;max-width:320px;font-size:12px;color:#334155;line-height:1.45}
@@ -356,25 +356,21 @@
             const stopHold = () => {
                 if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
                 if (repeatInterval) { clearInterval(repeatInterval); repeatInterval = null; }
-                window.removeEventListener('mouseup', stopHold);
-                window.removeEventListener('touchend', stopHold);
+                ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => window.removeEventListener(ev, stopHold));
             };
 
             const startHold = (e) => {
                 if (e.button !== undefined && e.button !== 0) return;
                 stopHold();
                 step(d);
-                window.addEventListener('mouseup', stopHold);
-                window.addEventListener('touchend', stopHold);
+                ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => window.addEventListener(ev, stopHold));
                 holdTimer = setTimeout(() => {
                     repeatInterval = setInterval(() => step(d), 70);
                 }, 320);
             };
 
-            b.addEventListener('mousedown', startHold);
-            b.addEventListener('touchstart', startHold, { passive: true });
-            b.addEventListener('mouseleave', stopHold);
-            b.addEventListener('touchcancel', stopHold);
+            b.addEventListener('pointerdown', startHold);
+            b.addEventListener('contextmenu', (e) => e.preventDefault());
 
             b.addEventListener('keydown', (e) => {
                 if (e.key === ' ' || e.key === 'Enter') {
@@ -596,6 +592,20 @@
     }
 
     // ---------- Lifecycle ----------
+    let stylesInjected = false;
+    let targetLoaded = false;
+
+    function ensureInit() {
+        if (!stylesInjected) {
+            injectStyles();
+            stylesInjected = true;
+        }
+        if (!targetLoaded) {
+            loadTarget();
+            targetLoaded = true;
+        }
+    }
+
     const observer = new MutationObserver(schedule);
     // Watches for the portal table being inserted or replaced. The callback ignores
     // ordinary edits inside the same table, so it won't duplicate the table observer.
@@ -603,6 +613,7 @@
         const current = document.getElementById('kt_ViewTable');
         if (current && current !== table) {
             table = current;
+            ensureInit();
             schedule();
         } else if (!current && table && !table.isConnected) {
             table = null;
@@ -643,6 +654,7 @@
         try {
             if (!table || !table.isConnected) table = document.getElementById('kt_ViewTable');
             if (!table) return;
+            ensureInit();
             const cols = getColumns(table);
             if (!cols) {         // error/open/closed layout: leave the portal alone
                 removeOurs(table);
@@ -672,10 +684,9 @@
             }
             table = document.getElementById('kt_ViewTable');
             if (!table) return;
-            injectStyles();
+            ensureInit();
             observe();
             schedule();
-            loadTarget();
         } catch (e) { }
     }
 
@@ -683,7 +694,13 @@
         try { observer.disconnect(); } catch (_) { }
         try { discoveryObserver.disconnect(); } catch (_) { }
         try { clearTimeout(saveTimer); } catch (_) { }
-    }, { once: true });
+    });
+
+    window.addEventListener('pageshow', (e) => {
+        if (e.persisted) {
+            start();
+        }
+    });
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', start, { once: true });

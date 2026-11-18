@@ -1,7 +1,7 @@
 {
     "name": "MUJ FISH",
     "description": "Automate attendance math, safe skips, internal marks, survey feedback, predict CGPA, and organize your dashboard in MUJ SLCM.",
-    "version": "1.9",
+    "version": "2.4.0",
     "manifest_version": 3,
     "icons": {
         "128": "icon128.png"

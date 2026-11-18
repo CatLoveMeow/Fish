@@ -206,8 +206,9 @@
         const st = document.createElement('style');
         st.id = 'mf-tt-style';
         st.textContent =
+            // SLCM's own spinner never stops on this page; the extension's chip shows loading state instead.
             '#dvLoader{display:none!important}' +
-            '#slcm-loading-indicator{position:fixed;right:80px;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:9999;opacity:0;pointer-events:none;' +
+            '#slcm-loading-indicator{position:fixed;right:80px;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:1030;opacity:0;pointer-events:none;' +
             'max-width:calc(100vw - 130px);padding:6px 16px;border-radius:20px;color:#fff;' +
             'font:13px/1.4 Poppins,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;' +
             'user-select:none;transition:opacity .3s,background .3s}' +
